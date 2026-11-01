@@ -31,6 +31,11 @@ jobs:
           cd timemaps_app
           flutter pub get
           
+          # Install CocoaPods dependencies for iOS plugins
+          cd ios
+          pod install
+          cd ..
+          
           # Attempt flutter build ios with no codesigning
           if ! flutter build ios --release --no-codesign; then
             echo "Flutter build ios exited, running direct xcodebuild with unsigned overrides..."

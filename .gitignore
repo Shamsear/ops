@@ -44,7 +44,10 @@ Thumbs.db
 *.iml
 
 # Temporary test screens and logs
-*.png
+/*.png
+screen*.png
 *.log
+!timemaps_app/android/app/src/main/res/**/*.png
+!timemaps_app/ios/Runner/Assets.xcassets/**/*.png
 scratch/
 pdf_template.html
