@@ -1,11 +1,3 @@
-// Copyright 2014 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// Contents of this file should be generated automatically by
-// dev/tools/bin/generate_gradle_lockfiles.dart, but currently are not.
-// See #141540.
-
 pluginManagement {
     val flutterSdkPath =
         run {
@@ -25,12 +17,10 @@ pluginManagement {
     }
 }
 
-
-
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "7.4.2" apply false
-    id("org.jetbrains.kotlin.android") version "1.7.10" apply false
+    id("com.android.application") version "8.3.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.24" apply false
 }
 
 include(":app")
