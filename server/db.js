@@ -1,8 +1,10 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+const connStr = (process.env.DATABASE_URL || '').replace('?sslmode=require', '');
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: connStr,
   ssl: {
     rejectUnauthorized: false
   },
@@ -12,7 +14,7 @@ const pool = new Pool({
 });
 
 pool.on('connect', () => {
-  console.log('Connected to Neon PostgreSQL pool.');
+  console.log('Connected to PostgreSQL pool (Supabase).');
 });
 
 pool.on('error', (err) => {
