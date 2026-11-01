@@ -92,24 +92,33 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
     }
   }
 
+  Color _getRetailerColor(String retailer) {
+    final r = retailer.toLowerCase();
+    if (r.contains('lulu')) return AppTheme.success;
+    if (r.contains('carrefour')) return AppTheme.accent;
+    if (r.contains('coop')) return AppTheme.warning;
+    if (r.contains('spinneys')) return AppTheme.accentTeal;
+    return AppTheme.primaryDark;
+  }
+
   @override
   Widget build(BuildContext context) {
     final stores = _filteredStores;
 
     return Scaffold(
-      backgroundColor: AppTheme.bgLight,
+      backgroundColor: AppTheme.canvasBg,
       appBar: AppBar(
-        titleSpacing: 0,
+        titleSpacing: 16,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
               'Store Directory & Chains',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
-              '${_allStores.length} Hypermarket Branches Active',
+              '${_allStores.length} Hypermarket Branches Registered',
               style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
             ),
           ],
@@ -125,11 +134,11 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
             child: ElevatedButton.icon(
               onPressed: () => _openCreateOrEditStore(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: AppTheme.primaryDark,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                minimumSize: const Size(0, 36),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                minimumSize: const Size(0, 38),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusPill)),
               ),
               icon: const Icon(Icons.add_rounded, size: 16),
               label: const Text('Add Store', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
@@ -142,10 +151,10 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
             ? const Center(child: CircularProgressIndicator())
             : Column(
                 children: [
-                  // Top Filter & Search Container
+                  // Top Search & Filter Container
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
                     ),
@@ -155,18 +164,24 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
                         TextField(
                           controller: _searchController,
                           onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
                           decoration: InputDecoration(
                             hintText: 'Search branch name, code, chain, or area...',
-                            prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppTheme.accent),
+                            hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textLight),
+                            prefixIcon: const Icon(Icons.search_rounded, size: 19, color: AppTheme.accent),
                             suffixIcon: _searchQuery.isNotEmpty
                                 ? IconButton(
-                                    icon: const Icon(Icons.clear_rounded, size: 18, color: AppTheme.textMuted),
+                                    icon: const Icon(Icons.clear_rounded, size: 17, color: AppTheme.textMuted),
                                     onPressed: () {
                                       _searchController.clear();
                                       setState(() => _searchQuery = '');
                                     },
                                   )
                                 : null,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                            isDense: true,
+                            filled: true,
+                            fillColor: AppTheme.surfaceSubtle,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -175,52 +190,46 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: DropdownButtonFormField<String>(
-                                isExpanded: true,
-                                value: _selectedEmirate,
-                                decoration: const InputDecoration(
-                                  labelText: 'Filter Emirate',
-                                  prefixIcon: Icon(Icons.location_city_outlined, size: 18),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceSubtle,
+                                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                                  border: Border.all(color: AppTheme.borderSubtle),
                                 ),
-                                items: _emirates.map((e) {
-                                  return DropdownMenuItem(
-                                    value: e,
-                                    child: Text(
-                                      e,
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (val) {
-                                  if (val != null) setState(() => _selectedEmirate = val);
-                                },
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: _selectedEmirate,
+                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                                    items: _emirates.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                                    onChanged: (val) {
+                                      if (val != null) setState(() => _selectedEmirate = val);
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 8),
                             Expanded(
-                              child: DropdownButtonFormField<String>(
-                                isExpanded: true,
-                                value: _selectedChain,
-                                decoration: const InputDecoration(
-                                  labelText: 'Filter Chain',
-                                  prefixIcon: Icon(Icons.shopping_bag_outlined, size: 18),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceSubtle,
+                                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                                  border: Border.all(color: AppTheme.borderSubtle),
                                 ),
-                                items: _availableChains.map((c) {
-                                  return DropdownMenuItem(
-                                    value: c,
-                                    child: Text(
-                                      c,
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  );
-                                }).toList(),
-                                onChanged: (val) {
-                                  if (val != null) setState(() => _selectedChain = val);
-                                },
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    value: _selectedChain,
+                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                                    items: _availableChains.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                                    onChanged: (val) {
+                                      if (val != null) setState(() => _selectedChain = val);
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -238,19 +247,21 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
                       children: [
                         Text(
                           'Showing ${stores.length} of ${_allStores.length} Stores',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textSecondary),
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted),
                         ),
-                        if (_selectedEmirate != 'All' || _selectedChain != 'All')
+                        if (_selectedEmirate != 'All' || _selectedChain != 'All' || _searchQuery.isNotEmpty)
                           InkWell(
                             onTap: () {
                               setState(() {
                                 _selectedEmirate = 'All';
                                 _selectedChain = 'All';
+                                _searchQuery = '';
+                                _searchController.clear();
                               });
                             },
                             child: const Text(
                               'Reset Filters',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent),
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.accent),
                             ),
                           ),
                       ],
@@ -264,14 +275,26 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.search_off_rounded, size: 44, color: AppTheme.textMuted),
-                                const SizedBox(height: 12),
+                                Container(
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.surfaceSubtle,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.search_off_rounded, size: 36, color: AppTheme.textMuted),
+                                ),
+                                const SizedBox(height: 14),
                                 const Text(
-                                  'No stores match your search',
-                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                                  'No stores match your search criteria',
+                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain),
                                 ),
                                 const SizedBox(height: 6),
-                                TextButton.icon(
+                                const Text(
+                                  'Try searching for another branch or onboard a new store',
+                                  style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                                ),
+                                const SizedBox(height: 14),
+                                ElevatedButton.icon(
                                   onPressed: () => _openCreateOrEditStore(),
                                   icon: const Icon(Icons.add_rounded, size: 16),
                                   label: const Text('Onboard New Store'),
@@ -280,184 +303,199 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
                             ),
                           )
                         : ListView.builder(
-                            padding: const EdgeInsets.all(14),
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
                             itemCount: stores.length,
                             itemBuilder: (ctx, idx) {
                               final store = stores[idx];
                               final chain = store.chain ?? store.retailer;
+                              final retailerColor = _getRetailerColor(chain);
 
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Row 1: Store Name & Customer Code Badge
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  store.storeName,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w800,
-                                                    fontSize: 14,
-                                                    color: AppTheme.textMain,
-                                                    letterSpacing: -0.2,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 3),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.storefront, size: 13, color: AppTheme.accent),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                      chain,
-                                                      style: const TextStyle(
-                                                        fontSize: 11,
-                                                        fontWeight: FontWeight.w700,
-                                                        color: AppTheme.accent,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 6),
-                                                    const Text('•', style: TextStyle(color: AppTheme.textMuted)),
-                                                    const SizedBox(width: 6),
-                                                    Expanded(
-                                                      child: Text(
-                                                        '${store.emirate}${store.city != null ? " • ${store.city}" : ""}',
-                                                        style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                                  border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+                                  boxShadow: AppTheme.cardShadow,
+                                ),
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Row 1: Emblem + Store Name + Customer Code
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: retailerColor.withOpacity(0.12),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(color: retailerColor.withOpacity(0.25)),
                                           ),
-                                          const SizedBox(width: 8),
-                                          StatusBadge(
-                                            label: store.customerCode != null
-                                                ? '#${store.customerCode}'
-                                                : (store.branchCode != null ? 'Br #${store.branchCode}' : store.emirate),
-                                            variant: StatusVariant.info,
-                                            fontSize: 10,
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Divider(height: 1, color: AppTheme.borderSubtle),
-                                      const SizedBox(height: 10),
-
-                                      // Row 2: Field Contacts & Leads
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Row(
-                                              children: [
-                                                CircleAvatar(
-                                                  radius: 14,
-                                                  backgroundColor: AppTheme.purpleBg,
-                                                  child: const Icon(Icons.supervisor_account, size: 14, color: AppTheme.purple),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        'FIELD LEAD',
-                                                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.4),
-                                                      ),
-                                                      Text(
-                                                        store.merchandiserLead ?? 'Supervisor Babar',
-                                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Row(
-                                              children: [
-                                                CircleAvatar(
-                                                  radius: 14,
-                                                  backgroundColor: AppTheme.infoBg,
-                                                  child: const Icon(Icons.person_pin, size: 14, color: AppTheme.info),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        'SMN CONTACT',
-                                                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.4),
-                                                      ),
-                                                      Text(
-                                                        store.smnContact ?? 'Assigned',
-                                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-
-                                      // Row 3: Action Buttons (Edit Store, Call)
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Flexible(
+                                          child: Center(
                                             child: Text(
-                                              store.contactPerson != null ? 'Manager: ${store.contactPerson}' : 'Branch Manager Assigned',
-                                              style: const TextStyle(fontSize: 10, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
+                                              chain.isNotEmpty ? chain[0] : 'S',
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: retailerColor),
                                             ),
                                           ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              if (store.contactPhone != null && store.contactPhone!.isNotEmpty)
-                                                IconButton(
-                                                  icon: const Icon(Icons.phone_outlined, size: 18, color: AppTheme.success),
-                                                  visualDensity: VisualDensity.compact,
-                                                  tooltip: 'Call Manager',
-                                                  onPressed: () => launchUrl(Uri.parse('tel:${store.contactPhone}')),
+                                              Text(
+                                                store.storeName,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 15,
+                                                  color: AppTheme.textMain,
+                                                  letterSpacing: -0.2,
                                                 ),
-                                              OutlinedButton.icon(
-                                                onPressed: () => _openCreateOrEditStore(store),
-                                                style: OutlinedButton.styleFrom(
-                                                  visualDensity: VisualDensity.compact,
-                                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                                  minimumSize: const Size(0, 32),
-                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                                ),
-                                                icon: const Icon(Icons.edit_outlined, size: 13),
-                                                label: const Text('Edit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                              ),
+                                              const SizedBox(height: 3),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    chain,
+                                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: retailerColor),
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  const Text('•', style: TextStyle(color: AppTheme.textMuted)),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      '${store.emirate}${store.city != null ? " • ${store.city}" : ""}',
+                                                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        StatusBadge(
+                                          label: store.customerCode != null
+                                              ? '#${store.customerCode}'
+                                              : (store.branchCode != null ? 'Br #${store.branchCode}' : store.emirate),
+                                          variant: StatusVariant.info,
+                                          fontSize: 10,
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 12),
+                                    const Divider(height: 1, color: AppTheme.borderSubtle),
+                                    const SizedBox(height: 10),
+
+                                    // Row 2: Field Contacts & Leads
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 12,
+                                                backgroundColor: AppTheme.purpleBg,
+                                                child: const Icon(Icons.supervisor_account_rounded, size: 14, color: AppTheme.purple),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text(
+                                                      'FIELD LEAD',
+                                                      style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.4),
+                                                    ),
+                                                    Text(
+                                                      store.merchandiserLead ?? 'Supervisor Babar',
+                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 12,
+                                                backgroundColor: AppTheme.infoBg,
+                                                child: const Icon(Icons.person_pin_rounded, size: 14, color: AppTheme.info),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text(
+                                                      'SMN CONTACT',
+                                                      style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.4),
+                                                    ),
+                                                    Text(
+                                                      store.smnContact ?? 'Assigned',
+                                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+
+                                    // Row 3: Action Buttons (Edit Store, Call)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            store.contactPerson != null ? 'Manager: ${store.contactPerson}' : 'Branch Manager Assigned',
+                                            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            if (store.contactPhone != null && store.contactPhone!.isNotEmpty)
+                                              IconButton(
+                                                icon: const Icon(Icons.phone_rounded, size: 18, color: AppTheme.success),
+                                                visualDensity: VisualDensity.compact,
+                                                tooltip: 'Call Manager',
+                                                onPressed: () => launchUrl(Uri.parse('tel:${store.contactPhone}')),
+                                              ),
+                                            OutlinedButton.icon(
+                                              onPressed: () => _openCreateOrEditStore(store),
+                                              style: OutlinedButton.styleFrom(
+                                                visualDensity: VisualDensity.compact,
+                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                minimumSize: const Size(0, 32),
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
+                                              ),
+                                              icon: const Icon(Icons.edit_outlined, size: 13),
+                                              label: const Text('Edit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               );
                             },

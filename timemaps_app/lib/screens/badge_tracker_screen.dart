@@ -65,7 +65,13 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppTheme.success,
-          content: Text('${badge.promoterName} moved to "$newStatus"'),
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text('${badge.promoterName} permit updated to "$newStatus"'),
+            ],
+          ),
         ),
       );
       _loadBadges();
@@ -75,19 +81,19 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.bgLight,
+      backgroundColor: AppTheme.canvasBg,
       appBar: AppBar(
-        titleSpacing: 0,
+        titleSpacing: 16,
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Store Badge Tracker',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
-              'Hypermarket Gate Passes & Security Permits',
+              'Hypermarket Gate Passes & Mall Permits',
               style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
             ),
           ],
@@ -102,11 +108,11 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
             padding: const EdgeInsets.only(right: 14),
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
+                backgroundColor: AppTheme.primaryDark,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                minimumSize: const Size(0, 36),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                minimumSize: const Size(0, 38),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusPill)),
               ),
               icon: const Icon(Icons.add_rounded, size: 16),
               label: const Text('Apply Badge', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
@@ -128,7 +134,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
             Container(
               color: Colors.white,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
               ),
@@ -137,12 +143,14 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                   // Search Input
                   TextField(
                     controller: _searchController,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
                     decoration: InputDecoration(
                       hintText: 'Search by promoter, store, or project...',
-                      prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppTheme.accent),
+                      hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textLight),
+                      prefixIcon: const Icon(Icons.search_rounded, size: 19, color: AppTheme.purple),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              icon: const Icon(Icons.clear_rounded, size: 17),
                               onPressed: () {
                                 _searchController.clear();
                                 setState(() => _searchQuery = '');
@@ -150,6 +158,10 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                               },
                             )
                           : null,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                      isDense: true,
+                      filled: true,
+                      fillColor: AppTheme.surfaceSubtle,
                     ),
                     onSubmitted: (query) {
                       setState(() => _searchQuery = query.trim());
@@ -170,16 +182,16 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                             label: Text(tab),
                             selected: isSelected,
                             onSelected: (_) => _onFilterChanged(tab),
-                            selectedColor: AppTheme.primary,
+                            selectedColor: AppTheme.primaryDark,
                             labelStyle: TextStyle(
                               color: isSelected ? Colors.white : AppTheme.textMain,
                               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                               fontSize: 11,
                             ),
-                            backgroundColor: AppTheme.surfaceSubtle,
+                            backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.borderSubtle),
+                              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                              side: BorderSide(color: isSelected ? AppTheme.primaryDark : AppTheme.borderSubtle),
                             ),
                           ),
                         );
@@ -200,32 +212,32 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
+                                padding: const EdgeInsets.all(18),
+                                decoration: const BoxDecoration(
                                   color: AppTheme.surfaceSubtle,
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(Icons.badge_outlined, size: 40, color: AppTheme.textMuted),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 16),
                               const Text(
-                                'No badge applications found',
+                                'No Badge Applications Found',
                                 style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 6),
                               const Text(
-                                'Submit a new store permit to get started',
+                                'Submit a new store permit application to get started',
                                 style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
                               ),
                               const SizedBox(height: 16),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.primary,
+                                  backgroundColor: AppTheme.primaryDark,
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
                                 ),
                                 icon: const Icon(Icons.add_rounded, size: 16),
-                                label: const Text('Submit Store Badge'),
+                                label: const Text('Apply Store Badge'),
                                 onPressed: () async {
                                   final res = await Navigator.push(
                                     context,
@@ -240,7 +252,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                       : RefreshIndicator(
                           onRefresh: _loadBadges,
                           child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
                             itemCount: _badges.length,
                             itemBuilder: (ctx, index) {
                               final badge = _badges[index];
@@ -256,139 +268,152 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
   }
 
   Widget _buildBadgeCard(BadgeModel badge) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row: Promoter Name & Status Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        badge.promoterName,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        badge.projectName,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent),
-                      ),
-                    ],
-                  ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+        boxShadow: AppTheme.cardShadow,
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Row: Promoter Name + Avatar + Status Badge
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 17,
+                backgroundColor: AppTheme.purpleBg,
+                child: Text(
+                  badge.promoterName.isNotEmpty ? badge.promoterName[0] : 'P',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.purple),
                 ),
-                StatusBadge.fromStatus(badge.status),
-              ],
-            ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: AppTheme.borderSubtle),
-            const SizedBox(height: 10),
-
-            // Store Info Row
-            Row(
-              children: [
-                const Icon(Icons.storefront_outlined, size: 16, color: AppTheme.textMuted),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${badge.storeName} • ${badge.emirate}',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-
-            // Submitter & Pass Number
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Submitted by: ${badge.submittedBy}',
-                  style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-                ),
-                if (badge.badgeNumber != null)
-                  Text(
-                    'Pass #: ${badge.badgeNumber}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                  ),
-              ],
-            ),
-
-            if (badge.notes != null && badge.notes!.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSubtle,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info_outline, size: 14, color: AppTheme.textMuted),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        badge.notes!,
-                        style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-                      ),
+                    Text(
+                      badge.promoterName,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      badge.projectName.toUpperCase(),
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.accent, letterSpacing: 0.3),
                     ),
                   ],
                 ),
               ),
+              StatusBadge.fromStatus(badge.status),
             ],
+          ),
 
-            const SizedBox(height: 10),
+          const SizedBox(height: 12),
+          const Divider(height: 1, color: AppTheme.borderSubtle),
+          const SizedBox(height: 10),
 
-            // Action Row: Advance Lifecycle Status
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Advance Status:',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMuted),
+          // Store Info Row
+          Row(
+            children: [
+              const Icon(Icons.storefront_rounded, size: 16, color: AppTheme.textMuted),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${badge.storeName} • ${badge.emirate}',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                PopupMenuButton<String>(
-                  tooltip: 'Change Status',
-                  onSelected: (newStatus) => _updateStatus(badge, newStatus),
-                  itemBuilder: (ctx) => [
-                    _popupItem('Documents ready for collection', 'Ready for collection', Icons.inventory_2_outlined),
-                    _popupItem('Submitted', 'Mark as Submitted', Icons.send_outlined),
-                    _popupItem('Pending with HR', 'Pending with HR', Icons.business_outlined),
-                    _popupItem('Pending with security', 'Pending with Security', Icons.security_outlined),
-                    _popupItem('Approved', 'Approve Badge (Gate Pass)', Icons.check_circle_outline_rounded),
-                    _popupItem('Rejected', 'Reject Application', Icons.cancel_outlined),
-                  ],
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surfaceSubtle,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTheme.borderSubtle),
-                    ),
-                    child: const Row(
-                      children: [
-                        Text('Update Stage', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.primary)),
-                        SizedBox(width: 4),
-                        Icon(Icons.arrow_drop_down_rounded, size: 16, color: AppTheme.primary),
-                      ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+
+          // Submitter & Pass Number
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Submitted by: ${badge.submittedBy}',
+                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+              ),
+              if (badge.badgeNumber != null)
+                Text(
+                  'Pass #: ${badge.badgeNumber}',
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMain, fontFamily: 'monospace'),
+                ),
+            ],
+          ),
+
+          if (badge.notes != null && badge.notes!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceSubtle,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.info_outline_rounded, size: 15, color: AppTheme.textMuted),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      badge.notes!,
+                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
-        ),
+
+          const SizedBox(height: 12),
+
+          // Action Row: Advance Lifecycle Status
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Permit Stage:',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+              ),
+              PopupMenuButton<String>(
+                tooltip: 'Change Status',
+                onSelected: (newStatus) => _updateStatus(badge, newStatus),
+                itemBuilder: (ctx) => [
+                  _popupItem('Documents ready for collection', 'Ready for collection', Icons.inventory_2_outlined),
+                  _popupItem('Submitted', 'Mark as Submitted', Icons.send_outlined),
+                  _popupItem('Pending with HR', 'Pending with HR', Icons.business_outlined),
+                  _popupItem('Pending with security', 'Pending with Security', Icons.security_outlined),
+                  _popupItem('Approved', 'Approve Badge (Gate Pass)', Icons.check_circle_outline_rounded),
+                  _popupItem('Rejected', 'Reject Application', Icons.cancel_outlined),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceSubtle,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                    border: Border.all(color: AppTheme.borderSubtle),
+                  ),
+                  child: const Row(
+                    children: [
+                      Text('Update Stage', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.primaryDark)),
+                      SizedBox(width: 4),
+                      Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppTheme.primaryDark),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -398,9 +423,9 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 16, color: AppTheme.primary),
+          Icon(icon, size: 16, color: AppTheme.primaryDark),
           const SizedBox(width: 10),
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
         ],
       ),
     );

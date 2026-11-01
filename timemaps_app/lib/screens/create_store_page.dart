@@ -47,10 +47,6 @@ class _CreateStorePageState extends State<CreateStorePage> {
     'Grandiose',
     'Mair Group',
     'Mark and Save',
-    'Al Maya',
-    'Sharjah Coop',
-    'KM Trading',
-    'West Zone',
   ];
 
   @override
@@ -103,7 +99,6 @@ class _CreateStorePageState extends State<CreateStorePage> {
 
     StoreModel? store;
     if (widget.storeToEdit != null) {
-      // Edit mode
       store = await ApiService.updateStore(
         storeId: widget.storeToEdit!.id,
         storeName: name,
@@ -120,7 +115,6 @@ class _CreateStorePageState extends State<CreateStorePage> {
         contactPhone: _contactPhoneController.text.trim().isEmpty ? null : _contactPhoneController.text.trim(),
       );
     } else {
-      // Create new
       store = await ApiService.createStore(
         storeName: name,
         retailer: _retailerController.text.trim().isEmpty ? 'Retailer' : _retailerController.text.trim(),
@@ -143,9 +137,15 @@ class _CreateStorePageState extends State<CreateStorePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppTheme.success,
-          content: Text(widget.storeToEdit != null
-              ? 'Store "${store.storeName}" updated successfully!'
-              : 'Store "${store.storeName}" onboarded successfully!'),
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(widget.storeToEdit != null
+                  ? 'Store "${store.storeName}" updated successfully!'
+                  : 'Store "${store.storeName}" onboarded to directory!'),
+            ],
+          ),
         ),
       );
       Navigator.pop(context, true);
@@ -164,19 +164,19 @@ class _CreateStorePageState extends State<CreateStorePage> {
     final isEditing = widget.storeToEdit != null;
 
     return Scaffold(
-      backgroundColor: AppTheme.bgLight,
+      backgroundColor: AppTheme.canvasBg,
       appBar: AppBar(
-        titleSpacing: 0,
+        titleSpacing: 16,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              isEditing ? 'Edit Store Branch' : 'Store Onboarding',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+              isEditing ? 'Edit Store Branch' : 'Onboard New Store',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
-              isEditing ? 'Update Branch Info & Contacts' : 'Add Hypermarket Branch & Account Codes',
+              isEditing ? 'Update Branch Contacts & Customer Code' : 'Register Hypermarket Branch to UAE Network',
               style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
             ),
           ],
@@ -184,297 +184,280 @@ class _CreateStorePageState extends State<CreateStorePage> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 14),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                minimumSize: const Size(0, 36),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              ),
+            child: TextButton.icon(
               onPressed: _isSaving ? null : _handleSave,
               icon: _isSaving
-                  ? const SizedBox(height: 14, width: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Icon(Icons.check_rounded, size: 16),
+                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accent))
+                  : const Icon(Icons.check_rounded, size: 18),
               label: Text(
                 isEditing ? 'Update' : 'Save',
-                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),
           ),
         ],
       ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(top: BorderSide(color: AppTheme.borderSubtle)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: ElevatedButton(
+            onPressed: _isSaving ? null : _handleSave,
+            child: _isSaving
+                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.storefront_rounded, size: 18),
+                      const SizedBox(width: 8),
+                      Text(isEditing ? 'Update Store Information' : 'Save Store Location to Network'),
+                    ],
+                  ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Card 1: Branch & Retailer Chain
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.storefront_outlined, size: 16, color: AppTheme.accent),
-                          const SizedBox(width: 6),
-                          Text(
-                            'BRANCH IDENTITY & RETAILER',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: AppTheme.textMuted,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-
-                      TextField(
-                        controller: _storeNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Store Branch Name *',
-                          hintText: 'e.g. Lulu Hypermarket - Al Barsha',
-                          prefixIcon: Icon(Icons.storefront_outlined, size: 18),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      TextField(
-                        controller: _retailerController,
-                        decoration: const InputDecoration(
-                          labelText: 'Retailer Chain Name *',
-                          hintText: 'Type or choose below...',
-                          prefixIcon: Icon(Icons.shopping_bag_outlined, size: 18),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
-                      // Quick Retailer Chips
-                      const Text(
-                        'Quick Select Chain:',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-                      ),
-                      const SizedBox(height: 6),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _popularRetailers.map((ret) {
-                            final isSelected = _retailerController.text == ret;
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 6),
-                              child: ChoiceChip(
-                                label: Text(
-                                  ret,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                    color: isSelected ? Colors.white : AppTheme.textMain,
-                                  ),
-                                ),
-                                selected: isSelected,
-                                selectedColor: AppTheme.primary,
-                                backgroundColor: AppTheme.surfaceSubtle,
-                                onSelected: (_) {
-                                  setState(() => _retailerController.text = ret);
-                                },
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _customerCodeController,
-                              decoration: const InputDecoration(
-                                labelText: 'Customer Code',
-                                hintText: 'e.g. 201104',
-                                prefixIcon: Icon(Icons.pin_outlined, size: 18),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: _branchCodeController,
-                              decoration: const InputDecoration(
-                                labelText: 'Branch Code',
-                                hintText: 'e.g. DXB-01',
-                                prefixIcon: Icon(Icons.numbers_outlined, size: 18),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                  border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+                  boxShadow: AppTheme.cardShadow,
                 ),
-              ),
-              const SizedBox(height: 14),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'BRANCH IDENTITY & RETAILER',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
+                    ),
+                    const SizedBox(height: 16),
 
-              // Card 2: Region & Location (Never overflows!)
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.location_on_outlined, size: 16, color: AppTheme.accent),
-                          const SizedBox(width: 6),
-                          Text(
-                            'GEOGRAPHY & LOCATION',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: AppTheme.textMuted,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
+                    TextField(
+                      controller: _storeNameController,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                      decoration: const InputDecoration(
+                        labelText: 'Store Branch Name *',
+                        hintText: 'e.g. Lulu Hypermarket - Al Barsha',
+                        prefixIcon: Icon(Icons.storefront_outlined, size: 20),
                       ),
-                      const SizedBox(height: 14),
+                    ),
+                    const SizedBox(height: 14),
 
-                      // Full width Emirate selector to prevent any right overflow
-                      DropdownButtonFormField<String>(
-                        isExpanded: true,
-                        value: _selectedEmirate,
-                        decoration: const InputDecoration(
-                          labelText: 'Emirate *',
-                          prefixIcon: Icon(Icons.location_city_outlined, size: 18),
-                        ),
-                        items: _emirates.map((em) {
-                          return DropdownMenuItem(
-                            value: em,
-                            child: Text(
-                              em,
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                    TextField(
+                      controller: _retailerController,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                      decoration: const InputDecoration(
+                        labelText: 'Retailer Chain Name *',
+                        hintText: 'Type or choose below...',
+                        prefixIcon: Icon(Icons.shopping_bag_outlined, size: 20),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Quick Retailer Chips
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _popularRetailers.map((ret) {
+                          final isSelected = _retailerController.text == ret;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: ChoiceChip(
+                              label: Text(ret),
+                              selected: isSelected,
+                              selectedColor: AppTheme.primaryDark,
+                              labelStyle: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                color: isSelected ? Colors.white : AppTheme.textMain,
+                              ),
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                                side: BorderSide(color: isSelected ? AppTheme.primaryDark : AppTheme.borderSubtle),
+                              ),
+                              onSelected: (_) {
+                                setState(() => _retailerController.text = ret);
+                              },
                             ),
                           );
                         }).toList(),
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedEmirate = val);
-                        },
                       ),
-                      const SizedBox(height: 12),
+                    ),
+                    const SizedBox(height: 14),
 
-                      TextField(
-                        controller: _cityController,
-                        decoration: const InputDecoration(
-                          labelText: 'City / Area / Mall',
-                          hintText: 'e.g. Al Barsha 1, Sheikh Zayed Road',
-                          prefixIcon: Icon(Icons.map_outlined, size: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _customerCodeController,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'monospace', color: AppTheme.textMain),
+                            decoration: const InputDecoration(
+                              labelText: 'Customer Code',
+                              hintText: 'e.g. 201104',
+                              prefixIcon: Icon(Icons.pin_outlined, size: 19),
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: _branchCodeController,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'monospace', color: AppTheme.textMain),
+                            decoration: const InputDecoration(
+                              labelText: 'Branch Code',
+                              hintText: 'e.g. DXB-01',
+                              prefixIcon: Icon(Icons.numbers_outlined, size: 19),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
+
+              // Card 2: Region & Location
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                  border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+                  boxShadow: AppTheme.cardShadow,
+                ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'GEOGRAPHY & LOCATION',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
+                    ),
+                    const SizedBox(height: 16),
+
+                    DropdownButtonFormField<String>(
+                      isExpanded: true,
+                      value: _selectedEmirate,
+                      decoration: const InputDecoration(
+                        labelText: 'Emirate *',
+                        prefixIcon: Icon(Icons.location_city_outlined, size: 19),
+                      ),
+                      items: _emirates.map((em) {
+                        return DropdownMenuItem(
+                          value: em,
+                          child: Text(em, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) setState(() => _selectedEmirate = val);
+                      },
+                    ),
+                    const SizedBox(height: 14),
+
+                    TextField(
+                      controller: _cityController,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                      decoration: const InputDecoration(
+                        labelText: 'City / Area / Mall Road',
+                        hintText: 'e.g. Al Barsha 1, Sheikh Zayed Road',
+                        prefixIcon: Icon(Icons.map_outlined, size: 19),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Card 3: Field Leads & Contacts
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.people_outline, size: 16, color: AppTheme.accent),
-                          const SizedBox(width: 6),
-                          Text(
-                            'FIELD LEADS & CONTACTS',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: AppTheme.textMuted,
-                              letterSpacing: 0.5,
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                  border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+                  boxShadow: AppTheme.cardShadow,
+                ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'FIELD LEADS & CONTACTS',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      controller: _smnContactController,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                      decoration: const InputDecoration(
+                        labelText: 'SMN Contact Name',
+                        hintText: 'e.g. Imran SMN',
+                        prefixIcon: Icon(Icons.person_pin_outlined, size: 19),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    TextField(
+                      controller: _merchandiserLeadController,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                      decoration: const InputDecoration(
+                        labelText: 'Merchandiser Field Lead',
+                        hintText: 'e.g. Babar / Jasheer',
+                        prefixIcon: Icon(Icons.supervisor_account_outlined, size: 19),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _contactPersonController,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                            decoration: const InputDecoration(
+                              labelText: 'Store Manager',
+                              hintText: 'Branch Manager',
+                              prefixIcon: Icon(Icons.badge_outlined, size: 19),
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-
-                      TextField(
-                        controller: _smnContactController,
-                        decoration: const InputDecoration(
-                          labelText: 'SMN Contact Name',
-                          hintText: 'e.g. Imran SMN',
-                          prefixIcon: Icon(Icons.person_pin_outlined, size: 18),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      TextField(
-                        controller: _merchandiserLeadController,
-                        decoration: const InputDecoration(
-                          labelText: 'Merchandiser Field Lead',
-                          hintText: 'e.g. Babar / Jasheer',
-                          prefixIcon: Icon(Icons.supervisor_account_outlined, size: 18),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: _contactPhoneController,
+                            keyboardType: TextInputType.phone,
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'monospace', color: AppTheme.textMain),
+                            decoration: const InputDecoration(
+                              labelText: 'Contact Phone',
+                              hintText: '+971...',
+                              prefixIcon: Icon(Icons.phone_outlined, size: 19),
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _contactPersonController,
-                              decoration: const InputDecoration(
-                                labelText: 'Store Manager',
-                                hintText: 'Name',
-                                prefixIcon: Icon(Icons.badge_outlined, size: 18),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: _contactPhoneController,
-                              keyboardType: TextInputType.phone,
-                              decoration: const InputDecoration(
-                                labelText: 'Contact Phone',
-                                hintText: '+971...',
-                                prefixIcon: Icon(Icons.phone_outlined, size: 18),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-
-              // Save Button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  minimumSize: const Size.fromHeight(50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-                onPressed: _isSaving ? null : _handleSave,
-                child: _isSaving
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Text(
-                        isEditing ? 'Update Store Details' : 'Save Store Location',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white),
-                      ),
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),

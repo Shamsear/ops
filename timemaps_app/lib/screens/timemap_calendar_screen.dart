@@ -1,9 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/status_badge.dart';
 
 class TimeMapCalendarScreen extends StatefulWidget {
   const TimeMapCalendarScreen({super.key});
@@ -26,6 +28,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
   String _selectedEmirate = 'All';
   String _selectedChain = 'All';
   String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   final List<String> _emirates = ['All', 'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Al Ain', 'Ras Al Khaimah', 'Fujairah'];
   final List<String> _chains = ['All', 'Lulu', 'Union Coop', 'Carrefour', 'MAIR GROUP', 'MARK AND SAVE'];
@@ -35,6 +38,13 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadAllData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadAllData() async {
@@ -100,7 +110,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Downloading Excel: ${ApiService.excelExportUrl}'),
-              backgroundColor: AppTheme.primary,
+              backgroundColor: AppTheme.primaryDark,
             ),
           );
         }
@@ -110,7 +120,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Export link: ${ApiService.excelExportUrl}'),
-            backgroundColor: AppTheme.accentEmerald,
+            backgroundColor: AppTheme.success,
           ),
         );
       }
@@ -120,46 +130,65 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.bgLight,
+      backgroundColor: AppTheme.canvasBg,
       appBar: AppBar(
-        title: const Text(
-          'Master TimeMap™ Calendar',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain),
+        titleSpacing: 16,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.76),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withOpacity(0.50),
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Master TimeMap™ Calendar',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain, letterSpacing: -0.2),
+            ),
+            Text(
+              'Multi-Store Roster, Coverage & Matrix Grid',
+              style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+            ),
+          ],
         ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppTheme.primary,
-          indicatorWeight: 2.5,
-          labelColor: AppTheme.textMain,
+          indicatorColor: AppTheme.accent,
+          indicatorSize: TabBarIndicatorSize.tab,
+          labelColor: AppTheme.primaryDark,
           unselectedLabelColor: AppTheme.textMuted,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
           tabs: const [
-            Tab(icon: Icon(Icons.view_day_outlined, size: 18), text: 'Daily Timeline'),
+            Tab(icon: Icon(Icons.view_day_rounded, size: 18), text: 'Today Timeline'),
             Tab(icon: Icon(Icons.grid_view_rounded, size: 18), text: 'TimeMap Grid'),
-            Tab(icon: Icon(Icons.file_download_outlined, size: 18), text: 'Excel & Reports'),
+            Tab(icon: Icon(Icons.table_view_rounded, size: 18), text: 'Export & Reports'),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.file_download_outlined, color: AppTheme.accentEmerald),
+            icon: const Icon(Icons.file_download_outlined, color: AppTheme.success),
             tooltip: 'Export to Excel (.xlsx)',
             onPressed: _exportExcel,
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh_rounded, size: 22),
             tooltip: 'Refresh Matrix',
             onPressed: _loadAllData,
           ),
-          IconButton(
-            icon: const Icon(Icons.content_copy_rounded),
-            tooltip: 'Duplicate to Next Week',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Duplicating active campaign shifts for next week... Done!')),
-              );
-            },
-          ),
+          const SizedBox(width: 4),
         ],
       ),
       body: _isLoading
@@ -177,130 +206,144 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
 
   Widget _buildDailyTimeline() {
     if (_schedules.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: Text(
-            'No live store coverage scheduled for today.\nUse the TimeMap Grid or In-App Creator to schedule shifts.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: const BoxDecoration(
+                  color: AppTheme.surfaceSubtle,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.calendar_today_rounded, size: 36, color: AppTheme.textMuted),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No Store Coverage Today',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Use the TimeMap Grid or Batch Scheduler to plan shifts.',
+                style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       );
     }
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              "Today's Shift Coverage",
+              "Today's Shift Coverage Breakdown",
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppTheme.textMain),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: const Color(0xFFECFDF5),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFA7F3D0)),
-              ),
-              child: Text(
-                '${_schedules.length} Active Stores',
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: AppTheme.accentEmerald),
-              ),
+            StatusBadge(
+              label: '${_schedules.length} Stores Active',
+              variant: StatusVariant.success,
+              fontSize: 10,
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         ..._schedules.map((storeHub) {
           final store = storeHub as LiveStoreHub;
-          return Card(
+          return Container(
             margin: const EdgeInsets.only(bottom: 12),
-            elevation: 0.5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-              side: const BorderSide(color: AppTheme.borderSubtle),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+              border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+              boxShadow: AppTheme.cardShadow,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        store.storeName,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain, letterSpacing: -0.2),
+                      ),
+                    ),
+                    StatusBadge(
+                      label: store.emirate,
+                      variant: StatusVariant.neutral,
+                      fontSize: 10,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${store.retailer} • Branch #${store.branchCode ?? "2100"}',
+                  style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 10),
+                const Divider(color: AppTheme.borderSubtle, height: 1),
+                const SizedBox(height: 10),
+                ...store.projects.map((proj) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
                         child: Text(
-                          store.storeName,
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain),
+                          'Campaign: ${proj.projectName.toUpperCase()}',
+                          style: const TextStyle(fontWeight: FontWeight.w800, color: AppTheme.accent, fontSize: 11, letterSpacing: 0.3),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppTheme.borderSubtle),
-                        ),
-                        child: Text(
-                          store.emirate,
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text('${store.retailer} • Branch #${store.branchCode ?? "2100"}',
-                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 8),
-                  const Divider(color: AppTheme.borderSubtle, height: 1),
-                  const SizedBox(height: 8),
-                  ...store.projects.map((proj) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Text(
-                            'Campaign: ${proj.projectName}',
-                            style: const TextStyle(fontWeight: FontWeight.w700, color: AppTheme.accent, fontSize: 12),
+                      ...proj.promoters.map((p) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.surfaceSubtle,
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                           ),
-                        ),
-                        ...proj.promoters.map((p) {
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            dense: true,
-                            leading: CircleAvatar(
-                              radius: 14,
-                              backgroundColor: AppTheme.surfaceSubtle,
-                              child: const Icon(Icons.person_rounded, size: 16, color: AppTheme.primary),
-                            ),
-                            title: Text(
-                              p.promoterName,
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.textMain),
-                            ),
-                            subtitle: Text(
-                              '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)} • Break: ${p.breakTimings ?? "None"}',
-                              style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
-                            ),
-                            trailing: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFECFDF5),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: const Color(0xFFA7F3D0)),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 12,
+                                backgroundColor: AppTheme.infoBg,
+                                child: const Icon(Icons.person, size: 14, color: AppTheme.accent),
                               ),
-                              child: const Text('ON DUTY',
-                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppTheme.accentEmerald)),
-                            ),
-                          );
-                        }),
-                      ],
-                    );
-                  }),
-                ],
-              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      p.promoterName,
+                                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: AppTheme.textMain),
+                                    ),
+                                    Text(
+                                      '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)} • Break: ${p.breakTimings ?? "None"}',
+                                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              StatusBadge.fromStatus('ON DUTY'),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  );
+                }),
+              ],
             ),
           );
         }),
@@ -323,48 +366,54 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
       children: [
         // Filter Controls Bar
         Container(
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-          color: Colors.white,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
+          ),
           child: Column(
             children: [
               // Search input
               TextField(
+                controller: _searchController,
                 onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
                 decoration: InputDecoration(
-                  hintText: 'Search stores or customer code...',
-                  hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                  prefixIcon: const Icon(Icons.search, size: 18, color: AppTheme.textMuted),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  hintText: 'Filter stores or customer code...',
+                  hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textLight),
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppTheme.accent),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded, size: 16),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   isDense: true,
                   filled: true,
                   fillColor: AppTheme.surfaceSubtle,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppTheme.borderSubtle),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppTheme.borderSubtle),
-                  ),
                 ),
               ),
               const SizedBox(height: 8),
-              // Dropdowns row
+              // Filter selectors
               Row(
                 children: [
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceSubtle,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                         border: Border.all(color: AppTheme.borderSubtle),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           isExpanded: true,
                           value: _selectedEmirate,
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                           items: _emirates.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                           onChanged: (val) {
                             if (val != null) {
@@ -379,17 +428,17 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
                   const SizedBox(width: 8),
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         color: AppTheme.surfaceSubtle,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                         border: Border.all(color: AppTheme.borderSubtle),
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           isExpanded: true,
                           value: _selectedChain,
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                           items: _chains.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                           onChanged: (val) {
                             if (val != null) {
@@ -405,14 +454,14 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
                   ElevatedButton.icon(
                     onPressed: _exportExcel,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accentEmerald,
+                      backgroundColor: AppTheme.success,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
                       elevation: 0,
                     ),
-                    icon: const Icon(Icons.download, size: 14),
-                    label: const Text('Excel', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                    icon: const Icon(Icons.download_rounded, size: 15),
+                    label: const Text('Excel', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
                   ),
                 ],
               ),
@@ -422,22 +471,22 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
 
         // Count Summary Strip
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           color: AppTheme.surfaceSubtle,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Showing ${filteredStores.length} Stores • ${_matrixDates.length} Dates',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted),
               ),
               Row(
                 children: [
-                  _legendDot(const Color(0xFF10B981), 'Approved'),
-                  const SizedBox(width: 6),
-                  _legendDot(const Color(0xFFF59E0B), 'HR/Sec'),
-                  const SizedBox(width: 6),
-                  _legendDot(const Color(0xFFEF4444), 'Rejected'),
+                  _legendDot(AppTheme.success, 'Approved'),
+                  const SizedBox(width: 8),
+                  _legendDot(AppTheme.warning, 'HR/Security'),
+                  const SizedBox(width: 8),
+                  _legendDot(AppTheme.danger, 'Rejected'),
                 ],
               ),
             ],
@@ -514,7 +563,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
                               final shifts = _shiftLookup[key] ?? [];
 
                               if (shifts.isEmpty) {
-                                return const DataCell(Center(child: Text('-', style: TextStyle(color: AppTheme.textMuted))));
+                                return const DataCell(Center(child: Text('—', style: TextStyle(color: AppTheme.textLight))));
                               }
 
                               return DataCell(
@@ -544,24 +593,24 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
   }
 
   Widget _staffChip(String name, String? badgeStatus) {
-    Color badgeColor = const Color(0xFF9CA3AF);
+    Color badgeColor = AppTheme.textLight;
     if (badgeStatus == 'Approved') {
-      badgeColor = const Color(0xFF10B981);
+      badgeColor = AppTheme.success;
     } else if (badgeStatus == 'Pending with HR' || badgeStatus == 'Pending with security') {
-      badgeColor = const Color(0xFFF59E0B);
+      badgeColor = AppTheme.warning;
     } else if (badgeStatus == 'Submitted') {
-      badgeColor = const Color(0xFF2563EB);
+      badgeColor = AppTheme.accent;
     } else if (badgeStatus == 'Rejected') {
-      badgeColor = const Color(0xFFEF4444);
+      badgeColor = AppTheme.danger;
     }
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 2),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F5F9),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFCBD5E1)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        border: Border.all(color: AppTheme.borderSubtle),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -589,8 +638,8 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(width: 6, height: 6, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 3),
-        Text(label, style: const TextStyle(fontSize: 9, color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 9, color: AppTheme.textMuted, fontWeight: FontWeight.w700)),
       ],
     );
   }
@@ -598,18 +647,29 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
   void _showShiftDetailSheet(StoreModel store, String date, List<dynamic> shifts) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusExtraLarge))),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(store.storeName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-            Text('${store.retailer} • ${store.emirate} • Date: $date', style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-            const SizedBox(height: 14),
-            const Text('Assigned Shifts:', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-            const SizedBox(height: 8),
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 14),
+                decoration: BoxDecoration(
+                  color: AppTheme.borderStrong,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Text(store.storeName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain)),
+            Text('${store.retailer} • ${store.emirate} • Shift Date: $date', style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
+            const SizedBox(height: 16),
+            const Text('Assigned Shifts:', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.textMain)),
+            const SizedBox(height: 10),
             ...shifts.map((s) {
               final pName = s['promoter_name'] ?? s['staff_role'] ?? 'Staff';
               final badgeStatus = s['badge_status'] ?? 'No Badge Linked';
@@ -620,32 +680,33 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
                   : 'Standard Break';
               final role = s['staff_role'] != null && s['staff_role'] != 'PROMOTER' ? ' • ${s['staff_role']}' : '';
 
-              return ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: CircleAvatar(
-                  backgroundColor: AppTheme.surfaceSubtle,
-                  child: const Icon(Icons.person, color: AppTheme.primary, size: 18),
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceSubtle,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  border: Border.all(color: AppTheme.borderSubtle),
                 ),
-                title: Text('$pName$role', style: const TextStyle(fontWeight: FontWeight.w700)),
-                subtitle: Text('Shift: $startTime - $endTime • $breakInfo', style: const TextStyle(fontSize: 11)),
-                trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: badgeStatus == 'Approved' ? const Color(0xFFECFDF5) : const Color(0xFFFEF3C7),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: badgeStatus == 'Approved' ? const Color(0xFFA7F3D0) : const Color(0xFFFDE68A),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 14,
+                      backgroundColor: AppTheme.infoBg,
+                      child: const Icon(Icons.person, color: AppTheme.accent, size: 16),
                     ),
-                  ),
-                  child: Text(
-                    badgeStatus.toString(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      color: badgeStatus == 'Approved' ? AppTheme.accentEmerald : const Color(0xFFB45309),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('$pName$role', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.textMain)),
+                          Text('Shift: $startTime - $endTime • $breakInfo', style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace')),
+                        ],
+                      ),
                     ),
-                  ),
+                    StatusBadge.fromStatus(badgeStatus.toString()),
+                  ],
                 ),
               );
             }),
@@ -657,107 +718,112 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
 
   Widget _buildReportsView() {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       children: [
         const Text(
           'Operational Excel Exporter & Sync',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain, letterSpacing: -0.2),
         ),
         const SizedBox(height: 4),
         const Text(
           'Download full campaign roster spreadsheets compatible with client reporting guidelines.',
           style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 16),
 
         // Big Excel Download Card
-        Card(
-          elevation: 1,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFECFDF5),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.table_chart_rounded, color: AppTheme.accentEmerald, size: 24),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radiusExtraLarge),
+            border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+            boxShadow: AppTheme.elevatedShadow,
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.successBg,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppTheme.successBorder),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text('Master TimeMap Roster (.xlsx)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
-                          Text('73 Stores • 39 Dates • Live Staff & Badges', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                const Text(
-                  'Includes customer codes, chains, cities, merchandiser leads, full date matrices, and badge clearance status tags.',
-                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _exportExcel,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accentEmerald,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
-                    ),
-                    icon: const Icon(Icons.download_rounded, size: 18),
-                    label: const Text('Export Client-Ready Excel', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                    child: const Icon(Icons.table_chart_rounded, color: AppTheme.success, size: 26),
                   ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Master TimeMap Roster (.xlsx)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain)),
+                        Text('${_matrixStores.length} Stores • ${_matrixDates.length} Dates • Live Staff & Badges', style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Includes customer codes, retail chains, cities, merchandiser leads, full date matrices, and badge clearance status tags.',
+                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary, height: 1.4),
+              ),
+              const SizedBox(height: 18),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _exportExcel,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.success,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
+                    elevation: 0,
+                  ),
+                  icon: const Icon(Icons.download_rounded, size: 19),
+                  label: const Text('Export Client-Ready Excel', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
 
-        const SizedBox(height: 16),
-        const Text('Active Campaign Metrics', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppTheme.textMain)),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
+        const Text('Active Campaign Metrics', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain)),
+        const SizedBox(height: 12),
 
         Row(
           children: [
-            Expanded(child: _metricCard('Total Stores', '${_matrixStores.length}', Icons.storefront_rounded)),
+            Expanded(child: _metricCard('Total Stores', '${_matrixStores.length}', Icons.storefront_rounded, AppTheme.accentTeal)),
             const SizedBox(width: 10),
-            Expanded(child: _metricCard('Active Shifts', '${_matrixShifts.length}', Icons.schedule_rounded)),
+            Expanded(child: _metricCard('Active Shifts', '${_matrixShifts.length}', Icons.schedule_rounded, AppTheme.accent)),
             const SizedBox(width: 10),
-            Expanded(child: _metricCard('Active Days', '${_matrixDates.length}', Icons.calendar_today_rounded)),
+            Expanded(child: _metricCard('Active Days', '${_matrixDates.length}', Icons.calendar_today_rounded, AppTheme.purple)),
           ],
         ),
       ],
     );
   }
 
-  Widget _metricCard(String title, String val, IconData icon) {
+  Widget _metricCard(String title, String val, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppTheme.borderSubtle),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+        boxShadow: AppTheme.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppTheme.primary),
+          Icon(icon, size: 20, color: color),
           const SizedBox(height: 8),
-          Text(val, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, fontFamily: 'monospace')),
+          Text(val, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 19, fontFamily: 'monospace', color: AppTheme.textMain)),
+          const SizedBox(height: 2),
           Text(title, style: const TextStyle(fontSize: 10, color: AppTheme.textMuted, fontWeight: FontWeight.w700)),
         ],
       ),

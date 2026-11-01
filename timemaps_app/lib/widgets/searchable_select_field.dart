@@ -87,7 +87,7 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
       builder: (ctx) {
         return Stack(
           children: [
-            // Barrier to dismiss when tapping outside
+            // Backdrop to dismiss
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
@@ -95,7 +95,7 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
                 child: const SizedBox.expand(),
               ),
             ),
-            // Anchored dropdown menu
+            // Floating anchored dropdown
             CompositedTransformFollower(
               link: _layerLink,
               showWhenUnlinked: false,
@@ -103,17 +103,17 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
               child: SizedBox(
                 width: size.width,
                 child: Material(
-                  elevation: 6,
-                  shadowColor: AppTheme.primaryDark.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  elevation: 12,
+                  shadowColor: AppTheme.primaryDark.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                   color: Colors.white,
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                       border: Border.all(color: AppTheme.borderStrong, width: 1.2),
                     ),
-                    constraints: const BoxConstraints(maxHeight: 260),
+                    constraints: const BoxConstraints(maxHeight: 280),
                     child: StatefulBuilder(
                       builder: (ctx, setMenuState) {
                         final query = _searchQuery.toLowerCase().trim();
@@ -129,19 +129,19 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Compact search input inside dropdown
+                            // Search field inside dropdown
                             Padding(
                               padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
                               child: TextField(
                                 controller: _searchController,
                                 autofocus: true,
-                                style: const TextStyle(fontSize: 13, color: AppTheme.textMain),
+                                style: const TextStyle(fontSize: 13, color: AppTheme.textMain, fontWeight: FontWeight.w600),
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  hintText: 'Filter ${widget.label}...',
+                                  hintText: 'Search ${widget.label}...',
                                   hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
                                   prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppTheme.accent),
-                                  prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                  prefixIconConstraints: const BoxConstraints(minWidth: 34, minHeight: 34),
                                   suffixIcon: _searchQuery.isNotEmpty
                                       ? GestureDetector(
                                           onTap: () {
@@ -153,7 +153,7 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
                                       : null,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                                     borderSide: const BorderSide(color: AppTheme.borderSubtle),
                                   ),
                                   filled: true,
@@ -167,15 +167,22 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
 
                             const Divider(height: 1, color: AppTheme.borderSubtle),
 
-                            // Filtered options list
+                            // Filtered option list
                             Flexible(
                               child: filtered.isEmpty
                                   ? const Padding(
-                                      padding: EdgeInsets.all(18),
-                                      child: Text(
-                                        'No matching items found',
-                                        style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                                        textAlign: TextAlign.center,
+                                      padding: EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.search_off_rounded, size: 28, color: AppTheme.textLight),
+                                          SizedBox(height: 6),
+                                          Text(
+                                            'No matching items found',
+                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMuted),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
                                       ),
                                     )
                                   : ListView.separated(
@@ -198,8 +205,8 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
                                             _closeDropdown();
                                           },
                                           child: Container(
-                                            color: isSelected ? AppTheme.infoBg.withOpacity(0.5) : null,
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                                            color: isSelected ? AppTheme.infoBg.withOpacity(0.6) : null,
+                                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                             child: Row(
                                               children: [
                                                 Expanded(
@@ -211,8 +218,9 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
                                                         opt.label,
                                                         style: TextStyle(
                                                           fontSize: 13,
-                                                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                                                           color: isSelected ? AppTheme.accent : AppTheme.textMain,
+                                                          letterSpacing: -0.1,
                                                         ),
                                                         maxLines: 1,
                                                         overflow: TextOverflow.ellipsis,
@@ -221,7 +229,7 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
                                                         const SizedBox(height: 2),
                                                         Text(
                                                           opt.subtitle!,
-                                                          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                                                          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                                                           maxLines: 1,
                                                           overflow: TextOverflow.ellipsis,
                                                         ),
@@ -231,10 +239,17 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
                                                 ),
                                                 if (isSelected) ...[
                                                   const SizedBox(width: 8),
-                                                  const Icon(
-                                                    Icons.check_circle_rounded,
-                                                    size: 16,
-                                                    color: AppTheme.accent,
+                                                  Container(
+                                                    padding: const EdgeInsets.all(3),
+                                                    decoration: const BoxDecoration(
+                                                      color: AppTheme.accent,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.check_rounded,
+                                                      size: 12,
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
                                                 ],
                                               ],
@@ -276,32 +291,32 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
       link: _layerLink,
       child: InkWell(
         onTap: _toggleDropdown,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: widget.label.isNotEmpty ? widget.label : null,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             prefixIcon: widget.prefixIcon != null
                 ? Padding(
-                    padding: const EdgeInsets.only(left: 12, right: 8),
+                    padding: const EdgeInsets.only(left: 14, right: 10),
                     child: widget.prefixIcon,
                   )
                 : null,
-            prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 38),
             suffixIcon: Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: 12),
               child: Icon(
-                _isOpen ? Icons.arrow_drop_up_rounded : Icons.arrow_drop_down_rounded,
+                _isOpen ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
                 color: _isOpen ? AppTheme.accent : AppTheme.textMuted,
-                size: 24,
+                size: 22,
               ),
             ),
-            suffixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            suffixIconConstraints: const BoxConstraints(minWidth: 34, minHeight: 34),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
               borderSide: BorderSide(
                 color: _isOpen ? AppTheme.accent : AppTheme.borderSubtle,
-                width: _isOpen ? 1.5 : 1.0,
+                width: _isOpen ? 1.8 : 1.0,
               ),
             ),
             filled: true,
@@ -311,8 +326,9 @@ class _SearchableSelectFieldState<T> extends State<SearchableSelectField<T>> {
             _displayLabel,
             style: TextStyle(
               fontSize: 13,
-              fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
-              color: hasValue ? AppTheme.textMain : AppTheme.textMuted,
+              fontWeight: hasValue ? FontWeight.w700 : FontWeight.w500,
+              color: hasValue ? AppTheme.textMain : AppTheme.textLight,
+              letterSpacing: -0.1,
             ),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,

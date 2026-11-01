@@ -17,12 +17,22 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   DateTime _endDate = DateTime(2026, 11, 30);
   bool _isSaving = false;
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _clientController.dispose();
+    super.dispose();
+  }
+
   Future<void> _handleSave() async {
     final name = _nameController.text.trim();
     final client = _clientController.text.trim();
     if (name.isEmpty || client.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter Campaign Name and Client Name')),
+        const SnackBar(
+          backgroundColor: AppTheme.danger,
+          content: Text('Please enter Campaign Name and Client Name'),
+        ),
       );
       return;
     }
@@ -40,12 +50,24 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
 
     if (project != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Campaign "${project.name}" created successfully!')),
+        SnackBar(
+          backgroundColor: AppTheme.success,
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text('Campaign "${project.name}" launched successfully! 🚀'),
+            ],
+          ),
+        ),
       );
       Navigator.pop(context, true);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to create campaign. Please try again.')),
+        const SnackBar(
+          backgroundColor: AppTheme.danger,
+          content: Text('Failed to create campaign. Please try again.'),
+        ),
       );
     }
   }
@@ -53,124 +75,156 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.bgLight,
+      backgroundColor: AppTheme.canvasBg,
       appBar: AppBar(
+        titleSpacing: 16,
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text('New Campaign Project', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain)),
-            Text('Create Activation Roadshow', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
+            Text('New Campaign Project', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2)),
+            Text('Create In-Store Activation Roadshow', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
           ],
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 14),
             child: TextButton.icon(
               onPressed: _isSaving ? null : _handleSave,
               icon: _isSaving
-                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primary))
+                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accent))
                   : const Icon(Icons.check_rounded, size: 18),
               label: const Text('Save', style: TextStyle(fontWeight: FontWeight.w800)),
             ),
           ),
         ],
       ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(top: BorderSide(color: AppTheme.borderSubtle)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: ElevatedButton(
+            onPressed: _isSaving ? null : _handleSave,
+            child: _isSaving
+                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_rounded, size: 18),
+                      SizedBox(width: 8),
+                      Text('Deploy Campaign Project'),
+                    ],
+                  ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'CAMPAIGN DETAILS',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
-                    ),
-                    const SizedBox(height: 14),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
+                boxShadow: AppTheme.cardShadow,
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'CAMPAIGN DETAILS',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
+                  ),
+                  const SizedBox(height: 16),
 
-                    TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Campaign Project Name *',
-                        hintText: 'e.g. Sadia In-Store Sampling Q4',
-                        prefixIcon: Icon(Icons.campaign_outlined, size: 20),
-                      ),
+                  TextField(
+                    controller: _nameController,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                    decoration: const InputDecoration(
+                      labelText: 'Campaign Project Name *',
+                      hintText: 'e.g. Sadia In-Store Sampling Q4',
+                      prefixIcon: Icon(Icons.campaign_outlined, size: 20),
                     ),
-                    const SizedBox(height: 14),
+                  ),
+                  const SizedBox(height: 14),
 
-                    TextField(
-                      controller: _clientController,
-                      decoration: const InputDecoration(
-                        labelText: 'Client / Brand *',
-                        hintText: 'e.g. Sadia, Johnson & Johnson, Nutella',
-                        prefixIcon: Icon(Icons.business_outlined, size: 20),
-                      ),
+                  TextField(
+                    controller: _clientController,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                    decoration: const InputDecoration(
+                      labelText: 'Client / Brand *',
+                      hintText: 'e.g. Sadia, L\'Oreal, Nestle',
+                      prefixIcon: Icon(Icons.business_outlined, size: 20),
                     ),
-                    const SizedBox(height: 14),
+                  ),
+                  const SizedBox(height: 14),
 
-                    Row(
-                      children: [
-                        Expanded(
-                          child: InkWell(
-                            onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: _startDate,
-                                firstDate: DateTime(2025),
-                                lastDate: DateTime(2030),
-                              );
-                              if (picked != null) setState(() => _startDate = picked);
-                            },
-                            child: InputDecorator(
-                              decoration: const InputDecoration(
-                                labelText: 'Start Date',
-                                prefixIcon: Icon(Icons.calendar_today_outlined, size: 18),
-                              ),
-                              child: Text(DateFormat('yyyy-MM-dd').format(_startDate), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: _startDate,
+                              firstDate: DateTime(2025),
+                              lastDate: DateTime(2030),
+                            );
+                            if (picked != null) setState(() => _startDate = picked);
+                          },
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'Start Date',
+                              prefixIcon: Icon(Icons.calendar_today_outlined, size: 18),
+                            ),
+                            child: Text(
+                              DateFormat('yyyy-MM-dd').format(_startDate),
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: InkWell(
-                            onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: _endDate,
-                                firstDate: DateTime(2025),
-                                lastDate: DateTime(2030),
-                              );
-                              if (picked != null) setState(() => _endDate = picked);
-                            },
-                            child: InputDecorator(
-                              decoration: const InputDecoration(
-                                labelText: 'End Date',
-                                prefixIcon: Icon(Icons.event_outlined, size: 18),
-                              ),
-                              child: Text(DateFormat('yyyy-MM-dd').format(_endDate), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: _endDate,
+                              firstDate: DateTime(2025),
+                              lastDate: DateTime(2030),
+                            );
+                            if (picked != null) setState(() => _endDate = picked);
+                          },
+                          child: InputDecorator(
+                            decoration: const InputDecoration(
+                              labelText: 'End Date',
+                              prefixIcon: Icon(Icons.event_outlined, size: 18),
+                            ),
+                            child: Text(
+                              DateFormat('yyyy-MM-dd').format(_endDate),
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 24),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(50),
-              ),
-              onPressed: _isSaving ? null : _handleSave,
-              child: _isSaving
-                  ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : const Text('Create Campaign Project', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
             ),
           ],
         ),

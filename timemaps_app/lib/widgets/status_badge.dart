@@ -25,12 +25,12 @@ class StatusBadge extends StatelessWidget {
     this.icon,
     this.showDot = false,
     this.fontSize = 11,
-    this.padding = const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+    this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
   });
 
   factory StatusBadge.fromStatus(String status) {
     final s = status.toLowerCase();
-    if (s.contains('on duty') || s.contains('active') || s.contains('approved') || s.contains('delivered') || s.contains('collected')) {
+    if (s.contains('on duty') || s.contains('active') || s.contains('approved') || s.contains('delivered') || s.contains('collected') || s.contains('verified')) {
       return StatusBadge(label: status, variant: StatusVariant.success, showDot: true);
     } else if (s.contains('pending') || s.contains('due') || s.contains('hr') || s.contains('security')) {
       return StatusBadge(label: status, variant: StatusVariant.warning, showDot: true);
@@ -38,6 +38,8 @@ class StatusBadge extends StatelessWidget {
       return StatusBadge(label: status, variant: StatusVariant.danger, showDot: true);
     } else if (s.contains('ready') || s.contains('shift') || s.contains('scheduled')) {
       return StatusBadge(label: status, variant: StatusVariant.info);
+    } else if (s.contains('supervisor') || s.contains('campaign')) {
+      return StatusBadge(label: status, variant: StatusVariant.purple);
     }
     return StatusBadge(label: status, variant: StatusVariant.neutral);
   }
@@ -116,22 +118,37 @@ class StatusBadge extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: _bg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _border, width: 1),
+        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+        border: Border.all(color: _border.withOpacity(0.9), width: 1.1),
+        boxShadow: [
+          BoxShadow(
+            color: _dotColor.withOpacity(0.06),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (showDot) ...[
             Container(
-              width: 6,
-              height: 6,
+              width: 7,
+              height: 7,
               decoration: BoxDecoration(
                 color: _dotColor,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: _dotColor.withOpacity(0.4),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 5),
+            const SizedBox(width: 6),
           ],
           if (icon != null) ...[
             Icon(icon, size: fontSize + 2, color: _text),
@@ -144,7 +161,8 @@ class StatusBadge extends StatelessWidget {
                 fontSize: fontSize,
                 fontWeight: FontWeight.w700,
                 color: _text,
-                letterSpacing: -0.1,
+                letterSpacing: -0.2,
+                height: 1.2,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
