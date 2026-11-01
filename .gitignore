@@ -47,6 +47,7 @@ Thumbs.db
 /*.png
 screen*.png
 *.log
+*.exe
 !timemaps_app/android/app/src/main/res/**/*.png
 !timemaps_app/ios/Runner/Assets.xcassets/**/*.png
 scratch/
