@@ -138,13 +138,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.all(12),
                           margin: const EdgeInsets.only(bottom: 16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEE2E2),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFF87171)),
+                            color: AppTheme.dangerBg,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppTheme.dangerBorder),
                           ),
-                          child: Text(
-                            _errorMessage!,
-                            style: const TextStyle(color: AppTheme.danger, fontSize: 13),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.error_outline_rounded, color: AppTheme.danger, size: 18),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _errorMessage!,
+                                  style: const TextStyle(color: AppTheme.dangerText, fontSize: 13, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
 
@@ -190,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 width: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                               )
-                            : const Text('Sign In to TimeMaps'),
+                            : const Text('Sign In to TimeMaps™'),
                       ),
 
                       const SizedBox(height: 24),
@@ -199,33 +207,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       // Quick-fill buttons for instant testing
                       const Text(
-                        'Quick-Fill Demo Users:',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMuted),
+                        'Demo Credentials Quick-Fill:',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
                         children: [
                           ActionChip(
-                            label: const Text('Ops Director', style: TextStyle(fontSize: 12)),
+                            avatar: const Icon(Icons.admin_panel_settings_outlined, size: 16, color: AppTheme.accent),
+                            label: const Text('Ops Director', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                             onPressed: () => _quickFill('ops@imlme.com', 'OPS_ADMIN'),
-                            backgroundColor: const Color(0xFFEFF6FF),
+                            backgroundColor: AppTheme.infoBg,
+                            side: const BorderSide(color: AppTheme.infoBorder),
                           ),
                           ActionChip(
-                            label: const Text('Supervisor Babar', style: TextStyle(fontSize: 12)),
+                            avatar: const Icon(Icons.supervisor_account_outlined, size: 16, color: AppTheme.purple),
+                            label: const Text('Supervisor Babar', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                             onPressed: () => _quickFill('babar@imlme.com', 'SUPERVISOR'),
-                            backgroundColor: const Color(0xFFF1F5F9),
+                            backgroundColor: AppTheme.purpleBg,
+                            side: const BorderSide(color: AppTheme.purpleBorder),
                           ),
                           ActionChip(
-                            label: const Text('Supervisor Jasheer', style: TextStyle(fontSize: 12)),
+                            avatar: const Icon(Icons.supervisor_account_outlined, size: 16, color: AppTheme.purple),
+                            label: const Text('Supervisor Jasheer', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                             onPressed: () => _quickFill('jasheer@imlme.com', 'SUPERVISOR'),
-                            backgroundColor: const Color(0xFFF1F5F9),
+                            backgroundColor: AppTheme.purpleBg,
+                            side: const BorderSide(color: AppTheme.purpleBorder),
                           ),
                           ActionChip(
-                            label: const Text('Promoter Sony', style: TextStyle(fontSize: 12)),
+                            avatar: const Icon(Icons.person_pin_circle_outlined, size: 16, color: AppTheme.success),
+                            label: const Text('Promoter Sony', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                             onPressed: () => _quickFill('sony@imlme.com', 'PROMOTER'),
-                            backgroundColor: const Color(0xFFECFDF5),
+                            backgroundColor: AppTheme.successBg,
+                            side: const BorderSide(color: AppTheme.successBorder),
                           ),
                         ],
                       ),

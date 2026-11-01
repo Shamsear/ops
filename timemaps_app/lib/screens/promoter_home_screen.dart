@@ -5,6 +5,7 @@ import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import 'login_screen.dart';
+import '../widgets/status_badge.dart';
 
 class PromoterHomeScreen extends StatefulWidget {
   final UserModel promoterUser;
@@ -139,62 +140,41 @@ class _PromoterHomeScreenState extends State<PromoterHomeScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Status Banner Card
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: _isShiftActive ? const Color(0xFFECFDF5) : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: _isShiftActive ? const Color(0xFFA7F3D0) : AppTheme.borderSubtle,
-                        width: 1.5,
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Status Banner Card
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: _isShiftActive ? AppTheme.successBg : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: _isShiftActive ? AppTheme.successBorder : AppTheme.borderSubtle,
+                          width: 1.5,
+                        ),
+                        boxShadow: AppTheme.cardShadow,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 10,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: _isShiftActive ? AppTheme.accentEmerald : AppTheme.textMuted,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  _isShiftActive ? 'ON DUTY (ACTIVE)' : 'NOT CLOCKED IN',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: _isShiftActive ? AppTheme.accentEmerald : AppTheme.textMuted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (_shiftStartTime != null)
-                              Text(
-                                'Clocked in at ${DateFormat('hh:mm a').format(_shiftStartTime!)}',
-                                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace'),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              StatusBadge(
+                                label: _isShiftActive ? 'ON DUTY (ACTIVE)' : 'NOT CLOCKED IN',
+                                variant: _isShiftActive ? StatusVariant.success : StatusVariant.neutral,
+                                showDot: true,
                               ),
-                          ],
-                        ),
+                              if (_shiftStartTime != null)
+                                Text(
+                                  'Clocked in at ${DateFormat('hh:mm a').format(_shiftStartTime!)}',
+                                  style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+                                ),
+                            ],
+                          ),
                         const SizedBox(height: 20),
 
                         // Prominent 1-Tap Shift Start Button
@@ -344,6 +324,7 @@ class _PromoterHomeScreenState extends State<PromoterHomeScreen> {
                 ],
               ),
             ),
+          ),
     );
   }
 }

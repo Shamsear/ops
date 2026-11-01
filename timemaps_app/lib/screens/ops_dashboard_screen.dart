@@ -14,6 +14,7 @@ import 'create_badge_page.dart';
 import 'badge_tracker_screen.dart';
 import 'store_management_screen.dart';
 import '../widgets/searchable_select_field.dart';
+import '../widgets/status_badge.dart';
 
 
 class OpsDashboardScreen extends StatefulWidget {
@@ -616,6 +617,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   // ==============================================
   // MODAL 4: FAST IN-APP SCHEDULE CREATOR
   // ==============================================
+  // ignore: unused_element
   void _showCreateScheduleModal() async {
     List<ProjectModel> projects = await ApiService.getProjects();
     List<StoreModel> stores = await ApiService.getStores();
@@ -1336,6 +1338,171 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     );
   }
 
+  void _showCreateMenuSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(
+              child: Container(
+                width: 38,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: AppTheme.borderStrong,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const Text(
+              'Quick Create & Dispatch',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Select an operational workflow to launch',
+              style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+            ),
+            const SizedBox(height: 16),
+            _createMenuItem(
+              icon: Icons.calendar_today_rounded,
+              color: AppTheme.accent,
+              title: 'Batch Schedule Shifts',
+              subtitle: 'Assign promoters to multiple dates and stores in 1 tap',
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateSchedulePage()))
+                    .then((_) => _loadDashboardData());
+              },
+            ),
+            _createMenuItem(
+              icon: Icons.badge_outlined,
+              color: AppTheme.purple,
+              title: 'Store Badge Permit',
+              subtitle: 'Apply for security clearance and gate passes',
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateBadgePage()))
+                    .then((_) => _loadDashboardData());
+              },
+            ),
+            _createMenuItem(
+              icon: Icons.campaign_outlined,
+              color: AppTheme.accentRose,
+              title: 'New Campaign Project',
+              subtitle: 'Onboard a brand project (Sadia, L\'Oreal, etc.)',
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateProjectPage()))
+                    .then((_) => _loadDashboardData());
+              },
+            ),
+            _createMenuItem(
+              icon: Icons.storefront_outlined,
+              color: AppTheme.accentTeal,
+              title: 'New Store Location',
+              subtitle: 'Add hypermarket branch with code and contacts',
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateStorePage()))
+                    .then((_) => _loadDashboardData());
+              },
+            ),
+            _createMenuItem(
+              icon: Icons.person_add_alt_1_outlined,
+              color: AppTheme.accentAmber,
+              title: 'Register Field Promoter',
+              subtitle: 'Add promoter profile with phone, emirates, and gender',
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatePromoterPage()))
+                    .then((_) => _loadDashboardData());
+              },
+            ),
+            const Divider(height: 18, color: AppTheme.borderSubtle),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 10)),
+                    icon: const Icon(Icons.local_shipping_outlined, size: 16, color: AppTheme.accentAmber),
+                    label: const Text('Assign Drop', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _showAssignDropModal();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 10)),
+                    icon: const Icon(Icons.repeat_rounded, size: 16, color: AppTheme.accentEmerald),
+                    label: const Text('Collection', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _showAssignCollectionModal();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _createMenuItem({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.textMain)),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 18, color: AppTheme.textMuted),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateDisplay = DateFormat('EEE, dd MMM yyyy').format(_selectedDate);
@@ -1343,182 +1510,271 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        titleSpacing: 16,
+        title: Row(
           children: [
-            const Text('TimeMaps™ Ops Command', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain)),
-            Text(dateDisplay, style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: AppTheme.primary,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.map_rounded, color: Colors.white, size: 18),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        'TimeMaps™',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMain,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: AppTheme.accentEmerald,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    'Ops Command • $dateDisplay',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.textMuted,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.storefront_outlined),
-            tooltip: 'Store Directory & Chains',
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreManagementScreen())).then((_) => _loadDashboardData());
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.badge_outlined),
-            tooltip: 'Store Badge Tracker',
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const BadgeTrackerScreen()));
-            },
+            icon: const Icon(Icons.refresh_rounded, size: 22),
+            tooltip: 'Refresh Roster',
+            onPressed: _loadDashboardData,
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.add_circle_outline, color: AppTheme.primary),
-            tooltip: 'Create New...',
+            icon: const Icon(Icons.more_vert_rounded, size: 22),
+            tooltip: 'Operations Menu',
             onSelected: (val) {
-              if (val == 'schedule') {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateSchedulePage())).then((_) => _loadDashboardData());
-              }
-              if (val == 'badge') {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateBadgePage())).then((_) => _loadDashboardData());
-              }
-              if (val == 'project') {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateProjectPage())).then((_) => _loadDashboardData());
-              }
-              if (val == 'store') {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateStorePage())).then((_) => _loadDashboardData());
-              }
-              if (val == 'promoter') {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatePromoterPage())).then((_) => _loadDashboardData());
+              if (val == 'calendar') {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const TimeMapCalendarScreen()));
+              } else if (val == 'stores') {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreManagementScreen()))
+                    .then((_) => _loadDashboardData());
+              } else if (val == 'badges') {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const BadgeTrackerScreen()));
+              } else if (val == 'logout') {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
               }
             },
             itemBuilder: (ctx) => const [
               PopupMenuItem(
-                value: 'schedule',
+                value: 'calendar',
                 child: Row(
                   children: [
-                    Icon(Icons.calendar_today, size: 18, color: AppTheme.primary),
+                    Icon(Icons.calendar_month_outlined, size: 18, color: AppTheme.accent),
                     SizedBox(width: 10),
-                    Text('Batch Schedule Shifts'),
+                    Text('Master Calendar Grid'),
                   ],
                 ),
               ),
               PopupMenuItem(
-                value: 'badge',
+                value: 'stores',
                 child: Row(
                   children: [
-                    Icon(Icons.badge_outlined, size: 18, color: AppTheme.primary),
+                    Icon(Icons.storefront_outlined, size: 18, color: AppTheme.accentTeal),
                     SizedBox(width: 10),
-                    Text('Store Badge Permit'),
+                    Text('Store Directory & Codes'),
                   ],
                 ),
               ),
               PopupMenuItem(
-                value: 'project',
+                value: 'badges',
                 child: Row(
                   children: [
-                    Icon(Icons.campaign_outlined, size: 18, color: AppTheme.primary),
+                    Icon(Icons.badge_outlined, size: 18, color: AppTheme.purple),
                     SizedBox(width: 10),
-                    Text('New Campaign Project'),
+                    Text('Gate Pass & Badges'),
                   ],
                 ),
               ),
+              PopupMenuDivider(),
               PopupMenuItem(
-                value: 'store',
+                value: 'logout',
                 child: Row(
                   children: [
-                    Icon(Icons.storefront_outlined, size: 18, color: AppTheme.primary),
+                    Icon(Icons.logout_rounded, size: 18, color: AppTheme.danger),
                     SizedBox(width: 10),
-                    Text('New Store Location'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'promoter',
-                child: Row(
-                  children: [
-                    Icon(Icons.person_add_alt_outlined, size: 18, color: AppTheme.primary),
-                    SizedBox(width: 10),
-                    Text('Register Promoter'),
+                    Text('Sign Out', style: TextStyle(color: AppTheme.danger, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
             ],
           ),
-          IconButton(
-            icon: const Icon(Icons.calendar_month_outlined),
-            tooltip: 'Master TimeMap Calendar',
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const TimeMapCalendarScreen()));
-            },
+          const SizedBox(width: 4),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppTheme.primary,
+        foregroundColor: Colors.white,
+        elevation: 3,
+        icon: const Icon(Icons.add_rounded, size: 20),
+        label: const Text('Create Action', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+        onPressed: _showCreateMenuSheet,
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: 0,
+        backgroundColor: Colors.white,
+        indicatorColor: AppTheme.surfaceSubtle,
+        elevation: 2,
+        height: 64,
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard_rounded, color: AppTheme.accent),
+            label: 'Live Hub',
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'Refresh Roster',
-            onPressed: _loadDashboardData,
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month_outlined),
+            selectedIcon: Icon(Icons.calendar_month_rounded, color: AppTheme.accent),
+            label: 'Calendar',
           ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            tooltip: 'Sign Out',
-            onPressed: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-            },
+          NavigationDestination(
+            icon: Icon(Icons.badge_outlined),
+            selectedIcon: Icon(Icons.badge_rounded, color: AppTheme.purple),
+            label: 'Badges',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.storefront_outlined),
+            selectedIcon: Icon(Icons.storefront_rounded, color: AppTheme.accentTeal),
+            label: 'Stores',
           ),
         ],
+        onDestinationSelected: (idx) {
+          if (idx == 1) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const TimeMapCalendarScreen()));
+          } else if (idx == 2) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const BadgeTrackerScreen()))
+                .then((_) => _loadDashboardData());
+          } else if (idx == 3) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreManagementScreen()))
+                .then((_) => _loadDashboardData());
+          }
+        },
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadDashboardData,
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                children: [
-                  // KPI Section
-                  _buildKpiSection(),
-                  const SizedBox(height: 14),
+          : SafeArea(
+              child: RefreshIndicator(
+                onRefresh: _loadDashboardData,
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
+                  children: [
+                    // Bento Grid KPI Section
+                    _buildKpiSection(),
+                    const SizedBox(height: 14),
 
-                  // Quick Action Buttons (Zero-Overflow Scrollable Bar)
-                  _buildQuickActionButtons(),
-                  const SizedBox(height: 14),
+                    // Quick Action Shortcuts Bar
+                    _buildQuickActionButtons(),
+                    const SizedBox(height: 14),
 
-                  // Emirate Filter Chips
-                  _buildEmirateFilter(),
-                  const SizedBox(height: 16),
+                    // Emirate Filter Chips
+                    _buildEmirateFilter(),
+                    const SizedBox(height: 16),
 
-                  // Section Title
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Live Stores Today (${_liveStores.length})',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
-                      ),
-                      Text(
-                        'Emirate: $_selectedEmirate',
-                        style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
+                    // Section Title
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Text(
+                              'Live Stores Today',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                            ),
+                            const SizedBox(width: 8),
+                            StatusBadge(
+                              label: '${_liveStores.length}',
+                              variant: StatusVariant.info,
+                              fontSize: 11,
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'Region: $_selectedEmirate',
+                          style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
 
-                  // Live Stores List
-                  if (_liveStores.isEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppTheme.borderSubtle),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.storefront_outlined, size: 40, color: AppTheme.textMuted),
-                          const SizedBox(height: 12),
-                          const Text('No stores active in this filter today', style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.textMain)),
-                          const SizedBox(height: 8),
-                          TextButton(
-                            onPressed: _showCreateScheduleModal,
-                            child: const Text('+ Add a Store Schedule Now'),
-                          ),
-                        ],
-                      ),
-                    )
-                  else
-                    ..._liveStores.map((store) => _buildStoreCard(store)),
-                ],
+                    // Live Stores List
+                    if (_liveStores.isEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppTheme.borderSubtle),
+                        ),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: const BoxDecoration(
+                                color: AppTheme.surfaceSubtle,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.storefront_outlined, size: 36, color: AppTheme.textMuted),
+                            ),
+                            const SizedBox(height: 14),
+                            const Text(
+                              'No stores active in this filter today',
+                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppTheme.textMain),
+                            ),
+                            const SizedBox(height: 6),
+                            const Text(
+                              'Try selecting another emirate or schedule shifts',
+                              style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                            ),
+                            const SizedBox(height: 14),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              icon: const Icon(Icons.add_rounded, size: 16),
+                              label: const Text('Schedule Shifts Now'),
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateSchedulePage()))
+                                    .then((_) => _loadDashboardData());
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ..._liveStores.map((store) => _buildStoreCard(store)),
+                  ],
+                ),
               ),
             ),
     );
@@ -1533,31 +1789,32 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     return Row(
       children: [
         Expanded(
-          child: _kpiTile('Live Stores', '$liveStoresCount', Icons.storefront_rounded, AppTheme.textMain),
+          child: _kpiTile('Live Stores', '$liveStoresCount', Icons.storefront_rounded, AppTheme.accentTeal, AppTheme.surfaceSubtle),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _kpiTile('Promoters', '$activePromotersCount', Icons.people_alt_rounded, AppTheme.accent),
+          child: _kpiTile('Promoters', '$activePromotersCount', Icons.people_alt_rounded, AppTheme.accent, AppTheme.infoBg),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _kpiTile('Drops Due', '$pendingDrops', Icons.local_shipping_rounded, AppTheme.accentAmber),
+          child: _kpiTile('Drops Due', '$pendingDrops', Icons.local_shipping_rounded, AppTheme.warning, AppTheme.warningBg),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _kpiTile('Collections', '$pendingCollections', Icons.repeat_rounded, AppTheme.accentEmerald),
+          child: _kpiTile('Collections', '$pendingCollections', Icons.repeat_rounded, AppTheme.success, AppTheme.successBg),
         ),
       ],
     );
   }
 
-  Widget _kpiTile(String title, String count, IconData icon, Color color) {
+  Widget _kpiTile(String title, String count, IconData icon, Color color, Color bgTint) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppTheme.borderSubtle),
+        boxShadow: AppTheme.cardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1565,16 +1822,31 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(count, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color)),
-              Icon(icon, size: 15, color: color),
+              Text(
+                count,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: AppTheme.textMain,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: bgTint,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 14, color: color),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.textMuted),
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
           ),
         ],
       ),
@@ -1588,11 +1860,14 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
         children: [
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(44, 40),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              backgroundColor: AppTheme.primary,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(0, 36),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             icon: const Icon(Icons.bolt_rounded, size: 16),
-            label: const Text('Batch Schedule'),
+            label: const Text('Batch Schedule', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
             onPressed: () async {
               final res = await Navigator.push(
                 context,
@@ -1602,15 +1877,14 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             },
           ),
           const SizedBox(width: 8),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryDark,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(44, 40),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(0, 36),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.badge_outlined, size: 16),
-            label: const Text('Badge Tracker', style: TextStyle(fontWeight: FontWeight.w700)),
+            icon: const Icon(Icons.badge_outlined, size: 16, color: AppTheme.purple),
+            label: const Text('Badges', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             onPressed: () async {
               await Navigator.push(
                 context,
@@ -1622,11 +1896,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(44, 40),
+              minimumSize: const Size(0, 36),
               padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.campaign_outlined, size: 16, color: AppTheme.primary),
-            label: const Text('+ Campaign', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700)),
+            icon: const Icon(Icons.campaign_outlined, size: 16, color: AppTheme.accentRose),
+            label: const Text('+ Campaign', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             onPressed: () async {
               final res = await Navigator.push(
                 context,
@@ -1638,11 +1913,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(44, 40),
+              minimumSize: const Size(0, 36),
               padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.storefront_outlined, size: 16, color: AppTheme.primary),
-            label: const Text('+ Store', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700)),
+            icon: const Icon(Icons.storefront_outlined, size: 16, color: AppTheme.accentTeal),
+            label: const Text('+ Store', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             onPressed: () async {
               final res = await Navigator.push(
                 context,
@@ -1654,11 +1930,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(44, 40),
+              minimumSize: const Size(0, 36),
               padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.person_add_alt_outlined, size: 16, color: AppTheme.primary),
-            label: const Text('+ Promoter', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w700)),
+            icon: const Icon(Icons.person_add_alt_outlined, size: 16, color: AppTheme.accentAmber),
+            label: const Text('+ Promoter', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             onPressed: () async {
               final res = await Navigator.push(
                 context,
@@ -1670,21 +1947,23 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(44, 40),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              minimumSize: const Size(0, 36),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.local_shipping_outlined, size: 16, color: AppTheme.accentAmber),
-            label: const Text('Assign Drop', style: TextStyle(color: AppTheme.accentAmber, fontWeight: FontWeight.w700)),
+            icon: const Icon(Icons.local_shipping_outlined, size: 16, color: AppTheme.warning),
+            label: const Text('Drop', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             onPressed: _showAssignDropModal,
           ),
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(44, 40),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              minimumSize: const Size(0, 36),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.repeat_rounded, size: 16, color: AppTheme.accentEmerald),
-            label: const Text('Assign Collection', style: TextStyle(color: AppTheme.accentEmerald, fontWeight: FontWeight.w700)),
+            icon: const Icon(Icons.repeat_rounded, size: 16, color: AppTheme.success),
+            label: const Text('Collection', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             onPressed: _showAssignCollectionModal,
           ),
         ],
@@ -1707,12 +1986,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
               selectedColor: AppTheme.primary,
               labelStyle: TextStyle(
                 color: isSelected ? Colors.white : AppTheme.textMain,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                fontSize: 11,
               ),
-              backgroundColor: Colors.white,
+              backgroundColor: AppTheme.surfaceSubtle,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
                 side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.borderSubtle),
               ),
             ),
@@ -1761,27 +2040,25 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     children: [
                       Text(
                         store.storeName,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMain,
+                          letterSpacing: -0.2,
+                        ),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppTheme.surfaceSubtle,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: AppTheme.borderSubtle),
-                            ),
-                            child: Text(
-                              store.emirate,
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                            ),
+                          StatusBadge(
+                            label: store.emirate,
+                            variant: StatusVariant.neutral,
+                            fontSize: 10,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             store.retailer,
-                            style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                            style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -1790,19 +2067,33 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                 ),
                 // Supervisor Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                   decoration: BoxDecoration(
                     color: AppTheme.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppTheme.borderSubtle),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('Field Lead', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: AppTheme.textMuted)),
-                      Text(
-                        store.supervisorName,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                      CircleAvatar(
+                        radius: 10,
+                        backgroundColor: AppTheme.primary,
+                        child: Text(
+                          store.supervisorName.isNotEmpty ? store.supervisorName[0] : 'S',
+                          style: const TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Field Lead', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: AppTheme.textMuted)),
+                          Text(
+                            store.supervisorName,
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -1817,14 +2108,14 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             ...store.projects.map((project) {
               final isSadia = project.projectName.toLowerCase().contains('sadia');
               final accentColor = isSadia ? AppTheme.accentRose : AppTheme.accent;
-              final bgColor = isSadia ? const Color(0xFFFFF1F2) : const Color(0xFFEFF6FF);
-              final borderColor = isSadia ? const Color(0xFFFECDD3) : const Color(0xFFBFDBFE);
+              final bgColor = isSadia ? AppTheme.dangerBg : AppTheme.infoBg;
+              final borderColor = isSadia ? AppTheme.dangerBorder : AppTheme.infoBorder;
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: bgColor,
+                  color: bgColor.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: borderColor),
                 ),
@@ -1834,27 +2125,47 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          project.projectName.toUpperCase(),
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: accentColor),
+                        Row(
+                          children: [
+                            Container(
+                              width: 3,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              project.projectName.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: accentColor,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          '${project.promoters.length} Staff',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMuted),
+                        StatusBadge(
+                          label: '${project.promoters.length} Staff',
+                          variant: StatusVariant.neutral,
+                          fontSize: 10,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
 
                     // Promoters working under this project
                     ...project.promoters.map((p) {
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 6),
-                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: AppTheme.borderSubtle),
+                          boxShadow: AppTheme.cardShadow,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1862,59 +2173,87 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  p.promoterName,
-                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 12,
+                                      backgroundColor: AppTheme.infoBg,
+                                      child: const Icon(Icons.person, size: 14, color: AppTheme.accent),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      p.promoterName,
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFECFDF5),
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: const Color(0xFFA7F3D0)),
+                                StatusBadge.fromStatus('ON DUTY'),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.schedule, size: 12, color: AppTheme.textMuted),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)}',
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textSecondary),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('•', style: TextStyle(color: AppTheme.textMuted)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Break: ${p.breakTimings ?? "None"}',
+                                    style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  child: const Text('ON DUTY', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppTheme.accentEmerald)),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)} • Break: ${p.breakTimings ?? "None"}',
-                              style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace'),
-                            ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
 
-                            // Quick Action Buttons (Call, WhatsApp, Audit)
-                            Wrap(
-                              spacing: 6,
-                              runSpacing: 4,
+                            // Action Pills (Call, WhatsApp, Audit)
+                            Row(
                               children: [
-                                OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(36, 32),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      minimumSize: const Size(0, 32),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    icon: const Icon(Icons.phone_outlined, size: 14, color: AppTheme.success),
+                                    label: const Text('Call', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                    onPressed: () => _makeCall(p.promoterPhone),
                                   ),
-                                  icon: const Icon(Icons.phone_outlined, size: 14, color: AppTheme.accentEmerald),
-                                  label: const Text('Call', style: TextStyle(fontSize: 11)),
-                                  onPressed: () => _makeCall(p.promoterPhone),
                                 ),
-                                OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(36, 32),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      minimumSize: const Size(0, 32),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    icon: const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: AppTheme.accent),
+                                    label: const Text('WhatsApp', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                    onPressed: () => _openWhatsApp(p.promoterPhone),
                                   ),
-                                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: AppTheme.accent),
-                                  label: const Text('WhatsApp', style: TextStyle(fontSize: 11)),
-                                  onPressed: () => _openWhatsApp(p.promoterPhone),
                                 ),
-                                OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(36, 32),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      minimumSize: const Size(0, 32),
+                                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    icon: const Icon(Icons.star_rounded, size: 14, color: AppTheme.warning),
+                                    label: const Text('Audit ⭐', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                    onPressed: () => _showEvaluationModal(p.promoterName),
                                   ),
-                                  icon: const Icon(Icons.star_rounded, size: 14, color: AppTheme.accentAmber),
-                                  label: const Text('Audit ⭐', style: TextStyle(fontSize: 11)),
-                                  onPressed: () => _showEvaluationModal(p.promoterName),
                                 ),
                               ],
                             ),

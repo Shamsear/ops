@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/status_badge.dart';
 import 'create_badge_page.dart';
 
 class BadgeTrackerScreen extends StatefulWidget {
@@ -33,6 +34,12 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
     _loadBadges();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadBadges() async {
     setState(() => _isLoading = true);
     final badges = await ApiService.getBadges(
@@ -56,60 +63,12 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
     final success = await ApiService.updateBadgeStatus(badge.id, newStatus);
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${badge.promoterName} moved to "$newStatus"')),
+        SnackBar(
+          backgroundColor: AppTheme.success,
+          content: Text('${badge.promoterName} moved to "$newStatus"'),
+        ),
       );
       _loadBadges();
-    }
-  }
-
-  Color _getStatusBg(String status) {
-    switch (status) {
-      case 'Approved':
-        return const Color(0xFFECFDF5);
-      case 'Pending with security':
-        return const Color(0xFFFFF7ED);
-      case 'Pending with HR':
-        return const Color(0xFFFEF3C7);
-      case 'Documents ready for collection':
-        return const Color(0xFFF1F5F9);
-      case 'Rejected':
-        return const Color(0xFFFEF2F2);
-      default:
-        return const Color(0xFFEFF6FF);
-    }
-  }
-
-  Color _getStatusTextColor(String status) {
-    switch (status) {
-      case 'Approved':
-        return AppTheme.accentEmerald;
-      case 'Pending with security':
-        return const Color(0xFFC2410C);
-      case 'Pending with HR':
-        return const Color(0xFFB45309);
-      case 'Documents ready for collection':
-        return const Color(0xFF475569);
-      case 'Rejected':
-        return AppTheme.danger;
-      default:
-        return AppTheme.primary;
-    }
-  }
-
-  Color _getStatusBorder(String status) {
-    switch (status) {
-      case 'Approved':
-        return const Color(0xFFA7F3D0);
-      case 'Pending with security':
-        return const Color(0xFFFED7AA);
-      case 'Pending with HR':
-        return const Color(0xFFFDE68A);
-      case 'Documents ready for collection':
-        return const Color(0xFFCBD5E1);
-      case 'Rejected':
-        return const Color(0xFFFECACA);
-      default:
-        return const Color(0xFFBFDBFE);
     }
   }
 
@@ -118,171 +77,187 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
+        titleSpacing: 0,
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Store Badge Tracker', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain)),
-            Text('UAE Hypermarket Security & Gate Permits', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
+            Text(
+              'Store Badge Tracker',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+            ),
+            Text(
+              'Hypermarket Gate Passes & Security Permits',
+              style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+            ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh_rounded, size: 22),
             tooltip: 'Refresh Badges',
             onPressed: _loadBadges,
           ),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline_rounded),
-            tooltip: 'Submit Badge',
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CreateBadgePage()),
-              );
-              if (result == true) _loadBadges();
-            },
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppTheme.primaryDark,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded, size: 20),
-        label: const Text('Submit Badge', style: TextStyle(fontWeight: FontWeight.w700)),
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CreateBadgePage()),
-          );
-          if (result == true) _loadBadges();
-        },
-      ),
-      body: Column(
-        children: [
-          // Search & Filter Header
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              children: [
-                // Search Input
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search by promoter, store, or project...',
-                    prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppTheme.textMuted),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-                              _loadBadges();
-                            },
-                          )
-                        : null,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                  ),
-                  onSubmitted: (query) {
-                    setState(() => _searchQuery = query.trim());
-                    _loadBadges();
-                  },
-                ),
-                const SizedBox(height: 10),
-
-                // Filter Tabs (Horizontal Scroll)
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _filterTabs.map((tab) {
-                      final isSelected = _selectedFilter == tab;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 6),
-                        child: ChoiceChip(
-                          label: Text(tab),
-                          selected: isSelected,
-                          onSelected: (_) => _onFilterChanged(tab),
-                          selectedColor: AppTheme.primary,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : AppTheme.textMain,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            fontSize: 11,
-                          ),
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.borderSubtle),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.only(right: 14),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                minimumSize: const Size(0, 36),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              ),
+              icon: const Icon(Icons.add_rounded, size: 16),
+              label: const Text('Apply Badge', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CreateBadgePage()),
+                );
+                if (result == true) _loadBadges();
+              },
             ),
           ),
-          const Divider(height: 1, color: AppTheme.borderSubtle),
-
-          // Badges List View
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _badges.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.badge_outlined, size: 48, color: AppTheme.textMuted),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'No badge applications found',
-                              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.textMain),
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'Submit a new store permit to get started',
-                              style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.add_rounded, size: 16),
-                              label: const Text('Submit Store Badge'),
-                              onPressed: () async {
-                                final res = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const CreateBadgePage()),
-                                );
-                                if (res == true) _loadBadges();
-                              },
-                            ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _loadBadges,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 80),
-                          itemCount: _badges.length,
-                          itemBuilder: (ctx, index) {
-                            final badge = _badges[index];
-                            return _buildBadgeCard(badge);
-                          },
-                        ),
-                      ),
-          ),
         ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Search & Filter Header
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
+              ),
+              child: Column(
+                children: [
+                  // Search Input
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search by promoter, store, or project...',
+                      prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppTheme.accent),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _searchQuery = '');
+                                _loadBadges();
+                              },
+                            )
+                          : null,
+                    ),
+                    onSubmitted: (query) {
+                      setState(() => _searchQuery = query.trim());
+                      _loadBadges();
+                    },
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Filter Tabs (Horizontal Scroll)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _filterTabs.map((tab) {
+                        final isSelected = _selectedFilter == tab;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: ChoiceChip(
+                            label: Text(tab),
+                            selected: isSelected,
+                            onSelected: (_) => _onFilterChanged(tab),
+                            selectedColor: AppTheme.primary,
+                            labelStyle: TextStyle(
+                              color: isSelected ? Colors.white : AppTheme.textMain,
+                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                              fontSize: 11,
+                            ),
+                            backgroundColor: AppTheme.surfaceSubtle,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side: BorderSide(color: isSelected ? AppTheme.primary : AppTheme.borderSubtle),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Badges List View
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _badges.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.surfaceSubtle,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.badge_outlined, size: 40, color: AppTheme.textMuted),
+                              ),
+                              const SizedBox(height: 14),
+                              const Text(
+                                'No badge applications found',
+                                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Submit a new store permit to get started',
+                                style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                icon: const Icon(Icons.add_rounded, size: 16),
+                                label: const Text('Submit Store Badge'),
+                                onPressed: () async {
+                                  final res = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const CreateBadgePage()),
+                                  );
+                                  if (res == true) _loadBadges();
+                                },
+                              ),
+                            ],
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _loadBadges,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            itemCount: _badges.length,
+                            itemBuilder: (ctx, index) {
+                              final badge = _badges[index];
+                              return _buildBadgeCard(badge);
+                            },
+                          ),
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildBadgeCard(BadgeModel badge) {
-    final bg = _getStatusBg(badge.status);
-    final textCol = _getStatusTextColor(badge.status);
-    final borderCol = _getStatusBorder(badge.status);
-
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -299,28 +274,17 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                     children: [
                       Text(
                         badge.promoterName,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         badge.projectName,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.primary),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: bg,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: borderCol),
-                  ),
-                  child: Text(
-                    badge.status.toUpperCase(),
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: textCol),
-                  ),
-                ),
+                StatusBadge.fromStatus(badge.status),
               ],
             ),
             const SizedBox(height: 10),
@@ -335,7 +299,9 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                 Expanded(
                   child: Text(
                     '${badge.storeName} • ${badge.emirate}',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -353,13 +319,13 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                 if (badge.badgeNumber != null)
                   Text(
                     'Pass #: ${badge.badgeNumber}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'monospace', color: AppTheme.textMain),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                   ),
               ],
             ),
 
             if (badge.notes != null && badge.notes!.isNotEmpty) ...[
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -388,7 +354,10 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Advance Status:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMuted)),
+                const Text(
+                  'Advance Status:',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMuted),
+                ),
                 PopupMenuButton<String>(
                   tooltip: 'Change Status',
                   onSelected: (newStatus) => _updateStatus(badge, newStatus),
@@ -403,7 +372,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppTheme.surfaceSubtle,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: AppTheme.borderSubtle),
                     ),

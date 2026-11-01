@@ -248,8 +248,10 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
     return Scaffold(
       backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
+        titleSpacing: 16,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text('Field Hub: ${widget.supervisor.name}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain)),
             const Text('Assigned Stores, Audits & Logistics', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
@@ -260,6 +262,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
           labelColor: AppTheme.primary,
           unselectedLabelColor: AppTheme.textMuted,
           indicatorColor: AppTheme.primary,
+          indicatorSize: TabBarIndicatorSize.tab,
           tabs: [
             Tab(text: 'Store Audits (${_myStores.length})'),
             Tab(text: 'Logistics (${_myDrops.length + _myCollections.length})'),
