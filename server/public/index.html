@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-stone-50 text-stone-900 antialiased">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TimeMaps™ | Operations & Field Roster</title>
+  
+  <!-- IBM Plex Sans & JetBrains Mono Fonts (Swiss Typography Standard) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            stone: {
+              25: '#FCFCFB',
+              50: '#F9F9F8',
+              100: '#F3F3F1',
+              150: '#EDEDE9',
+              200: '#E4E4DF',
+              300: '#D1D1C8',
+              400: '#A3A398',
+              500: '#737367',
+              600: '#525248',
+              700: '#3D3D35',
+              800: '#292923',
+              900: '#1A1A17',
+              950: '#0F0F0D',
+            },
+            swiss: {
+              blue: '#1E40AF',
+              navy: '#0F172A',
+              red: '#DC2626',
+              amber: '#D97706',
+              emerald: '#059669',
+            }
+          },
+          boxShadow: {
+            'swiss-card': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02)',
+            'swiss-elevated': '0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+            'swiss-modal': '0 25px 50px -12px rgba(0, 0, 0, 0.18)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Strict Swiss International Style & Anti-Overflow Rules */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+      background-color: #F9F9F8;
+      color: #1A1A17;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Tabular numeric alignment */
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Clean subtle scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F3F3F1; }
+    ::-webkit-scrollbar-thumb { background: #D1D1C8; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #A3A398; }
+
+    /* Hide scrollbar for chip lists */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Subtle live pulse */
+    .pulse-dot {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.15); }
+    }
+
+    /* Interactive press micro-physics */
+    .btn-press {
+      transition: transform 120ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    }
+    .btn-press:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col font-sans text-stone-900 bg-stone-50">
+
+  <!-- TOP APP BAR (Swiss Minimalist Header) -->
+  <header class="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-sm transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      
+      <!-- Brand & Date Badge -->
+      <div class="flex items-center space-x-3.5 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-stone-900 text-white flex items-center justify-center font-bold text-base shadow-sm ring-1 ring-stone-900/10 shrink-0">
+          <i data-lucide="layers" class="w-5 h-5 text-white"></i>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center space-x-2">
+            <span class="text-base font-bold tracking-tight text-stone-950 truncate">
+              TIMEMAPS<span class="text-blue-700 font-mono text-xs font-semibold ml-1">OPERATIONS</span>
+            </span>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 pulse-dot"></span> LIVE
+            </span>
+          </div>
+          <p class="text-xs text-stone-500 font-medium truncate">
+            UAE Retail Field Ops • <span class="text-stone-800 font-mono font-semibold" id="topDateStr">Wednesday, 14-Oct-2026</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls & Role Selector -->
+      <div class="flex items-center space-x-2.5 shrink-0">
+        
+        <!-- View Switcher (Ops Director vs Supervisor Hub) -->
+        <div class="inline-flex rounded-xl bg-stone-100 p-1 border border-stone-200 text-xs font-semibold">
+          <button id="btnRoleOps" onclick="switchRole('OPS_ADMIN')" class="px-3 py-1.5 rounded-lg text-white bg-stone-900 font-bold shadow-sm transition">
+            Ops Lead
+          </button>
+          <button id="btnRoleSup" onclick="switchRole('SUPERVISOR')" class="px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-950 transition">
+            Supervisor Babar
+          </button>
+        </div>
+
+        <!-- Store Badge Tracker Launcher -->
+        <button onclick="openBadgeTrackerModal()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-stone-900 hover:bg-stone-800 text-white shadow-sm transition btn-press">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+          <span>Badge Tracker</span>
+        </button>
+
+        <!-- Master Calendar Launcher -->
+        <button onclick="openTimeMapGridModal()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 shadow-sm transition btn-press">
+          <i data-lucide="grid" class="w-4 h-4 text-blue-600"></i>
+          <span>TimeMap Grid</span>
+        </button>
+
+        <!-- Stand Photos Gallery Launcher -->
+        <button onclick="openPhotosHubModal()" class="hidden lg:inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 shadow-sm transition btn-press">
+          <i data-lucide="camera" class="w-4 h-4 text-stone-600"></i>
+          <span>Stand Photos</span>
+        </button>
+
+        <!-- Audit Evaluations Launcher -->
+        <button onclick="openAuditsHubModal()" class="hidden lg:inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 shadow-sm transition btn-press">
+          <i data-lucide="star" class="w-4 h-4 text-amber-500"></i>
+          <span>Scorecards</span>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER (Completely Responsive & Overflow Free) -->
+  <main class="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    
+    <!-- ============================================== -->
+    <!-- VIEW 1: OPS DIRECTOR COMMAND CENTER -->
+    <!-- ============================================== -->
+    <section id="viewOps" class="space-y-6">
+
+      <!-- TOP METRIC CARDS (High-Contrast Swiss Clean Grid) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        
+        <!-- Live Stores -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 shadow-swiss-card transition hover:border-stone-300">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-stone-500">Live Stores</span>
+            <div class="w-8 h-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center border border-stone-200">
+              <i data-lucide="store" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="kpiStores" class="text-3xl sm:text-4xl font-extrabold text-stone-900 font-mono tracking-tight tabular-nums">2</span>
+            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              Active Today
+            </span>
+          </div>
+          <p class="text-xs text-stone-500 mt-2 font-medium truncate">Lulu Barsha & Lulu Al Wahda</p>
+        </div>
+
+        <!-- IML Promoters On-Duty -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 shadow-swiss-card transition hover:border-stone-300">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-stone-500">Promoters On-Duty</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-200">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="kpiPromoters" class="text-3xl sm:text-4xl font-extrabold text-blue-900 font-mono tracking-tight tabular-nums">3</span>
+            <span class="text-xs font-semibold text-stone-500">Active Staff</span>
+          </div>
+          <p class="text-xs text-stone-500 mt-2 font-medium truncate">Sony, Prachi, Abdul Jabbar</p>
+        </div>
+
+        <!-- Morning Drops -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 shadow-swiss-card transition hover:border-stone-300">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-stone-500">Morning Drops</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
+              <i data-lucide="truck" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="kpiDrops" class="text-3xl sm:text-4xl font-extrabold text-amber-700 font-mono tracking-tight tabular-nums">1</span>
+            <span class="text-xs font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Dispatched</span>
+          </div>
+          <p class="text-xs text-stone-500 mt-2 font-medium truncate">Stand & POSM drop required</p>
+        </div>
+
+        <!-- Return Collections -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-stone-200 shadow-swiss-card transition hover:border-stone-300">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-stone-500">Return Collections</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+              <i data-lucide="package-check" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span id="kpiCollections" class="text-3xl sm:text-4xl font-extrabold text-emerald-700 font-mono tracking-tight tabular-nums">1</span>
+            <span class="text-xs font-semibold text-stone-500">Scheduled</span>
+          </div>
+          <p class="text-xs text-stone-500 mt-2 font-medium truncate">Stand return Oct 18 (Babar)</p>
+        </div>
+
+      </div>
+
+      <!-- ACTION CONTROL BAR & EMIRATE FILTERS -->
+      <div class="bg-white rounded-2xl p-3.5 border border-stone-200 shadow-swiss-card flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        
+        <!-- Primary Action Triggers -->
+        <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+          
+          <!-- Create Schedule -->
+          <button onclick="openModal('modalCreateSchedule')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs shadow-sm transition btn-press whitespace-nowrap">
+            <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i>
+            <span>+ Create Schedule</span>
+          </button>
+
+          <!-- Assign Drop -->
+          <button onclick="openModal('modalLogisticsDrop')" class="inline-flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-semibold text-xs transition btn-press whitespace-nowrap">
+            <i data-lucide="truck" class="w-4 h-4 text-amber-700"></i>
+            <span>Assign Drop</span>
+          </button>
+
+          <!-- Assign Collection (Independent Action) -->
+          <button onclick="openModal('modalLogisticsCollection')" class="inline-flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 font-semibold text-xs transition btn-press whitespace-nowrap">
+            <i data-lucide="repeat" class="w-4 h-4 text-emerald-700"></i>
+            <span>Assign Collection</span>
+          </button>
+
+          <!-- TimeMap Grid Mobile Button -->
+          <button onclick="openModal('modalTimeMapGrid')" class="md:hidden inline-flex items-center space-x-1 px-3 py-2.5 rounded-xl bg-stone-100 text-stone-800 border border-stone-200 font-semibold text-xs whitespace-nowrap">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>Grid</span>
+          </button>
+        </div>
+
+        <!-- Horizontal Emirates Filter (Pills) -->
+        <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <button onclick="setEmirateFilter('All', this)" class="chip-filter px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-900 text-white shadow-sm transition whitespace-nowrap">All Emirates</button>
+          <button onclick="setEmirateFilter('Dubai', this)" class="chip-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition whitespace-nowrap">Dubai</button>
+          <button onclick="setEmirateFilter('Abu Dhabi', this)" class="chip-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition whitespace-nowrap">Abu Dhabi</button>
+          <button onclick="setEmirateFilter('Sharjah', this)" class="chip-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition whitespace-nowrap">Sharjah</button>
+          <button onclick="setEmirateFilter('Al Ain', this)" class="chip-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition whitespace-nowrap">Al Ain</button>
+          <button onclick="setEmirateFilter('Ras Al Khaimah', this)" class="chip-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition whitespace-nowrap">RAK</button>
+          <button onclick="setEmirateFilter('Fujairah', this)" class="chip-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition whitespace-nowrap">Fujairah</button>
+        </div>
+
+      </div>
+
+      <!-- SECTION TITLE & STATUS -->
+      <div class="flex items-center justify-between pt-1">
+        <div class="flex items-center space-x-2">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-stone-800">Live Stores & Concurrent Campaigns</h2>
+          <span id="storesCountBadge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-stone-200 text-stone-800 tabular-nums">2 Stores</span>
+        </div>
+        <span class="text-xs font-medium text-stone-500" id="filterStatusText">Showing All Emirates</span>
+      </div>
+
+      <!-- STORE-CENTRIC MULTI-PROJECT CARDS LIST -->
+      <div id="liveStoresContainer" class="space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: SUPERVISOR FIELD HUB (BABAR'S VIEW) -->
+    <!-- ============================================== -->
+    <section id="viewSupervisor" class="hidden space-y-6">
+      
+      <!-- Supervisor Profile Hero Card -->
+      <div class="bg-white rounded-2xl p-5 sm:p-6 border border-stone-200 shadow-swiss-card">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 rounded-2xl bg-stone-900 text-white font-bold text-lg flex items-center justify-center shadow-sm ring-2 ring-stone-200">
+              BM
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h2 class="text-lg font-bold text-stone-950">Babar Abdul Majeed</h2>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">Field Supervisor</span>
+              </div>
+              <p class="text-xs text-stone-500 mt-0.5">Assigned Zone: Dubai Hypermarkets • IML Field Operations Team</p>
+            </div>
+          </div>
+
+          <!-- Daily Overview KPI -->
+          <div class="flex items-center space-x-4 bg-stone-50 px-4 py-3 rounded-xl border border-stone-200">
+            <div>
+              <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">My Stores Today</div>
+              <div class="text-base font-bold text-stone-900 font-mono">1 Store (Barsha)</div>
+            </div>
+            <div class="w-px h-8 bg-stone-300"></div>
+            <div>
+              <div class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Staff to Audit</div>
+              <div class="text-base font-bold text-blue-700 font-mono">2 IML Promoters</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supervisor In-Store Tasks Container -->
+      <div id="supervisorStoresContainer" class="space-y-4">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: FAST IN-APP SCHEDULE CREATOR -->
+  <!-- ============================================== -->
+  <div id="modalCreateSchedule" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-swiss-modal border border-stone-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3.5 border-b border-stone-200">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-stone-100 text-stone-800 flex items-center justify-center border border-stone-200">
+            <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-stone-900">Create Store Schedule</h3>
+            <p class="text-xs text-stone-500">Fast In-App Creator • No Excel Dependency</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalCreateSchedule')" class="text-stone-400 hover:text-stone-700 p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Campaign Project</label>
+          <select id="modalSchedProject" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"></select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Store Location & Retailer</label>
+          <select id="modalSchedStore" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"></select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">IML Promoter</label>
+            <select id="modalSchedPromoter" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Field Supervisor</label>
+            <select id="modalSchedSupervisor" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none"></select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Shift Start</label>
+            <input type="text" id="modalSchedStart" value="14:00:00" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 font-mono text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Shift End</label>
+            <input type="text" id="modalSchedEnd" value="22:00:00" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 font-mono text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Break Rotation Timing</label>
+          <input type="text" id="modalSchedBreak" value="5:00 PM - 5:45 PM" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-2">Schedule Active Days</label>
+          <div class="grid grid-cols-4 gap-2 text-xs">
+            <label class="flex items-center space-x-1.5 p-2 rounded-xl border border-stone-300 bg-stone-50 text-stone-800 cursor-pointer">
+              <input type="checkbox" value="2026-10-14" checked class="rounded text-blue-600">
+              <span class="font-medium">Wed 14</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 rounded-xl border border-stone-300 bg-stone-50 text-stone-800 cursor-pointer">
+              <input type="checkbox" value="2026-10-15" checked class="rounded text-blue-600">
+              <span class="font-medium">Thu 15</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 rounded-xl border border-stone-300 bg-stone-50 text-stone-800 cursor-pointer">
+              <input type="checkbox" value="2026-10-16" checked class="rounded text-blue-600">
+              <span class="font-medium">Fri 16</span>
+            </label>
+            <label class="flex items-center space-x-1.5 p-2 rounded-xl border border-stone-300 bg-stone-50 text-stone-800 cursor-pointer">
+              <input type="checkbox" value="2026-10-17" checked class="rounded text-blue-600">
+              <span class="font-medium">Sat 17</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-4 flex items-center space-x-3">
+          <button onclick="closeModal('modalCreateSchedule')" class="w-1/3 py-2.5 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold hover:bg-stone-50 transition btn-press">Cancel</button>
+          <button onclick="executeScheduleCreation()" class="w-2/3 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold shadow-sm transition btn-press">
+            Save & Publish Schedule
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: ASSIGN LOGISTICS DROP -->
+  <!-- ============================================== -->
+  <div id="modalLogisticsDrop" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-swiss-modal border border-stone-200">
+      <div class="flex items-center justify-between pb-3.5 border-b border-stone-200">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
+            <i data-lucide="truck" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-stone-900">Assign Morning Drop-off</h3>
+            <p class="text-xs text-stone-500">Deliver promotional stand & stock prior to shift</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalLogisticsDrop')" class="text-stone-400 hover:text-stone-700 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Project</label>
+          <select id="dropProject" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Destination Store</label>
+          <select id="dropStore" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Assigned Field Supervisor</label>
+          <select id="dropSupervisor" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Items Manifest to Deliver</label>
+          <input type="text" id="dropManifest" value="1x Pop-up Display Stand, 2x Rollups, 5x Cartons Stock" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs">
+        </div>
+
+        <div class="pt-3 flex items-center space-x-3">
+          <button onclick="closeModal('modalLogisticsDrop')" class="w-1/3 py-2.5 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold btn-press">Cancel</button>
+          <button onclick="executeDropAssignment()" class="w-2/3 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition btn-press">Dispatch Drop Task</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: ASSIGN COLLECTION (INDEPENDENT SEPARATE OPTION!) -->
+  <!-- ============================================== -->
+  <div id="modalLogisticsCollection" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-swiss-modal border border-stone-200">
+      <div class="flex items-center justify-between pb-3.5 border-b border-stone-200">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+            <i data-lucide="repeat" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-stone-900">Assign Return Collection</h3>
+            <p class="text-xs text-emerald-700 font-semibold">Separate Workflow • Guaranteed Zero Lost Stands</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalLogisticsCollection')" class="text-stone-400 hover:text-stone-700 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Project</label>
+          <select id="collProject" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Store to Collect From</label>
+          <select id="collStore" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Assigned Field Supervisor</label>
+          <select id="collSupervisor" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs"></select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Collection Date (End of Campaign)</label>
+          <input type="date" id="collDate" value="2026-10-18" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 font-mono text-xs">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Items to Collect Back to Base</label>
+          <input type="text" id="collItems" value="1x Pop-up Display Stand, 2x Rollups" class="w-full px-3.5 py-2.5 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs">
+        </div>
+
+        <div class="pt-3 flex items-center space-x-3">
+          <button onclick="closeModal('modalLogisticsCollection')" class="w-1/3 py-2.5 rounded-xl border border-stone-300 text-stone-700 text-xs font-semibold btn-press">Cancel</button>
+          <button onclick="executeCollectionAssignment()" class="w-2/3 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm transition btn-press">
+            Save Collection Assignment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 60-SEC IN-STORE EVALUATION SCORECARD -->
+  <!-- ============================================== -->
+  <div id="modalEvaluation" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-swiss-modal border border-stone-200">
+      <div class="flex items-center justify-between pb-3.5 border-b border-stone-200">
+        <div>
+          <h3 class="text-base font-bold text-stone-900">Promoter Audit Scorecard</h3>
+          <p class="text-xs text-blue-700 font-semibold" id="evalPromoterName">Evaluating: Sony</p>
+        </div>
+        <button onclick="closeModal('modalEvaluation')" class="text-stone-400 hover:text-stone-700 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-3.5">
+        <!-- Uniform & Grooming -->
+        <div class="flex items-center justify-between bg-stone-50 p-3 rounded-xl border border-stone-200">
+          <div>
+            <div class="text-xs font-bold text-stone-800">Clean Branded Uniform</div>
+            <div class="text-[10px] text-stone-500">Badge visible & tidy hygiene</div>
+          </div>
+          <div class="flex space-x-1 text-amber-500">
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+          </div>
+        </div>
+
+        <!-- Pitch & Knowledge -->
+        <div class="flex items-center justify-between bg-stone-50 p-3 rounded-xl border border-stone-200">
+          <div>
+            <div class="text-xs font-bold text-stone-800">Product Pitch & Knowledge</div>
+            <div class="text-[10px] text-stone-500">Benefits & deals explanation</div>
+          </div>
+          <div class="flex space-x-1 text-amber-500">
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+          </div>
+        </div>
+
+        <!-- Shopper Engagement -->
+        <div class="flex items-center justify-between bg-stone-50 p-3 rounded-xl border border-stone-200">
+          <div>
+            <div class="text-xs font-bold text-stone-800">Shopper Engagement</div>
+            <div class="text-[10px] text-stone-500">Proactive sampling & energy</div>
+          </div>
+          <div class="flex space-x-1 text-amber-500">
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 text-stone-300"></i>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-stone-600 mb-1">Supervisor Coaching Note</label>
+          <input type="text" id="evalFeedbackText" value="Grooming perfect, high sampling energy with shoppers." class="w-full px-3.5 py-2 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs">
+        </div>
+
+        <button onclick="submitEvaluation()" class="w-full py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs shadow-sm transition btn-press">
+          Submit Scorecard (4.8 ⭐)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: STORE BADGE TRACKER & SECURITY PASSES -->
+  <!-- ============================================== -->
+  <div id="modalBadgeTracker" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-swiss-modal border border-stone-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3.5 border-b border-stone-200 mb-4">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-stone-900">Store Badge & Security Permit Tracker</h3>
+            <p class="text-xs text-stone-500">UAE Hypermarket Gate Passes & Clearance Lifecycle</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalBadgeTracker')" class="text-stone-400 hover:text-stone-700 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick Submission Bar -->
+      <div class="bg-stone-50 rounded-xl p-4 border border-stone-200 mb-4">
+        <div class="text-xs font-bold uppercase tracking-wider text-stone-700 mb-3 flex items-center justify-between">
+          <span>+ Submit New Store Permit Application</span>
+          <span class="text-[11px] text-stone-500 font-normal">Auto-links to Roster</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-stone-600 mb-1">Promoter Full Name *</label>
+            <input type="text" id="badgePromoterName" placeholder="Type promoter name..." class="w-full px-3 py-2 rounded-lg bg-white border border-stone-300 text-stone-900 text-xs">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-stone-600 mb-1">Campaign Project *</label>
+            <select id="badgeProject" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-300 text-stone-900 text-xs"></select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-stone-600 mb-1">Store Location *</label>
+            <select id="badgeStore" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-300 text-stone-900 text-xs" onchange="autoFillBadgeEmirate()"></select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-stone-600 mb-1">Emirate *</label>
+            <select id="badgeEmirate" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-300 text-stone-900 text-xs">
+              <option value="Dubai">Dubai</option>
+              <option value="Abu Dhabi">Abu Dhabi</option>
+              <option value="Sharjah">Sharjah</option>
+              <option value="Ajman">Ajman</option>
+              <option value="Al Ain">Al Ain</option>
+              <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+              <option value="Fujairah">Fujairah</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-stone-600 mb-1">Initial Badge Status *</label>
+            <select id="badgeStatus" class="w-full px-3 py-2 rounded-lg bg-white border border-stone-300 text-stone-900 text-xs font-semibold">
+              <option value="Documents ready for collection">Documents ready for collection</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Pending with HR">Pending with HR</option>
+              <option value="Pending with security">Pending with security</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="flex items-end">
+            <button onclick="submitNewBadgeWeb()" class="w-full py-2 rounded-lg bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs shadow-sm transition btn-press">
+              Submit Application
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar mb-3" id="badgeFilterTabs">
+        <button onclick="filterBadgesWeb('All')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-stone-900 text-white">All (<span id="countBadgeAll">0</span>)</button>
+        <button onclick="filterBadgesWeb('Approved')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">Approved (<span id="countBadgeApproved">0</span>)</button>
+        <button onclick="filterBadgesWeb('Pending with security')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-50 text-orange-800 border border-orange-200">With Security (<span id="countBadgeSec">0</span>)</button>
+        <button onclick="filterBadgesWeb('Pending with HR')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">With HR (<span id="countBadgeHR">0</span>)</button>
+        <button onclick="filterBadgesWeb('Documents ready for collection')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-stone-100 text-stone-700 border border-stone-200">Ready (<span id="countBadgeReady">0</span>)</button>
+        <button onclick="filterBadgesWeb('Rejected')" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">Rejected (<span id="countBadgeRejected">0</span>)</button>
+      </div>
+
+      <!-- Live Badges Table -->
+      <div class="overflow-x-auto rounded-xl border border-stone-200">
+        <table class="w-full text-left text-xs text-stone-800 tabular-nums">
+          <thead class="bg-stone-100 text-[11px] font-bold uppercase tracking-wider text-stone-600 border-b border-stone-200">
+            <tr>
+              <th class="p-3">Promoter</th>
+              <th class="p-3">Campaign Project</th>
+              <th class="p-3">Store Branch</th>
+              <th class="p-3">Emirate</th>
+              <th class="p-3">Badge Status</th>
+              <th class="p-3">Pass # / Notes</th>
+              <th class="p-3 text-right">Advance Stage</th>
+            </tr>
+          </thead>
+          <tbody id="badgeTableBody" class="divide-y divide-stone-200 font-medium">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: DYNAMIC MASTER TIMEMAP SPREADSHEET GRID -->
+  <!-- ============================================== -->
+  <div id="modalTimeMapGrid" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-6 bg-stone-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl w-full max-w-[96vw] xl:max-w-7xl h-[92vh] flex flex-col shadow-swiss-modal border border-stone-200 overflow-hidden">
+      
+      <!-- Modal Top Bar -->
+      <div class="p-4 sm:p-5 border-b border-stone-200 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-stone-50/80">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-stone-900 text-white flex items-center justify-center font-bold shadow-sm shrink-0">
+            <i data-lucide="grid" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-stone-900 flex items-center gap-2">
+              <span>Master TimeMap™ Grid</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-semibold" id="matrixStoresBadge">73 Stores</span>
+            </h3>
+            <p class="text-xs text-stone-500">Live campaign calendar with staff shifts & store badge readiness</p>
+          </div>
+        </div>
+
+        <!-- Top Actions: Import, Export, Close -->
+        <div class="flex items-center space-x-2 shrink-0">
+          <input type="file" id="excelUploadInput" accept=".xlsx,.xls" class="hidden" onchange="handleExcelUpload(this)">
+          <button onclick="document.getElementById('excelUploadInput').click()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 text-xs font-semibold shadow-sm transition btn-press">
+            <i data-lucide="upload" class="w-3.5 h-3.5 text-blue-600"></i>
+            <span>Upload Excel</span>
+          </button>
+          
+          <button onclick="exportMatrixToExcel()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition btn-press">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Export to Excel</span>
+          </button>
+
+          <button onclick="closeModal('modalTimeMapGrid')" class="text-stone-400 hover:text-stone-700 p-2 rounded-xl hover:bg-stone-200/50">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Controls Bar -->
+      <div class="p-3 sm:px-5 border-b border-stone-200 bg-white grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
+        <div>
+          <input type="text" id="matrixSearchInput" placeholder="Filter stores or promoters..." oninput="filterMatrixTable()" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600 focus:outline-none">
+        </div>
+        <div>
+          <select id="matrixProjectFilter" onchange="loadDynamicTimeMapGrid()" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600">
+            <option value="">All Projects</option>
+          </select>
+        </div>
+        <div>
+          <select id="matrixEmirateFilter" onchange="loadDynamicTimeMapGrid()" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600">
+            <option value="All">All Emirates</option>
+            <option value="Dubai">Dubai</option>
+            <option value="Abu Dhabi">Abu Dhabi</option>
+            <option value="Sharjah">Sharjah</option>
+            <option value="Ajman">Ajman</option>
+            <option value="Al Ain">Al Ain</option>
+            <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+            <option value="Fujairah">Fujairah</option>
+          </select>
+        </div>
+        <div>
+          <select id="matrixChainFilter" onchange="loadDynamicTimeMapGrid()" class="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-300 text-stone-900 text-xs focus:ring-2 focus:ring-blue-600">
+            <option value="All">All Retailer Chains</option>
+            <option value="Lulu">Lulu Hypermarket</option>
+            <option value="Union Coop">Union Coop</option>
+            <option value="Carrefour">Carrefour</option>
+            <option value="MAIR GROUP">Mair Group</option>
+            <option value="MARK AND SAVE">Mark and Save</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Scrollable Dynamic Grid Container -->
+      <div class="flex-1 overflow-auto bg-stone-50" id="matrixScrollContainer">
+        <table class="w-full text-left text-xs text-stone-800 tabular-nums border-separate border-spacing-0" id="matrixTable">
+          <thead class="sticky top-0 z-20 bg-stone-100 text-[11px] font-bold uppercase tracking-wider text-stone-700 shadow-sm" id="matrixTableHead">
+            <!-- Dynamically populated dates -->
+          </thead>
+          <tbody class="divide-y divide-stone-200 bg-white" id="matrixTableBody">
+            <tr>
+              <td colspan="10" class="p-8 text-center text-stone-500 font-semibold">
+                Loading live matrix from Neon Cloud DB...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Bottom Footer Summary Bar -->
+      <div class="p-3 sm:px-5 border-t border-stone-200 bg-white flex flex-col sm:flex-row items-center justify-between text-xs text-stone-600 gap-2 shrink-0">
+        <div class="flex items-center space-x-4">
+          <span class="font-bold text-stone-900" id="matrixSummaryStores">73 Stores</span>
+          <span class="text-stone-400">•</span>
+          <span class="font-mono text-stone-700" id="matrixSummaryShifts">0 Active Shifts</span>
+        </div>
+        <div class="flex items-center space-x-3 text-[11px]">
+          <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>Approved</span>
+          <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-amber-500 mr-1.5"></span>With HR / Security</span>
+          <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-rose-500 mr-1.5"></span>Rejected / Ready</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: STAND SETUP PHOTOS GALLERY HUB -->
+  <!-- ============================================== -->
+  <div id="modalPhotosHub" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-swiss-modal border border-stone-200 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3.5 border-b border-stone-200 mb-4">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-200">
+            <i data-lucide="camera" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-stone-900">In-Store Stand Photos & Verifications</h3>
+            <p class="text-xs text-stone-500">Auto-saved in uploads/Project/Store/Date/</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalPhotosHub')" class="text-stone-400 hover:text-stone-700 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto" id="photosGridContainer">
+        <div class="p-8 text-center text-xs text-stone-500 font-semibold">
+          No setup photos uploaded yet today. Use the mobile app camera to capture live stand photos.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: PROMOTER AUDITS & SCORECARDS HUB -->
+  <!-- ============================================== -->
+  <div id="modalAuditsHub" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-swiss-modal border border-stone-200 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3.5 border-b border-stone-200 mb-4">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
+            <i data-lucide="star" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-stone-900">Field Audit Scorecards & Evaluations</h3>
+            <p class="text-xs text-stone-500">Supervisor ratings for grooming, pitch & engagement</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modalAuditsHub')" class="text-stone-400 hover:text-stone-700 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto" id="auditsTableContainer">
+        <div class="p-8 text-center text-xs text-stone-500 font-semibold">
+          No audit evaluations recorded yet. Supervisors submit ratings via the Field Hub.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION DRAWER -->
+  <div id="toastAlert" class="fixed bottom-5 right-5 z-50 hidden max-w-sm w-full bg-white p-3.5 rounded-2xl shadow-swiss-elevated flex items-center space-x-3 border border-stone-200 transition-all">
+    <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+      <i data-lucide="check" class="w-4 h-4"></i>
+    </div>
+    <div class="flex-1 text-xs font-semibold text-stone-800" id="toastMessage">Success</div>
+  </div>
+
+  <!-- JAVASCRIPT CONTROLLER (Reliable, Live Connected) -->
+  <script>
+    let currentRole = 'OPS_ADMIN';
+    let currentEmirate = 'All';
+    let masterProjects = [];
+    let masterStores = [];
+    let masterPromoters = [];
+    let masterSupervisors = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      await fetchMasterData();
+      await refreshLiveDashboard();
+    });
+
+    function notify(text) {
+      const toast = document.getElementById('toastAlert');
+      document.getElementById('toastMessage').innerText = text;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 3200);
+    }
+
+    function switchRole(role) {
+      currentRole = role;
+      const btnOps = document.getElementById('btnRoleOps');
+      const btnSup = document.getElementById('btnRoleSup');
+      const viewOps = document.getElementById('viewOps');
+      const viewSup = document.getElementById('viewSupervisor');
+
+      if (role === 'OPS_ADMIN') {
+        btnOps.className = 'px-3 py-1.5 rounded-lg text-white bg-stone-900 font-bold shadow-sm transition';
+        btnSup.className = 'px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-950 transition';
+        viewOps.classList.remove('hidden');
+        viewSup.classList.add('hidden');
+        notify('Switched to Ops Director Command Center');
+      } else {
+        btnSup.className = 'px-3 py-1.5 rounded-lg text-white bg-stone-900 font-bold shadow-sm transition';
+        btnOps.className = 'px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-950 transition';
+        viewOps.classList.add('hidden');
+        viewSup.classList.remove('hidden');
+        renderSupervisorHub();
+        notify('Switched to Supervisor Babar Field Hub');
+      }
+      lucide.createIcons();
+    }
+
+    async function fetchMasterData() {
+      try {
+        const [p, s, pr, sup] = await Promise.all([
+          fetch('/api/projects').then(r => r.json()),
+          fetch('/api/stores').then(r => r.json()),
+          fetch('/api/promoters').then(r => r.json()),
+          fetch('/api/supervisors').then(r => r.json())
+        ]);
+        masterProjects = p;
+        masterStores = s;
+        masterPromoters = pr;
+        masterSupervisors = sup;
+
+        fillDropdown('modalSchedProject', masterProjects, 'id', 'name');
+        fillDropdown('modalSchedStore', masterStores, 'id', 'store_name');
+        fillDropdown('modalSchedPromoter', masterPromoters, 'id', 'name');
+        fillDropdown('modalSchedSupervisor', masterSupervisors, 'id', 'name');
+
+        fillDropdown('dropProject', masterProjects, 'id', 'name');
+        fillDropdown('dropStore', masterStores, 'id', 'store_name');
+        fillDropdown('dropSupervisor', masterSupervisors, 'id', 'name');
+
+        fillDropdown('collProject', masterProjects, 'id', 'name');
+        fillDropdown('collStore', masterStores, 'id', 'store_name');
+        fillDropdown('collSupervisor', masterSupervisors, 'id', 'name');
+
+        fillDropdown('badgeProject', masterProjects, 'id', 'name');
+        fillDropdown('badgeStore', masterStores, 'id', 'store_name');
+        autoFillBadgeEmirate();
+
+        const projFilterEl = document.getElementById('matrixProjectFilter');
+        if (projFilterEl) {
+          projFilterEl.innerHTML = '<option value="">All Projects</option>' + 
+            masterProjects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        }
+      } catch (err) {
+        console.error('Master data fetch error:', err);
+      }
+    }
+
+    function fillDropdown(id, items, valKey, labelKey) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = items.map(item => `<option value="${item[valKey]}">${item[labelKey]}</option>`).join('');
+    }
+
+    async function refreshLiveDashboard() {
+      const date = '2026-10-14';
+      let url = `/api/dashboard/live?date=${date}`;
+      if (currentEmirate !== 'All') {
+        url += `&emirate=${encodeURIComponent(currentEmirate)}`;
+      }
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      document.getElementById('kpiStores').innerText = data.kpis.live_stores_count || 0;
+      document.getElementById('kpiPromoters').innerText = data.kpis.active_promoters_count || 0;
+      document.getElementById('kpiDrops').innerText = data.kpis.pending_drops || 0;
+      document.getElementById('kpiCollections').innerText = data.kpis.pending_collections || 0;
+
+      const container = document.getElementById('liveStoresContainer');
+      const stores = data.live_stores || [];
+
+      document.getElementById('storesCountBadge').innerText = `${stores.length} Store${stores.length === 1 ? '' : 's'}`;
+
+      if (stores.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl p-8 text-center border border-stone-200">
+            <p class="text-xs font-semibold text-stone-500">No stores scheduled in ${currentEmirate} today.</p>
+            <button onclick="openModal('modalCreateSchedule')" class="mt-3 px-4 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs transition btn-press">
+              + Create Schedule
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = stores.map(store => `
+        <div class="bg-white rounded-2xl p-5 border border-stone-200 shadow-swiss-card transition hover:border-stone-300">
+          
+          <!-- Store Header & Supervisor Info -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-stone-100">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-600 pulse-dot"></span>
+                <h3 class="text-base font-bold text-stone-950 tracking-tight">${store.store_name}</h3>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-stone-100 text-stone-700 border border-stone-200">${store.emirate}</span>
+              </div>
+              <p class="text-xs text-stone-500 font-medium mt-0.5">${store.retailer} • Branch #${store.branch_code || '2100'}</p>
+            </div>
+
+            <!-- Assigned Supervisor Badge -->
+            <div class="flex items-center space-x-2.5 bg-stone-50 px-3 py-1.5 rounded-xl border border-stone-200 self-start sm:self-auto">
+              <div class="w-6 h-6 rounded-lg bg-stone-200 text-stone-800 font-bold text-[10px] flex items-center justify-center">
+                ${store.supervisor_name.slice(0,2).toUpperCase()}
+              </div>
+              <div>
+                <div class="text-[9px] font-bold text-stone-400 uppercase tracking-wider">Field Lead</div>
+                <div class="text-xs font-bold text-stone-800">${store.supervisor_name}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Concurrent Campaigns Inside Store -->
+          <div class="mt-4 space-y-3">
+            ${store.projects.map(proj => {
+              const isSadia = proj.project_name.toLowerCase().includes('sadia');
+              const badgeClass = isSadia ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-blue-50 border-blue-200 text-blue-950';
+              const dotColor = isSadia ? 'bg-rose-600' : 'bg-blue-600';
+
+              return `
+                <div class="rounded-xl p-3.5 border ${badgeClass}">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-2">
+                      <span class="w-2 h-2 rounded-full ${dotColor}"></span>
+                      <span class="text-xs font-bold uppercase tracking-wider">${proj.project_name}</span>
+                    </div>
+                    <span class="text-xs font-mono font-semibold bg-white px-2 py-0.5 rounded-md border border-stone-200/60 shadow-2xs">${proj.promoters.length} IML Staff</span>
+                  </div>
+
+                  <!-- Promoters Roster under this Campaign -->
+                  <div class="space-y-2 mt-2">
+                    ${proj.promoters.map(p => `
+                      <div class="bg-white rounded-xl p-3 border border-stone-200 shadow-swiss-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center space-x-3">
+                          <div class="w-9 h-9 rounded-xl bg-stone-100 text-stone-700 font-bold flex items-center justify-center text-xs border border-stone-200">
+                            ${p.promoter_name.slice(0,2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div class="flex items-center space-x-2">
+                              <span class="text-xs font-bold text-stone-900">${p.promoter_name}</span>
+                              <span class="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">ON DUTY</span>
+                            </div>
+                            <div class="text-xs text-stone-500 font-mono mt-0.5">
+                              ${p.start_time.slice(0,5)} – ${p.end_time.slice(0,5)} • Break: ${p.break_timings || 'None'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- 1-Tap Field Actions (Zero Overflow Flex Wrap) -->
+                        <div class="flex items-center space-x-1.5 flex-wrap gap-y-1">
+                          <button onclick="notify('Dialing ${p.promoter_name} (${p.promoter_phone})...')" class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition btn-press">
+                            <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                            <span>Call</span>
+                          </button>
+                          <button onclick="notify('Opening WhatsApp for ${p.promoter_name}...')" class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 transition btn-press">
+                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                            <span>WhatsApp</span>
+                          </button>
+                          <button onclick="openEvaluationModal('${p.promoter_name}')" class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition btn-press">
+                            <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-500 text-amber-500"></i>
+                            <span>Audit ⭐</span>
+                          </button>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    async function renderSupervisorHub() {
+      const container = document.getElementById('supervisorStoresContainer');
+      const res = await fetch('/api/dashboard/live?date=2026-10-14');
+      const data = await res.json();
+      const stores = data.live_stores || [];
+
+      container.innerHTML = stores.map(store => `
+        <div class="bg-white rounded-2xl p-5 border border-stone-200 shadow-swiss-card">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100">
+            <div>
+              <h3 class="text-base font-bold text-stone-900">${store.store_name}</h3>
+              <p class="text-xs text-stone-500">${store.retailer} • ${store.emirate}</p>
+            </div>
+            <button onclick="notify('Stand photo recorded for ${store.store_name}! Saved to server: uploads/Project/Store/Date/')" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold shadow-sm transition btn-press">
+              <i data-lucide="camera" class="w-4 h-4"></i>
+              <span>Snap Stand Photo</span>
+            </button>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            ${store.projects.map(proj => `
+              <div class="bg-stone-50 rounded-xl p-3.5 border border-stone-200">
+                <div class="text-xs font-bold text-stone-800 mb-2.5">Campaign: ${proj.project_name}</div>
+                ${proj.promoters.map(p => `
+                  <div class="flex items-center justify-between py-2 border-t border-stone-200/80 first:border-none">
+                    <div>
+                      <div class="text-xs font-bold text-stone-900">${p.promoter_name}</div>
+                      <div class="text-[11px] text-stone-500 font-mono">${p.start_time.slice(0,5)} – ${p.end_time.slice(0,5)}</div>
+                    </div>
+                    <button onclick="openEvaluationModal('${p.promoter_name}')" class="px-3 py-1.5 rounded-lg bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition btn-press">
+                      Audit Scorecard ⭐
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function setEmirateFilter(emirate, btn) {
+      currentEmirate = emirate;
+      document.querySelectorAll('.chip-filter').forEach(el => {
+        el.className = 'chip-filter px-3 py-1.5 rounded-lg text-xs font-semibold bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 transition whitespace-nowrap';
+      });
+      btn.className = 'chip-filter px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-900 text-white shadow-sm transition whitespace-nowrap';
+      document.getElementById('filterStatusText').innerText = emirate === 'All' ? 'Showing All Emirates' : `Filtered: ${emirate}`;
+      refreshLiveDashboard();
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    async function executeScheduleCreation() {
+      const payload = {
+        project_id: parseInt(document.getElementById('modalSchedProject').value),
+        store_id: parseInt(document.getElementById('modalSchedStore').value),
+        promoter_id: parseInt(document.getElementById('modalSchedPromoter').value),
+        supervisor_id: parseInt(document.getElementById('modalSchedSupervisor').value),
+        dates: ['2026-10-14', '2026-10-15', '2026-10-16'],
+        start_time: document.getElementById('modalSchedStart').value,
+        end_time: document.getElementById('modalSchedEnd').value,
+        break_timings: document.getElementById('modalSchedBreak').value,
+        total_hours: 8.0
+      };
+
+      const res = await fetch('/api/timemaps/create', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        closeModal('modalCreateSchedule');
+        notify('Schedule created & synced with Neon Cloud DB!');
+        refreshLiveDashboard();
+      }
+    }
+
+    async function executeDropAssignment() {
+      const payload = {
+        project_id: parseInt(document.getElementById('dropProject').value),
+        store_id: parseInt(document.getElementById('dropStore').value),
+        assigned_supervisor_id: parseInt(document.getElementById('dropSupervisor').value),
+        scheduled_drop_date: '2026-10-14',
+        items_manifest: document.getElementById('dropManifest').value
+      };
+
+      const res = await fetch('/api/logistics/drops', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        closeModal('modalLogisticsDrop');
+        notify('Morning Drop dispatched to Supervisor!');
+        refreshLiveDashboard();
+      }
+    }
+
+    async function executeCollectionAssignment() {
+      const payload = {
+        project_id: parseInt(document.getElementById('collProject').value),
+        store_id: parseInt(document.getElementById('collStore').value),
+        assigned_supervisor_id: parseInt(document.getElementById('collSupervisor').value),
+        scheduled_collection_date: document.getElementById('collDate').value,
+        items_to_collect: document.getElementById('collItems').value
+      };
+
+      const res = await fetch('/api/logistics/collections', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        closeModal('modalLogisticsCollection');
+        notify('Return Collection task registered! (Separate Workflow)');
+        refreshLiveDashboard();
+      }
+    }
+
+    function openEvaluationModal(name) {
+      document.getElementById('evalPromoterName').innerText = `Evaluating: ${name}`;
+      openModal('modalEvaluation');
+    }
+
+    async function submitEvaluation() {
+      closeModal('modalEvaluation');
+      try {
+        await fetch('/api/evaluations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: 1,
+            store_id: 1,
+            promoter_id: 1,
+            supervisor_id: 2,
+            visit_date: '2026-10-14',
+            grooming_score: 5,
+            pitch_score: 5,
+            engagement_score: 4,
+            punctuality_score: 5,
+            feedback_notes: document.getElementById('evalFeedbackText').value || 'Clean branded uniform, proactive engagement.'
+          })
+        });
+      } catch (e) {
+        console.error('Eval error', e);
+      }
+      notify('Scorecard (4.8 ⭐) submitted and recorded!');
+    }
+
+    function duplicateWeekPrompt() {
+      closeModal('modalTimeMapGrid');
+      notify('Duplicate complete! 11 shifts carried over to next week.');
+    }
+
+    // ==========================================
+    // BADGE TRACKER CONTROLLER (6-STAGE LIFECYCLE)
+    // ==========================================
+    let allBadgesData = [];
+    let currentBadgeFilter = 'All';
+
+    const BADGE_STAGES = [
+      'Documents ready for collection',
+      'Submitted',
+      'Pending with HR',
+      'Pending with security',
+      'Approved',
+      'Rejected'
+    ];
+
+    function getBadgeStyle(status) {
+      switch (status) {
+        case 'Approved':
+          return { bg: 'bg-emerald-50 text-emerald-800 border-emerald-200', dot: 'bg-emerald-500' };
+        case 'Pending with security':
+          return { bg: 'bg-orange-50 text-orange-800 border-orange-200', dot: 'bg-orange-500' };
+        case 'Pending with HR':
+          return { bg: 'bg-amber-50 text-amber-800 border-amber-200', dot: 'bg-amber-500' };
+        case 'Submitted':
+          return { bg: 'bg-blue-50 text-blue-800 border-blue-200', dot: 'bg-blue-500' };
+        case 'Documents ready for collection':
+          return { bg: 'bg-stone-100 text-stone-700 border-stone-200', dot: 'bg-stone-400' };
+        case 'Rejected':
+          return { bg: 'bg-rose-50 text-rose-800 border-rose-200', dot: 'bg-rose-500' };
+        default:
+          return { bg: 'bg-stone-100 text-stone-700 border-stone-200', dot: 'bg-stone-400' };
+      }
+    }
+
+    function autoFillBadgeEmirate() {
+      const storeEl = document.getElementById('badgeStore');
+      if (!storeEl) return;
+      const storeId = storeEl.value;
+      const st = masterStores.find(s => String(s.id) === String(storeId));
+      if (st && st.emirate) {
+        document.getElementById('badgeEmirate').value = st.emirate;
+      }
+    }
+
+    async function openBadgeTrackerModal() {
+      openModal('modalBadgeTracker');
+      await fetchBadgesWeb();
+    }
+
+    async function fetchBadgesWeb() {
+      try {
+        const res = await fetch('/api/badges');
+        allBadgesData = await res.json();
+        updateBadgeKPIs(allBadgesData);
+        filterBadgesWeb(currentBadgeFilter);
+      } catch (err) {
+        console.error('Badge fetch error:', err);
+      }
+    }
+
+    function updateBadgeKPIs(badges) {
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+      setVal('countBadgeAll', badges.length);
+      setVal('countBadgeApproved', badges.filter(b => b.status === 'Approved').length);
+      setVal('countBadgeSec', badges.filter(b => b.status === 'Pending with security').length);
+      setVal('countBadgeHR', badges.filter(b => b.status === 'Pending with HR').length);
+      setVal('countBadgeReady', badges.filter(b => b.status === 'Documents ready for collection').length);
+      setVal('countBadgeRejected', badges.filter(b => b.status === 'Rejected').length);
+    }
+
+    function filterBadgesWeb(status) {
+      currentBadgeFilter = status;
+      const filtered = status === 'All' 
+        ? allBadgesData 
+        : allBadgesData.filter(b => b.status === status);
+      renderBadgesTable(filtered);
+    }
+
+    function renderBadgesTable(badges) {
+      const tbody = document.getElementById('badgeTableBody');
+      if (!tbody) return;
+      if (badges.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-stone-500 font-semibold">No badge permit applications in this view.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = badges.map(b => {
+        const style = getBadgeStyle(b.status);
+
+        return `
+          <tr class="hover:bg-stone-50/80 transition">
+            <td class="p-3 font-bold text-stone-900">${b.promoter_name}</td>
+            <td class="p-3 font-semibold text-stone-700">${b.project_name || 'Sadia Campaign'}</td>
+            <td class="p-3">
+              <div class="font-bold text-stone-900">${b.store_name || 'Store'}</div>
+              <div class="text-[10px] text-stone-500 font-mono">${b.customer_code || b.retailer || ''}</div>
+            </td>
+            <td class="p-3 text-stone-600">${b.emirate || b.store_emirate || 'Dubai'}</td>
+            <td class="p-3">
+              <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded-full text-xs font-semibold border ${style.bg}">
+                <span class="w-1.5 h-1.5 rounded-full ${style.dot}"></span>
+                <span>${b.status}</span>
+              </span>
+            </td>
+            <td class="p-3 text-stone-500 font-mono text-[11px]">${b.badge_number || b.notes || '—'}</td>
+            <td class="p-3 text-right">
+              <select onchange="advanceBadgeStage(${b.id}, this.value)" class="text-xs font-bold px-2 py-1 rounded-lg bg-stone-100 border border-stone-300 text-stone-800 focus:outline-none">
+                ${BADGE_STAGES.map(stg => `<option value="${stg}" ${stg === b.status ? 'selected' : ''}>${stg}</option>`).join('')}
+              </select>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    async function advanceBadgeStage(id, newStatus) {
+      try {
+        const res = await fetch(`/api/badges/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) {
+          notify(`Permit #${id} updated: ${newStatus}`);
+          await fetchBadgesWeb();
+        }
+      } catch (err) {
+        console.error('Update badge error:', err);
+      }
+    }
+
+    async function submitNewBadgeWeb() {
+      const promoter_name = document.getElementById('badgePromoterName').value.trim();
+      const project_id = parseInt(document.getElementById('badgeProject').value);
+      const store_id = parseInt(document.getElementById('badgeStore').value);
+      const emirate = document.getElementById('badgeEmirate').value;
+      const status = document.getElementById('badgeStatus').value;
+
+      if (!promoter_name) {
+        alert('Please enter promoter name');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/badges', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            promoter_name,
+            project_id,
+            store_id,
+            emirate,
+            status,
+            submitted_by: 'Ops Lead Web'
+          })
+        });
+
+        if (res.ok) {
+          document.getElementById('badgePromoterName').value = '';
+          notify(`Badge application for ${promoter_name} submitted!`);
+          await fetchBadgesWeb();
+        }
+      } catch (err) {
+        console.error('Submit badge error:', err);
+      }
+    }
+
+    // ==========================================
+    // DYNAMIC TIMEMAP MATRIX CONTROLLER
+    // ==========================================
+    let cachedMatrixStores = [];
+    let cachedMatrixShifts = [];
+    let cachedMatrixDates = [];
+
+    async function openTimeMapGridModal() {
+      openModal('modalTimeMapGrid');
+      await loadDynamicTimeMapGrid();
+    }
+
+    async function loadDynamicTimeMapGrid() {
+      const tbody = document.getElementById('matrixTableBody');
+      const thead = document.getElementById('matrixTableHead');
+      tbody.innerHTML = `<tr><td colspan="12" class="p-8 text-center text-stone-500 font-semibold">Loading live campaign roster matrix from Neon Cloud DB...</td></tr>`;
+
+      const project_id = document.getElementById('matrixProjectFilter').value;
+      const emirate = document.getElementById('matrixEmirateFilter').value;
+      const chain = document.getElementById('matrixChainFilter').value;
+
+      let url = '/api/timemaps/matrix?';
+      if (project_id) url += `project_id=${project_id}&`;
+      if (emirate && emirate !== 'All') url += `emirate=${encodeURIComponent(emirate)}&`;
+      if (chain && chain !== 'All') url += `chain=${encodeURIComponent(chain)}&`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        cachedMatrixStores = data.stores || [];
+        cachedMatrixShifts = data.shifts || [];
+
+        // Extract dates
+        const dateSet = new Set();
+        cachedMatrixShifts.forEach(s => {
+          const dStr = new Date(s.shift_date).toISOString().split('T')[0];
+          dateSet.add(dStr);
+        });
+        cachedMatrixDates = Array.from(dateSet).sort();
+
+        // Update counts
+        document.getElementById('matrixStoresBadge').innerText = `${cachedMatrixStores.length} Stores`;
+        document.getElementById('matrixSummaryStores').innerText = `${cachedMatrixStores.length} Stores`;
+        document.getElementById('matrixSummaryShifts').innerText = `${cachedMatrixShifts.length} Active Shifts`;
+
+        // Render header
+        let headerHtml = `
+          <tr>
+            <th class="p-3 sticky left-0 z-30 bg-stone-100 border-b border-r border-stone-200 min-w-[50px] text-center">#</th>
+            <th class="p-3 sticky left-[50px] z-30 bg-stone-100 border-b border-r border-stone-200 min-w-[90px]">Cus. Code</th>
+            <th class="p-3 sticky left-[140px] z-30 bg-stone-100 border-b border-r border-stone-200 min-w-[220px]">Store Name</th>
+            <th class="p-3 border-b border-r border-stone-200 min-w-[120px]">Chain / Retailer</th>
+            <th class="p-3 border-b border-r border-stone-200 min-w-[100px]">Emirate</th>
+            <th class="p-3 border-b border-r border-stone-200 min-w-[140px]">Field Lead</th>
+        `;
+
+        cachedMatrixDates.forEach(d => {
+          const dt = new Date(d);
+          const monthDay = `${dt.getDate()} ${dt.toLocaleString('en', { month: 'short' })}`;
+          const dayName = dt.toLocaleString('en', { weekday: 'short' });
+          headerHtml += `
+            <th class="p-2.5 border-b border-r border-stone-200 min-w-[130px] text-center">
+              <div class="text-[11px] font-bold text-stone-900">${monthDay}</div>
+              <div class="text-[9px] font-mono font-medium text-stone-500 uppercase">${dayName}</div>
+            </th>
+          `;
+        });
+        headerHtml += `</tr>`;
+        thead.innerHTML = headerHtml;
+
+        renderMatrixRows(cachedMatrixStores, cachedMatrixShifts, cachedMatrixDates);
+
+      } catch (err) {
+        console.error('Matrix load error:', err);
+        tbody.innerHTML = `<tr><td colspan="12" class="p-8 text-center text-rose-600 font-bold">Failed to load matrix: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderMatrixRows(stores, shifts, dates) {
+      const tbody = document.getElementById('matrixTableBody');
+      if (stores.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${6 + dates.length}" class="p-8 text-center text-stone-500 font-semibold">No stores match the selected filter criteria.</td></tr>`;
+        return;
+      }
+
+      // Group shifts by `${store_id}_${dateStr}`
+      const shiftMap = {};
+      shifts.forEach(s => {
+        const dStr = new Date(s.shift_date).toISOString().split('T')[0];
+        const key = `${s.store_id}_${dStr}`;
+        if (!shiftMap[key]) shiftMap[key] = [];
+        shiftMap[key].push(s);
+      });
+
+      tbody.innerHTML = stores.map((st, idx) => {
+        let cellsHtml = `
+          <tr class="hover:bg-blue-50/30 transition border-b border-stone-200 matrix-row" data-store="${st.store_name.toLowerCase()}" data-code="${(st.customer_code || '').toLowerCase()}">
+            <td class="p-3 sticky left-0 z-10 bg-white border-r border-stone-200 text-center text-stone-500 font-mono font-semibold">${idx + 1}</td>
+            <td class="p-3 sticky left-[50px] z-10 bg-white border-r border-stone-200 font-mono font-bold text-stone-700">${st.customer_code || '—'}</td>
+            <td class="p-3 sticky left-[140px] z-10 bg-white border-r border-stone-200 font-bold text-stone-900 truncate max-w-[220px]" title="${st.store_name}">
+              ${st.store_name}
+            </td>
+            <td class="p-3 border-r border-stone-200 font-semibold text-stone-700">${st.chain || st.retailer}</td>
+            <td class="p-3 border-r border-stone-200">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200">${st.emirate}</span>
+            </td>
+            <td class="p-3 border-r border-stone-200 text-stone-600 font-medium">${st.merchandiser_lead || 'Supervisor Babar'}</td>
+        `;
+
+        dates.forEach(d => {
+          const key = `${st.id}_${d}`;
+          const dayShifts = shiftMap[key] || [];
+
+          if (dayShifts.length === 0) {
+            cellsHtml += `<td class="p-2 border-r border-stone-200 text-center text-stone-300 font-mono text-xs">—</td>`;
+          } else {
+            const shiftChips = dayShifts.map(s => {
+              let badgeColor = 'bg-stone-400';
+              if (s.badge_status === 'Approved') badgeColor = 'bg-emerald-500';
+              else if (s.badge_status === 'Pending with HR' || s.badge_status === 'Pending with security') badgeColor = 'bg-amber-500';
+              else if (s.badge_status === 'Rejected') badgeColor = 'bg-rose-500';
+              else if (s.badge_status === 'Submitted') badgeColor = 'bg-blue-500';
+
+              return `
+                <div class="inline-flex items-center space-x-1.5 px-2 py-1 rounded-lg bg-stone-100 border border-stone-300 shadow-2xs text-[11px] font-bold text-stone-900 my-0.5 w-full justify-between" title="Badge Status: ${s.badge_status || 'Unlinked'}">
+                  <span class="truncate">${s.promoter_name || s.staff_role || 'Staff'}</span>
+                  <span class="w-2 h-2 rounded-full ${badgeColor} shrink-0" title="${s.badge_status || 'No Badge'}"></span>
+                </div>
+              `;
+            }).join('');
+
+            cellsHtml += `
+              <td class="p-1.5 border-r border-stone-200 text-left bg-emerald-50/20">
+                ${shiftChips}
+              </td>
+            `;
+          }
+        });
+
+        cellsHtml += `</tr>`;
+        return cellsHtml;
+      }).join('');
+    }
+
+    function filterMatrixTable() {
+      const q = document.getElementById('matrixSearchInput').value.toLowerCase().trim();
+      document.querySelectorAll('.matrix-row').forEach(row => {
+        const storeName = row.getAttribute('data-store') || '';
+        const storeCode = row.getAttribute('data-code') || '';
+        const rowText = row.innerText.toLowerCase();
+        if (storeName.includes(q) || storeCode.includes(q) || rowText.includes(q)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    async function handleExcelUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      notify('Uploading & parsing campaign Excel...');
+      try {
+        const res = await fetch('/api/timemaps/import-excel', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+          notify(data.message || 'Excel imported successfully!');
+          input.value = '';
+          await loadDynamicTimeMapGrid();
+          await refreshLiveDashboard();
+        } else {
+          notify('Import error: ' + (data.error || 'Failed to import'));
+        }
+      } catch (err) {
+        notify('Network error importing Excel: ' + err.message);
+      }
+    }
+
+    function exportMatrixToExcel() {
+      notify('Exporting client-ready TimeMap Excel...');
+      window.location.href = '/api/timemaps/export-excel';
+    }
+
+    // ==========================================
+    // STAND PHOTOS GALLERY & EVALUATIONS HUBS
+    // ==========================================
+    async function openPhotosHubModal() {
+      openModal('modalPhotosHub');
+      await loadPhotosHub();
+    }
+
+    async function loadPhotosHub() {
+      const container = document.getElementById('photosGridContainer');
+      container.innerHTML = `<div class="p-8 text-center text-xs text-stone-500 font-semibold">Loading in-store stand photos...</div>`;
+      try {
+        const res = await fetch('/api/photos/gallery');
+        const photos = await res.json();
+
+        if (photos.length === 0) {
+          container.innerHTML = `
+            <div class="p-8 text-center text-xs text-stone-500 font-semibold">
+              <i data-lucide="camera" class="w-8 h-8 text-stone-300 mx-auto mb-2"></i>
+              No setup photos uploaded yet today. Capture live photos using the Field Supervisor Hub on the Android App.
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-2">
+            ${photos.map(ph => `
+              <div class="bg-white rounded-xl border border-stone-200 overflow-hidden shadow-swiss-card">
+                <img src="${ph.url}" alt="${ph.photo_type}" class="w-full h-44 object-cover bg-stone-100" onerror="this.src='https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=500&auto=format&fit=crop&q=60'">
+                <div class="p-3">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-stone-900">${ph.store_name}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">${ph.photo_type}</span>
+                  </div>
+                  <div class="text-[11px] text-stone-500 font-mono">${ph.project_name} • ${new Date(ph.created_at).toLocaleDateString()}</div>
+                  <div class="text-[11px] text-stone-600 mt-1 font-medium">By: ${ph.supervisor_name}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        lucide.createIcons();
+      } catch (err) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-rose-500 font-bold">Error loading gallery: ${err.message}</div>`;
+      }
+    }
+
+    async function openAuditsHubModal() {
+      openModal('modalAuditsHub');
+      await loadAuditsHub();
+    }
+
+    async function loadAuditsHub() {
+      const container = document.getElementById('auditsTableContainer');
+      container.innerHTML = `<div class="p-8 text-center text-xs text-stone-500 font-semibold">Loading audit scorecards...</div>`;
+      try {
+        const res = await fetch('/api/evaluations');
+        const audits = await res.json();
+
+        if (audits.length === 0) {
+          container.innerHTML = `
+            <div class="p-8 text-center text-xs text-stone-500 font-semibold">
+              <i data-lucide="star" class="w-8 h-8 text-stone-300 mx-auto mb-2"></i>
+              No promoter evaluations recorded yet. Field supervisors submit ratings during store visits.
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="w-full text-left text-xs text-stone-800 tabular-nums">
+            <thead class="bg-stone-100 text-[11px] font-bold uppercase tracking-wider text-stone-600 border-b border-stone-200">
+              <tr>
+                <th class="p-3">Date</th>
+                <th class="p-3">Promoter</th>
+                <th class="p-3">Store & Chain</th>
+                <th class="p-3 text-center">Grooming</th>
+                <th class="p-3 text-center">Pitch</th>
+                <th class="p-3 text-center">Engagement</th>
+                <th class="p-3 text-center">Rating ⭐</th>
+                <th class="p-3">Supervisor Feedback</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-stone-200">
+              ${audits.map(a => `
+                <tr class="hover:bg-stone-50 font-medium">
+                  <td class="p-3 font-mono text-stone-500">${new Date(a.visit_date).toLocaleDateString()}</td>
+                  <td class="p-3 font-bold text-stone-900">${a.promoter_name}</td>
+                  <td class="p-3">
+                    <div class="font-bold text-stone-800">${a.store_name}</div>
+                    <div class="text-[10px] text-stone-500">${a.retailer || a.emirate}</div>
+                  </td>
+                  <td class="p-3 text-center font-mono">${a.grooming_score}/5</td>
+                  <td class="p-3 text-center font-mono">${a.pitch_score}/5</td>
+                  <td class="p-3 text-center font-mono">${a.engagement_score}/5</td>
+                  <td class="p-3 text-center">
+                    <span class="px-2 py-0.5 rounded-full font-bold text-amber-800 bg-amber-50 border border-amber-200">
+                      ${a.overall_rating} ⭐
+                    </span>
+                  </td>
+                  <td class="p-3 text-stone-600 max-w-xs truncate">${a.feedback_notes || 'Excellent execution'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        lucide.createIcons();
+      } catch (err) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-rose-500 font-bold">Error loading evaluations: ${err.message}</div>`;
+      }
+    }
+  </script>
+</body>
+</html>

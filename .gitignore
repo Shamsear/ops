@@ -1,0 +1,49 @@
+# Node.js
+**/node_modules/
+**/npm-debug.log*
+**/yarn-error.log*
+**/.env
+
+# Flutter / Dart
+**/.dart_tool/
+**/.packages
+**/.pub/
+**/.pub-cache/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/build/
+
+# Android build outputs
+**/android/.gradle/
+**/android/local.properties
+**/android/app/build/
+**/*.apk
+**/*.aab
+**/*.keystore
+**/*.jks
+
+# iOS build outputs
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/App.framework
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/ephemeral/
+**/ios/Runner.xcworkspace/xcuserdata/
+**/ios/Runner.xcodeproj/xcuserdata/
+**/ios/Runner.xcodeproj/project.xcworkspace/xcuserdata/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+**/.idea/
+**/.vscode/
+*.iml
+
+# Temporary test screens and logs
+*.png
+*.log
+scratch/
+pdf_template.html
