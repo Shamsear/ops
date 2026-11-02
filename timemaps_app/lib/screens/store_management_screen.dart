@@ -323,7 +323,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
                                         Text('FIELD LEAD', style: AppText.micro.copyWith(color: AppColors.textMuted)),
                                         Text(
                                           store.merchandiserLead ?? 'Assigned Lead',
-                                          style: AppText.bodyBold.copyWith(fontSize: 12),
+                                          style: AppText.bodySmall.copyWith(fontWeight: FontWeight.w700),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -350,7 +350,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
                                         Text('SMN CONTACT', style: AppText.micro.copyWith(color: AppColors.textMuted)),
                                         Text(
                                           store.smnContact ?? 'Coordinating',
-                                          style: AppText.bodyBold.copyWith(fontSize: 12),
+                                          style: AppText.bodySmall.copyWith(fontWeight: FontWeight.w700),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),

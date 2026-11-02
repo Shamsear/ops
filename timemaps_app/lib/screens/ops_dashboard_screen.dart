@@ -577,7 +577,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                       Text('FIELD SUPERVISOR', style: AppText.micro.copyWith(color: AppColors.textMuted)),
                       Text(
                         store.supervisorName,
-                        style: AppText.bodyBold.copyWith(fontSize: 12),
+                        style: AppText.bodySmall.copyWith(fontWeight: FontWeight.w700),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

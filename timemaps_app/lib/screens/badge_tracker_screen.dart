@@ -370,9 +370,9 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('1. HR Review', style: AppText.micro.copyWith(fontSize: 9.5, color: currentStage >= 1 ? AppColors.textPrimary : AppColors.textMuted)),
-              Text('2. Security Check', style: AppText.micro.copyWith(fontSize: 9.5, color: currentStage >= 2 ? AppColors.textPrimary : AppColors.textMuted)),
-              Text('3. Gate Pass', style: AppText.micro.copyWith(fontSize: 9.5, color: currentStage >= 3 ? AppColors.textPrimary : AppColors.textMuted)),
+              Text('1. HR Review', style: AppText.micro.copyWith(color: currentStage >= 1 ? AppColors.textPrimary : AppColors.textMuted)),
+              Text('2. Security Check', style: AppText.micro.copyWith(color: currentStage >= 2 ? AppColors.textPrimary : AppColors.textMuted)),
+              Text('3. Gate Pass', style: AppText.micro.copyWith(color: currentStage >= 3 ? AppColors.textPrimary : AppColors.textMuted)),
             ],
           ),
 
@@ -453,7 +453,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
         children: [
           Icon(icon, size: 16, color: AppColors.primary),
           const SizedBox(width: 10),
-          Text(label, style: AppText.bodyBold.copyWith(fontSize: 12)),
+          Text(label, style: AppText.bodySmall.copyWith(fontWeight: FontWeight.w700)),
         ],
       ),
     );

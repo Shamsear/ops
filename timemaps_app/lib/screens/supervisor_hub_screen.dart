@@ -598,7 +598,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                               children: [
                                 Text(
                                   p.promoterName,
-                                  style: AppText.bodyBold.copyWith(fontSize: 12.5),
+                                  style: AppText.bodySmall.copyWith(fontWeight: FontWeight.w700),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),

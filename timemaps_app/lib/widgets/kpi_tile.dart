@@ -26,10 +26,11 @@ class KpiTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCard.compact(
+    return AppCard(
       onTap: onTap,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       border: isSelected
-          ? BorderSide(color: AppColors.primary, width: 1.5)
+          ? const BorderSide(color: AppColors.primary, width: 1.5)
           : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,13 +60,15 @@ class KpiTile extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              value,
-              style: AppText.display,
+          const SizedBox(height: 4),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: AppText.display,
+              ),
             ),
           ),
           const SizedBox(height: 2),

@@ -7,6 +7,8 @@ class IconBox extends StatelessWidget {
   final Color color;
   final Color? backgroundColor;
   final bool isCompact;
+  final double? size;
+  final double? iconSize;
 
   const IconBox({
     super.key,
@@ -14,24 +16,26 @@ class IconBox extends StatelessWidget {
     required this.color,
     this.backgroundColor,
     this.isCompact = false,
+    this.size,
+    this.iconSize,
   });
 
   @override
   Widget build(BuildContext context) {
-    final size = isCompact ? 28.0 : 36.0;
-    final iconSize = isCompact ? 15.0 : 18.0;
+    final boxSize = size ?? (isCompact ? 28.0 : 36.0);
+    final iSize = iconSize ?? (isCompact ? 15.0 : 18.0);
     final radius = isCompact ? 8.0 : AppRadius.iconBox;
     final bg = backgroundColor ?? color.withOpacity(0.12);
 
     return Container(
-      width: size,
-      height: size,
+      width: boxSize,
+      height: boxSize,
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Center(
-        child: Icon(icon, size: iconSize, color: color),
+        child: Icon(icon, size: iSize, color: color),
       ),
     );
   }

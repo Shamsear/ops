@@ -414,7 +414,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                         constraints: const BoxConstraints(maxWidth: 160),
                         child: Text(
                           store.storeName,
-                          style: AppText.bodyBold.copyWith(fontSize: 12),
+                          style: AppText.bodySmall.copyWith(fontWeight: FontWeight.w700),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -430,7 +430,6 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                         StatusBadge(
                           label: '${shifts.length} Shift',
                           variant: StatusVariant.success,
-                          fontSize: 9.5,
                         ),
                       );
                     }),
