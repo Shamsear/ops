@@ -213,11 +213,13 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
             const Text(
               'Field Audit Scorecard',
               style: TextStyle(
-                fontSize: 17,
+                fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.textMain,
                 letterSpacing: -0.3,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
               _selectedPromoter != null ? 'Auditing: ${_selectedPromoter!.name}' : 'Promoter quality & compliance review',
@@ -226,6 +228,8 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
                 color: AppTheme.textMuted,
                 fontWeight: FontWeight.w600,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -255,12 +259,13 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        '${_overallScore.toStringAsFixed(1)}',
+                        _overallScore.toStringAsFixed(1),
                         style: const TextStyle(
                           fontFamily: 'monospace',
-                          fontSize: 18,
+                          fontSize: 17,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFFF59E0B),
                         ),
@@ -269,22 +274,26 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
                       const Text(
                         '/ 5.0 Rating',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w700,
                           color: AppTheme.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                  Text(
-                    _selectedPromoter != null ? _selectedPromoter!.name : 'Select promoter',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textMuted,
-                      fontWeight: FontWeight.w600,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _selectedPromoter != null ? _selectedPromoter!.name : 'Select promoter',
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: AppTheme.textMuted,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -396,27 +405,35 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
                   child: const Icon(Icons.person_pin_circle_rounded, size: 18, color: AppTheme.primary),
                 ),
                 const SizedBox(width: 10),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'PROMOTER & LOCATION DETAILS',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'PROMOTER & LOCATION DETAILS',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMuted,
+                          letterSpacing: 0.6,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      'Assigned shift and brand venue',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
+                      SizedBox(height: 1),
+                      Text(
+                        'Assigned shift and brand venue',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -492,12 +509,16 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
                   child: Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
                       color: AppTheme.textMain,
+                      letterSpacing: -0.2,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
@@ -519,45 +540,53 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
             const SizedBox(height: 4),
             Text(
               description,
-              style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, height: 1.3),
+              style: const TextStyle(fontSize: 11.5, color: AppTheme.textMuted, height: 1.3),
             ),
             const SizedBox(height: 12),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: List.generate(5, (index) {
                 final starVal = index + 1;
                 final isFilled = starVal <= score;
-                return InkWell(
-                  onTap: () => onChanged(starVal),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isFilled ? const Color(0xFFFEF3C7) : AppTheme.surfaceSubtle,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isFilled ? const Color(0xFFF59E0B) : AppTheme.borderSubtle,
-                      ),
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: index == 0 ? 0 : 3,
+                      right: index == 4 ? 0 : 3,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.star_rounded,
-                          size: 18,
-                          color: isFilled ? const Color(0xFFF59E0B) : AppTheme.textMuted,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$starVal',
-                          style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: isFilled ? const Color(0xFFB45309) : AppTheme.textMuted,
+                    child: InkWell(
+                      onTap: () => onChanged(starVal),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 7),
+                        decoration: BoxDecoration(
+                          color: isFilled ? const Color(0xFFFEF3C7) : AppTheme.surfaceSubtle,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isFilled ? const Color(0xFFF59E0B) : AppTheme.borderSubtle,
                           ),
                         ),
-                      ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.star_rounded,
+                              size: 15,
+                              color: isFilled ? const Color(0xFFF59E0B) : AppTheme.textMuted,
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              '$starVal',
+                              style: TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w800,
+                                color: isFilled ? const Color(0xFFB45309) : AppTheme.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -592,27 +621,35 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
                   child: const Icon(Icons.rate_review_outlined, size: 18, color: AppTheme.accent),
                 ),
                 const SizedBox(width: 10),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'SUPERVISOR COACHING FEEDBACK',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'SUPERVISOR COACHING FEEDBACK',
+                        style: TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMuted,
+                          letterSpacing: 0.6,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      'Constructive guidance for promoter development',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
+                      SizedBox(height: 1),
+                      Text(
+                        'Constructive guidance for promoter development',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),

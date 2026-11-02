@@ -356,21 +356,27 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
                                                 store.storeName,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w800,
-                                                  fontSize: 15,
+                                                  fontSize: 13.5,
                                                   color: AppTheme.textMain,
                                                   letterSpacing: -0.2,
                                                 ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                               const SizedBox(height: 3),
                                               Row(
                                                 children: [
-                                                  Text(
-                                                    chain,
-                                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: retailerColor),
+                                                  Flexible(
+                                                    child: Text(
+                                                      chain,
+                                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: retailerColor),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
                                                   ),
-                                                  const SizedBox(width: 6),
-                                                  const Text('•', style: TextStyle(color: AppTheme.textMuted)),
-                                                  const SizedBox(width: 6),
+                                                  const SizedBox(width: 5),
+                                                  const Text('•', style: TextStyle(color: AppTheme.textMuted, fontSize: 10)),
+                                                  const SizedBox(width: 5),
                                                   Expanded(
                                                     child: Text(
                                                       '${store.emirate}${store.city != null ? " • ${store.city}" : ""}',

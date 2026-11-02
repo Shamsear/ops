@@ -87,7 +87,12 @@ class _CreateDropPageState extends State<CreateDropPage> {
         }
         _selectedStore ??= _stores.isNotEmpty ? _stores.first : null;
 
-        _selectedSupervisor = _supervisors.isNotEmpty ? _supervisors.first : null;
+        if (_selectedSupervisor != null) {
+          _selectedSupervisor = _supervisors.where((s) => s.id == _selectedSupervisor!.id).firstOrNull ??
+              (_supervisors.isNotEmpty ? _supervisors.first : null);
+        } else {
+          _selectedSupervisor = _supervisors.isNotEmpty ? _supervisors.first : null;
+        }
         _isLoading = false;
       });
     }

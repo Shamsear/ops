@@ -73,7 +73,13 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
             children: [
               const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
               const SizedBox(width: 8),
-              Text('${badge.promoterName} permit updated to "$newStatus"'),
+              Expanded(
+                child: Text(
+                  '${badge.promoterName} permit updated to "$newStatus"',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),
