@@ -31,11 +31,12 @@ class OpsDashboardScreen extends StatefulWidget {
 
 class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   late int _currentNavIndex;
+  late PageController _pageController;
   String _selectedEmirate = 'All';
   DateTime _selectedDate = DateTime(2026, 10, 14);
   bool _isLoading = true;
   Map<String, dynamic> _kpis = {};
-  List<LiveStoreHub> _liveStores = [];
+  List<LiveStoreHub> _allLiveStores = [];
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
@@ -54,27 +55,31 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   void initState() {
     super.initState();
     _currentNavIndex = widget.initialTab;
+    _pageController = PageController(initialPage: _currentNavIndex);
     _loadDashboardData();
   }
 
   @override
   void dispose() {
+    _pageController.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadDashboardData() async {
-    setState(() => _isLoading = true);
+  Future<void> _loadDashboardData({bool isUserPull = false}) async {
+    if (!isUserPull && _allLiveStores.isEmpty) {
+      setState(() => _isLoading = true);
+    }
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
     final data = await ApiService.getLiveDashboard(
       date: dateStr,
-      emirate: _selectedEmirate,
+      emirate: 'All', // Always load national data so emirate filtering is instant
     );
 
     if (mounted) {
       setState(() {
         _kpis = data['kpis'] ?? {};
-        _liveStores = data['live_stores'] ?? [];
+        _allLiveStores = data['live_stores'] ?? [];
         _isLoading = false;
       });
     }
@@ -84,7 +89,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     setState(() {
       _selectedEmirate = emirate;
     });
-    _loadDashboardData();
+    // Instant local filtering with zero page reload or spinner flash
   }
 
   void _openActionCenter() async {
@@ -92,7 +97,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       context,
       MaterialPageRoute(builder: (_) => const OperationsMenuPage()),
     );
-    if (res == true) _loadDashboardData();
+    if (res == true) _loadDashboardData(isUserPull: true);
   }
 
   @override
@@ -101,8 +106,14 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         extendBody: true,
-        body: IndexedStack(
-          index: _currentNavIndex,
+        body: PageView(
+          controller: _pageController,
+          physics: const BouncingScrollPhysics(),
+          onPageChanged: (idx) {
+            setState(() {
+              _currentNavIndex = idx;
+            });
+          },
           children: [
             _buildDashboardView(context),
             const TimeMapCalendarScreen(isEmbedded: true),
@@ -112,6 +123,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
         ),
         bottomNavigationBar: LiquidGlassNavBar(
           currentIndex: _currentNavIndex,
+          pageController: _pageController,
           items: const [
             LiquidGlassNavItem(
               icon: Icons.dashboard_outlined,
@@ -138,7 +150,11 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             setState(() {
               _currentNavIndex = idx;
             });
-            if (idx == 0) _loadDashboardData();
+            _pageController.animateToPage(
+              idx,
+              duration: const Duration(milliseconds: 320),
+              curve: Curves.easeOutCubic,
+            );
           },
         ),
       ),
@@ -148,16 +164,19 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   Widget _buildDashboardView(BuildContext context) {
     final dateDisplay = DateFormat('EEE, dd MMM yyyy').format(_selectedDate);
     final query = _searchQuery.toLowerCase().trim();
-    final filteredStores = query.isEmpty
-        ? _liveStores
-        : _liveStores.where((s) {
-            final matchStore = s.storeName.toLowerCase().contains(query);
-            final matchRetailer = s.retailer.toLowerCase().contains(query);
-            final matchSupervisor = s.supervisorName.toLowerCase().contains(query);
-            final matchPromoter = s.projects.any((p) =>
-                p.promoters.any((shift) => shift.promoterName.toLowerCase().contains(query)));
-            return matchStore || matchRetailer || matchSupervisor || matchPromoter;
-          }).toList();
+    final filteredStores = _allLiveStores.where((s) {
+      if (_selectedEmirate != 'All' &&
+          !s.emirate.toLowerCase().contains(_selectedEmirate.toLowerCase())) {
+        return false;
+      }
+      if (query.isEmpty) return true;
+      final matchStore = s.storeName.toLowerCase().contains(query);
+      final matchRetailer = s.retailer.toLowerCase().contains(query);
+      final matchSupervisor = s.supervisorName.toLowerCase().contains(query);
+      final matchPromoter = s.projects.any((p) =>
+          p.promoters.any((shift) => shift.promoterName.toLowerCase().contains(query)));
+      return matchStore || matchRetailer || matchSupervisor || matchPromoter;
+    }).toList();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -367,7 +386,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     const SizedBox(height: 14),
 
                     // Bento Grid KPI Section
-                    _buildKpiSection(),
+                    _buildKpiSection(filteredStores),
                     const SizedBox(height: 14),
 
                     // Quick Action Shortcuts Bar
@@ -501,9 +520,17 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     );
   }
 
-  Widget _buildKpiSection() {
-    final liveStoresCount = _kpis['live_stores_count'] ?? 0;
-    final activePromotersCount = _kpis['active_promoters_count'] ?? 0;
+  Widget _buildKpiSection(List<LiveStoreHub> currentStores) {
+    final liveStoresCount = currentStores.length;
+    final distinctStaff = <int>{};
+    for (final s in currentStores) {
+      for (final p in s.projects) {
+        for (final shift in p.promoters) {
+          if (shift.promoterId > 0) distinctStaff.add(shift.promoterId);
+        }
+      }
+    }
+    final activePromotersCount = distinctStaff.length;
     final pendingDrops = _kpis['pending_drops'] ?? 0;
     final pendingCollections = _kpis['pending_collections'] ?? 0;
 
@@ -661,6 +688,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             label: const Text('Badges', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
             onPressed: () {
               setState(() => _currentNavIndex = 2);
+              _pageController.animateToPage(2, duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
             },
           ),
           const SizedBox(width: 8),

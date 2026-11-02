@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -172,12 +172,15 @@ class LiquidGlassNavItem {
 
 /// Cross-Platform Morphing Liquid Glass Bottom Navigation Bar
 /// Floating frosted glass island with smooth animated sliding indicator pill
+/// Cross-Platform Morphing Liquid Glass Bottom Navigation Bar
+/// Floating frosted glass island with interactive swipeable tracking and fluid gliding indicator pill
 class LiquidGlassNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   final List<LiquidGlassNavItem> items;
   final double blur;
   final EdgeInsetsGeometry margin;
+  final PageController? pageController;
 
   const LiquidGlassNavBar({
     super.key,
@@ -186,7 +189,32 @@ class LiquidGlassNavBar extends StatelessWidget {
     required this.items,
     this.blur = 22.0,
     this.margin = const EdgeInsets.fromLTRB(16, 0, 16, 12),
+    this.pageController,
   });
+
+  Widget _buildActivePill() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryDark, AppTheme.primaryLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.18),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryDark.withOpacity(0.28),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,89 +243,160 @@ class LiquidGlassNavBar extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final itemWidth = constraints.maxWidth / items.length;
-              return Stack(
-                alignment: Alignment.centerLeft,
-                children: [
-                  // Smooth Gliding Active Pill Indicator (Morphing Animation)
-                  AnimatedPositioned(
-                    duration: const Duration(milliseconds: 260),
-                    curve: Curves.easeOutCubic,
-                    left: currentIndex * itemWidth + 2,
-                    width: itemWidth - 4,
-                    height: 52,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppTheme.primaryDark, AppTheme.primaryLight],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.18),
-                          width: 1.0,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primaryDark.withOpacity(0.28),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
 
-                  // Interactive Navigation Items Row (Vertical stacking to prevent horizontal clipping)
-                  Row(
-                    children: List.generate(items.length, (index) {
-                      final item = items[index];
-                      final isSelected = index == currentIndex;
+              Widget pillWidget;
+              if (pageController != null) {
+                pillWidget = AnimatedBuilder(
+                  animation: pageController!,
+                  builder: (context, _) {
+                    double pagePos = currentIndex.toDouble();
+                    if (pageController!.hasClients &&
+                        pageController!.position.hasContentDimensions &&
+                        pageController!.page != null) {
+                      pagePos = pageController!.page!;
+                    }
+                    return Positioned(
+                      left: (pagePos * itemWidth + 2).clamp(2.0, constraints.maxWidth - itemWidth + 2),
+                      width: itemWidth - 4,
+                      height: 52,
+                      child: _buildActivePill(),
+                    );
+                  },
+                );
+              } else {
+                pillWidget = AnimatedPositioned(
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutCubic,
+                  left: currentIndex * itemWidth + 2,
+                  width: itemWidth - 4,
+                  height: 52,
+                  child: _buildActivePill(),
+                );
+              }
 
-                      return Expanded(
-                        child: InkWell(
-                          onTap: () => onTap(index),
-                          borderRadius: BorderRadius.circular(20),
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          child: Container(
-                            height: 52,
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                AnimatedScale(
-                                  duration: const Duration(milliseconds: 180),
-                                  scale: isSelected ? 1.08 : 1.0,
-                                  child: Icon(
-                                    isSelected ? (item.activeIcon ?? item.icon) : item.icon,
-                                    size: 20,
-                                    color: isSelected ? Colors.white : AppTheme.textMuted,
+              return GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onHorizontalDragUpdate: (details) {
+                  final localX = details.localPosition.dx;
+                  final target = (localX / itemWidth).floor().clamp(0, items.length - 1);
+                  if (target != currentIndex) {
+                    onTap(target);
+                  }
+                },
+                child: Stack(
+                  alignment: Alignment.centerLeft,
+                  children: [
+                    // Dynamic tracking / morphing active pill
+                    pillWidget,
+
+                    // Interactive Navigation Items Row
+                    Row(
+                      children: List.generate(items.length, (index) {
+                        final item = items[index];
+
+                        if (pageController != null) {
+                          return Expanded(
+                            child: AnimatedBuilder(
+                              animation: pageController!,
+                              builder: (context, _) {
+                                double pagePos = currentIndex.toDouble();
+                                if (pageController!.hasClients &&
+                                    pageController!.position.hasContentDimensions &&
+                                    pageController!.page != null) {
+                                  pagePos = pageController!.page!;
+                                }
+                                final isSelected = (pagePos - index).abs() < 0.5;
+
+                                return InkWell(
+                                  onTap: () => onTap(index),
+                                  borderRadius: BorderRadius.circular(20),
+                                  splashColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  child: Container(
+                                    height: 52,
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        AnimatedScale(
+                                          duration: const Duration(milliseconds: 180),
+                                          scale: isSelected ? 1.08 : 1.0,
+                                          child: Icon(
+                                            isSelected ? (item.activeIcon ?? item.icon) : item.icon,
+                                            size: 20,
+                                            color: isSelected ? Colors.white : AppTheme.textMuted,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Text(
+                                          item.label,
+                                          style: TextStyle(
+                                            color: isSelected ? Colors.white : AppTheme.textMuted,
+                                            fontSize: 10.5,
+                                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                            letterSpacing: -0.1,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.visible,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  item.label,
-                                  style: TextStyle(
-                                    color: isSelected ? Colors.white : AppTheme.textMuted,
-                                    fontSize: 10.5,
-                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                    letterSpacing: -0.1,
+                                );
+                              },
+                            ),
+                          );
+                        }
+
+                        final isSelected = index == currentIndex;
+                        return Expanded(
+                          child: InkWell(
+                            onTap: () => onTap(index),
+                            borderRadius: BorderRadius.circular(20),
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            child: Container(
+                              height: 52,
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  AnimatedScale(
+                                    duration: const Duration(milliseconds: 180),
+                                    scale: isSelected ? 1.08 : 1.0,
+                                    child: Icon(
+                                      isSelected ? (item.activeIcon ?? item.icon) : item.icon,
+                                      size: 20,
+                                      color: isSelected ? Colors.white : AppTheme.textMuted,
+                                    ),
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.visible,
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    item.label,
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.white : AppTheme.textMuted,
+                                      fontSize: 10.5,
+                                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                      letterSpacing: -0.1,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.visible,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }),
-                  ),
-                ],
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               );
             },
           ),

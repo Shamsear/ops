@@ -14,7 +14,10 @@ class StoreManagementScreen extends StatefulWidget {
   State<StoreManagementScreen> createState() => _StoreManagementScreenState();
 }
 
-class _StoreManagementScreenState extends State<StoreManagementScreen> {
+class _StoreManagementScreenState extends State<StoreManagementScreen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   List<StoreModel> _allStores = [];
   bool _isLoading = true;
   String _searchQuery = '';
@@ -104,6 +107,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final stores = _filteredStores;
 
     return Scaffold(

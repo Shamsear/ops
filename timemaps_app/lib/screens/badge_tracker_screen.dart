@@ -13,7 +13,10 @@ class BadgeTrackerScreen extends StatefulWidget {
   State<BadgeTrackerScreen> createState() => _BadgeTrackerScreenState();
 }
 
-class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
+class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   bool _isLoading = true;
   List<BadgeModel> _badges = [];
   String _selectedFilter = 'All';
@@ -81,6 +84,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(

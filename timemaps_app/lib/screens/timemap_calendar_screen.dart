@@ -16,7 +16,11 @@ class TimeMapCalendarScreen extends StatefulWidget {
   State<TimeMapCalendarScreen> createState() => _TimeMapCalendarScreenState();
 }
 
-class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with SingleTickerProviderStateMixin {
+class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   late TabController _tabController;
   bool _isLoading = true;
   List<dynamic> _schedules = [];
@@ -131,6 +135,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return AmbientMeshBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
