@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
+import 'app_card.dart';
+
+class KpiTile extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color iconColor;
+  final String? delta;
+  final bool? isPositive;
+  final VoidCallback? onTap;
+  final bool isSelected;
+
+  const KpiTile({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.iconColor = AppColors.primary,
+    this.delta,
+    this.isPositive,
+    this.onTap,
+    this.isSelected = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard.compact(
+      onTap: onTap,
+      border: isSelected
+          ? BorderSide(color: AppColors.primary, width: 1.5)
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconBox(
+                icon: icon,
+                color: iconColor,
+                isCompact: true,
+              ),
+              if (delta != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: (isPositive ?? true) ? AppColors.successSoft : AppColors.dangerSoft,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  child: Text(
+                    delta!,
+                    style: AppText.micro.copyWith(
+                      color: (isPositive ?? true) ? AppColors.success : AppColors.danger,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: AppText.display,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label.toUpperCase(),
+            style: AppText.micro.copyWith(color: AppColors.textMuted),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}

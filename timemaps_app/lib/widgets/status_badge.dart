@@ -25,8 +25,8 @@ class StatusBadge extends StatelessWidget {
     this.variant = StatusVariant.neutral,
     this.icon,
     this.showDot = false,
-    this.fontSize = 9.5,
-    this.padding = const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.5),
+    this.fontSize = 10.5,
+    this.padding = const EdgeInsets.symmetric(horizontal: 9.0, vertical: 0.0),
     this.maxWidth,
   });
 
@@ -86,86 +86,46 @@ class StatusBadge extends StatelessWidget {
   Color get _bg {
     switch (variant) {
       case StatusVariant.success:
-        return AppTheme.successBg;
+        return AppColors.successSoft;
       case StatusVariant.warning:
-        return AppTheme.warningBg;
+        return AppColors.warningSoft;
       case StatusVariant.danger:
-        return AppTheme.dangerBg;
+        return AppColors.dangerSoft;
       case StatusVariant.info:
-        return AppTheme.infoBg;
+        return AppColors.accentSoft;
       case StatusVariant.purple:
-        return AppTheme.purpleBg;
+        return AppColors.purpleSoft;
       case StatusVariant.neutral:
-        return AppTheme.surfaceSubtle;
-    }
-  }
-
-  Color get _border {
-    switch (variant) {
-      case StatusVariant.success:
-        return AppTheme.successBorder;
-      case StatusVariant.warning:
-        return AppTheme.warningBorder;
-      case StatusVariant.danger:
-        return AppTheme.dangerBorder;
-      case StatusVariant.info:
-        return AppTheme.infoBorder;
-      case StatusVariant.purple:
-        return AppTheme.purpleBorder;
-      case StatusVariant.neutral:
-        return AppTheme.borderSubtle;
+        return AppColors.surfaceMuted;
     }
   }
 
   Color get _text {
     switch (variant) {
       case StatusVariant.success:
-        return AppTheme.successText;
+        return AppColors.success;
       case StatusVariant.warning:
-        return AppTheme.warningText;
+        return AppColors.warning;
       case StatusVariant.danger:
-        return AppTheme.dangerText;
+        return AppColors.danger;
       case StatusVariant.info:
-        return AppTheme.infoText;
+        return AppColors.accent;
       case StatusVariant.purple:
-        return AppTheme.purpleText;
+        return AppColors.purple;
       case StatusVariant.neutral:
-        return AppTheme.textSecondary;
-    }
-  }
-
-  Color get _dotColor {
-    switch (variant) {
-      case StatusVariant.success:
-        return AppTheme.success;
-      case StatusVariant.warning:
-        return AppTheme.warning;
-      case StatusVariant.danger:
-        return AppTheme.danger;
-      case StatusVariant.info:
-        return AppTheme.info;
-      case StatusVariant.purple:
-        return AppTheme.purple;
-      case StatusVariant.neutral:
-        return AppTheme.textMuted;
+        return AppColors.textSecondary;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     Widget badge = Container(
+      height: 24,
       padding: padding,
       decoration: BoxDecoration(
         color: _bg,
-        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-        border: Border.all(color: _border.withOpacity(0.85), width: 0.85),
-        boxShadow: [
-          BoxShadow(
-            color: _dotColor.withOpacity(0.06),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: AppColors.statusBorder(_text), width: 1.0),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -173,21 +133,21 @@ class StatusBadge extends StatelessWidget {
         children: [
           if (showDot) ...[
             Container(
-              width: 5.5,
-              height: 5.5,
+              width: 6.0,
+              height: 6.0,
               decoration: BoxDecoration(
-                color: _dotColor,
+                color: _text,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: _dotColor.withOpacity(0.4),
-                    blurRadius: 4,
+                    color: _text.withOpacity(0.45),
+                    blurRadius: 6,
                     spreadRadius: 1,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 5),
+            const SizedBox(width: 6),
           ],
           if (icon != null) ...[
             Icon(icon, size: fontSize + 2, color: _text),
@@ -195,13 +155,11 @@ class StatusBadge extends StatelessWidget {
           ],
           Flexible(
             child: Text(
-              label,
-              style: TextStyle(
+              label.toUpperCase(),
+              style: AppText.micro.copyWith(
                 fontSize: fontSize,
-                fontWeight: FontWeight.w700,
                 color: _text,
-                letterSpacing: -0.2,
-                height: 1.2,
+                height: 1.1,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
