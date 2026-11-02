@@ -444,16 +444,16 @@ class _PromoterHomeScreenState extends State<PromoterHomeScreen> {
                                     Text(
                                       _assignedStore?.storeName ?? 'Lulu Hypermarket - Al Barsha',
                                       style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w800,
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w700,
                                         color: AppTheme.textMain,
-                                        letterSpacing: -0.3,
+                                        letterSpacing: -0.2,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       '${_assignedStore?.retailer ?? "Lulu"} • ${_assignedStore?.emirate ?? "Dubai"} Region',
-                                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontSize: 10.5, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                                     ),
                                   ],
                                 ),
@@ -579,14 +579,14 @@ class _PromoterHomeScreenState extends State<PromoterHomeScreen> {
                                         children: [
                                           Text(
                                             _assignedStore?.supervisorName.isNotEmpty == true ? _assignedStore!.supervisorName : 'Babar (Lead)',
-                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
                                             _assignedStore?.supervisorPhone.isNotEmpty == true ? _assignedStore!.supervisorPhone : '+971 50 123 4567',
-                                            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace'),
+                                            style: const TextStyle(fontSize: 10, color: AppTheme.textMuted, fontFamily: 'monospace'),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),

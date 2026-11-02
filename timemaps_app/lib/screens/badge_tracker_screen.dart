@@ -96,7 +96,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
           children: [
             Text(
               'Store Badge Tracker',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
               'Hypermarket Gate Passes & Mall Permits',

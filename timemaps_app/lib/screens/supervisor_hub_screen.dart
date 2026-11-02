@@ -426,7 +426,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                   children: [
                     Text(
                       drop.storeName,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -464,7 +464,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                 Expanded(
                   child: Text(
                     'Items: ${drop.itemsManifest}',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMain),
                   ),
                 ),
               ],
@@ -476,11 +476,11 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.success,
                 foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(40),
+                minimumSize: const Size.fromHeight(36),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
               ),
               icon: const Icon(Icons.check_circle_rounded, size: 16),
-              label: const Text('Confirm Drop Delivered to Store'),
+              label: const Text('Confirm Drop Delivered to Store', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
               onPressed: () => _markDropDelivered(drop),
             ),
           ],
@@ -512,7 +512,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                   children: [
                     Text(
                       col.storeName,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -550,7 +550,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                 Expanded(
                   child: Text(
                     'Collect: ${col.itemsToCollect}',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMain),
                   ),
                 ),
               ],
@@ -562,11 +562,11 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryDark,
                 foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(40),
+                minimumSize: const Size.fromHeight(36),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
               ),
               icon: const Icon(Icons.check_rounded, size: 16),
-              label: const Text('Confirm Equipment Collected Back'),
+              label: const Text('Confirm Equipment Collected Back', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
               onPressed: () => _markCollectionComplete(col),
             ),
           ],
@@ -578,10 +578,10 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
   Widget _summaryStat(String label, String value, IconData icon, Color accentColor) {
     return Column(
       children: [
-        Icon(icon, color: accentColor, size: 20),
-        const SizedBox(height: 4),
-        Text(value, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: accentColor, fontFamily: 'monospace')),
-        Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMuted)),
+        Icon(icon, color: accentColor, size: 16),
+        const SizedBox(height: 3),
+        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: accentColor, fontFamily: 'monospace')),
+        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.textMuted)),
       ],
     );
   }
@@ -608,14 +608,14 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                   children: [
                     Text(
                       store.storeName,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                      style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppTheme.textMain, letterSpacing: -0.2),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '${store.retailer} • ${store.emirate}',
-                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 10.5, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

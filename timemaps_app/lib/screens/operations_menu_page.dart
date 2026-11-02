@@ -73,7 +73,7 @@ class OperationsMenuPage extends StatelessWidget {
                   Text(
                     'IML Operations Hub',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w800,
                       color: AppTheme.textMain,
                       letterSpacing: -0.3,

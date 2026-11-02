@@ -117,13 +117,13 @@ class AppTheme {
   // Soft Organic Tinted Shadows (Never Pure Gray/Black)
   static List<BoxShadow> get cardShadow => [
     BoxShadow(
-      color: const Color(0xFF0F172A).withOpacity(0.04),
-      blurRadius: 12,
-      offset: const Offset(0, 4),
+      color: const Color(0xFF0F172A).withOpacity(0.025),
+      blurRadius: 10,
+      offset: const Offset(0, 2),
     ),
     BoxShadow(
-      color: const Color(0xFF0F172A).withOpacity(0.02),
-      blurRadius: 3,
+      color: const Color(0xFF0F172A).withOpacity(0.015),
+      blurRadius: 2,
       offset: const Offset(0, 1),
     ),
   ];
@@ -203,10 +203,10 @@ class AppTheme {
         centerTitle: false,
         toolbarHeight: 64,
         titleTextStyle: TextStyle(
-          fontSize: 18,
+          fontSize: 15,
           fontWeight: FontWeight.w800,
           color: textMain,
-          letterSpacing: -0.4,
+          letterSpacing: -0.3,
         ),
         iconTheme: IconThemeData(color: primary, size: 22),
       ),
@@ -228,15 +228,15 @@ class AppTheme {
           backgroundColor: primary,
           foregroundColor: textInverse,
           elevation: 0,
-          minimumSize: const Size(44, 50),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+          minimumSize: const Size(40, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMedium),
           ),
           textStyle: const TextStyle(
-            fontSize: 14,
+            fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            letterSpacing: -0.2,
+            letterSpacing: -0.15,
           ),
         ),
       ),
@@ -245,14 +245,14 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: textMain,
-          minimumSize: const Size(44, 46),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-          side: const BorderSide(color: borderSubtle, width: 1.2),
+          minimumSize: const Size(40, 36),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          side: const BorderSide(color: borderSubtle, width: 1.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMedium),
           ),
           textStyle: const TextStyle(
-            fontSize: 13,
+            fontSize: 11.5,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.1,
           ),
@@ -311,12 +311,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(radiusPill),
         ),
         labelStyle: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
+          fontSize: 10.5,
+          fontWeight: FontWeight.w600,
           color: textMain,
           letterSpacing: -0.1,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
 
       // Segmented TabBar
@@ -325,8 +325,8 @@ class AppTheme {
         indicatorSize: TabBarIndicatorSize.tab,
         labelColor: primary,
         unselectedLabelColor: textMuted,
-        labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: -0.2),
-        unselectedLabelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        labelStyle: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, letterSpacing: -0.15),
+        unselectedLabelStyle: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500),
         dividerColor: borderSubtle,
       ),
 

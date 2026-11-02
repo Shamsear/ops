@@ -121,7 +121,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
           children: [
             const Text(
               'Store Directory & Chains',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
               '${_allStores.length} Hypermarket Branches Registered',
@@ -343,7 +343,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
                                           child: Center(
                                             child: Text(
                                               chain.isNotEmpty ? chain[0] : 'S',
-                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: retailerColor),
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: retailerColor),
                                             ),
                                           ),
                                         ),

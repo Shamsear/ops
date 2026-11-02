@@ -138,8 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Text(
                             'IML Operations Hub',
                             style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.w900,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
                               color: AppTheme.textMain,
                               letterSpacing: -0.6,
                             ),
@@ -148,8 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           const Text(
                             'Warehouse & UAE National Field Operations',
                             style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
                               color: AppTheme.textMuted,
                               letterSpacing: -0.1,
                             ),
@@ -170,8 +170,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Text(
                                   '74+ Retail Stores Synchronized',
                                   style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
                                     color: AppTheme.successText,
                                   ),
                                 ),

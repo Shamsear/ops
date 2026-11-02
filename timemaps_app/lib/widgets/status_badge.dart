@@ -25,8 +25,8 @@ class StatusBadge extends StatelessWidget {
     this.variant = StatusVariant.neutral,
     this.icon,
     this.showDot = false,
-    this.fontSize = 11,
-    this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    this.fontSize = 9.5,
+    this.padding = const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.5),
     this.maxWidth,
   });
 
@@ -158,7 +158,7 @@ class StatusBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: _bg,
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-        border: Border.all(color: _border.withOpacity(0.9), width: 1.1),
+        border: Border.all(color: _border.withOpacity(0.85), width: 0.85),
         boxShadow: [
           BoxShadow(
             color: _dotColor.withOpacity(0.06),
@@ -173,8 +173,8 @@ class StatusBadge extends StatelessWidget {
         children: [
           if (showDot) ...[
             Container(
-              width: 7,
-              height: 7,
+              width: 5.5,
+              height: 5.5,
               decoration: BoxDecoration(
                 color: _dotColor,
                 shape: BoxShape.circle,

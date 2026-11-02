@@ -240,10 +240,10 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                       const Text(
                         'IML Ops',
                         style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
                           color: AppTheme.textMain,
-                          letterSpacing: -0.4,
+                          letterSpacing: -0.3,
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -367,11 +367,11 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                       padding: EdgeInsets.zero,
                       child: TextField(
                         controller: _searchController,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMain),
                         decoration: InputDecoration(
                           hintText: 'Search stores, promoters, chains, or supervisors...',
-                          hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textLight),
-                          prefixIcon: const Icon(Icons.search_rounded, size: 19, color: AppTheme.accent),
+                          hintStyle: const TextStyle(fontSize: 11, color: AppTheme.textLight),
+                          prefixIcon: const Icon(Icons.search_rounded, size: 17, color: AppTheme.accent),
                           suffixIcon: _searchQuery.isNotEmpty
                               ? IconButton(
                                   icon: const Icon(Icons.clear_rounded, size: 16),
@@ -611,8 +611,8 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     required Color bgTint,
   }) {
     return GlassCard(
-      padding: const EdgeInsets.all(14),
-      radius: 16.0,
+      padding: const EdgeInsets.all(12),
+      radius: 14.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -620,42 +620,42 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.all(7),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: bgTint,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, size: 18, color: color),
+                child: Icon(icon, size: 15, color: color),
               ),
               Text(
                 count,
                 style: const TextStyle(
                   fontFamily: 'monospace',
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
                   color: AppTheme.textMain,
-                  letterSpacing: -0.5,
+                  letterSpacing: -0.3,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Text(
             title,
             maxLines: 1,
             style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
               color: AppTheme.textMain,
-              letterSpacing: -0.2,
+              letterSpacing: -0.15,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1.5),
           Text(
             subtitle,
             maxLines: 1,
             style: const TextStyle(
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: FontWeight.w500,
               color: AppTheme.textMuted,
             ),
@@ -674,12 +674,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primary,
               foregroundColor: Colors.white,
-              minimumSize: const Size(0, 36),
+              minimumSize: const Size(0, 32),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             icon: const Icon(Icons.bolt_rounded, size: 16),
-            label: const Text('Batch Schedule', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+            label: const Text('Batch Schedule', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
             onPressed: () async {
               final res = await Navigator.push(
                 context,
@@ -691,7 +691,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, 36),
+              minimumSize: const Size(0, 32),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -705,7 +705,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, 36),
+              minimumSize: const Size(0, 32),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -722,7 +722,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, 36),
+              minimumSize: const Size(0, 32),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -739,7 +739,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, 36),
+              minimumSize: const Size(0, 32),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -756,7 +756,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, 36),
+              minimumSize: const Size(0, 32),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -773,7 +773,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 8),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              minimumSize: const Size(0, 36),
+              minimumSize: const Size(0, 32),
               padding: const EdgeInsets.symmetric(horizontal: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
@@ -867,36 +867,36 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             children: [
               // Retailer Avatar Emblem
               Container(
-                width: 40,
-                height: 40,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
                   color: retailerColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: retailerColor.withOpacity(0.25)),
                 ),
                 child: Center(
                   child: Text(
                     store.retailer.isNotEmpty ? store.retailer[0] : 'S',
                     style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
                       color: retailerColor,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               // Full Width Store Name
               Expanded(
                 child: Text(
                   store.storeName,
                   style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
                     color: AppTheme.textMain,
-                    letterSpacing: -0.3,
+                    letterSpacing: -0.2,
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1048,19 +1048,19 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               CircleAvatar(
-                                radius: 13,
+                                radius: 11,
                                 backgroundColor: AppTheme.infoBg,
-                                child: const Icon(Icons.person, size: 15, color: AppTheme.accent),
+                                child: const Icon(Icons.person, size: 13, color: AppTheme.accent),
                               ),
                               const SizedBox(width: 9),
                               Expanded(
                                 child: Text(
                                   p.promoterName,
                                   style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
                                     color: AppTheme.textMain,
-                                    letterSpacing: -0.2,
+                                    letterSpacing: -0.15,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1078,8 +1078,8 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                               Text(
                                 '${_formatTime(p.startTime)} – ${_formatTime(p.endTime)}',
                                 style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
                                   color: AppTheme.textSecondary,
                                   fontFamily: 'monospace',
                                 ),
@@ -1090,7 +1090,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                               Expanded(
                                 child: Text(
                                   'Break: ${p.breakTimings ?? "None"}',
-                                  style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(fontSize: 10, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),

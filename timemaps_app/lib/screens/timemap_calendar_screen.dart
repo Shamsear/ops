@@ -166,7 +166,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
           children: [
             Text(
               'Operations Shift Calendar',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain, letterSpacing: -0.2),
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
               'Roster & Coverage Matrix',
@@ -236,7 +236,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
               const SizedBox(height: 16),
               const Text(
                 'No Store Coverage Today',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppTheme.textMain),
               ),
               const SizedBox(height: 6),
               const Text(
@@ -292,7 +292,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                     Expanded(
                       child: Text(
                         store.storeName,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain, letterSpacing: -0.2),
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppTheme.textMain, letterSpacing: -0.2),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -687,7 +687,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                 ),
               ),
             ),
-            Text(store.storeName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain)),
+            Text(store.storeName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppTheme.textMain)),
             Text('${store.retailer} • ${store.emirate} • Shift Date: $date', style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
             const SizedBox(height: 16),
             const Text('Assigned Shifts:', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.textMain)),
@@ -745,7 +745,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
       children: [
         const Text(
           'Operational Excel Exporter & Sync',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain, letterSpacing: -0.2),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppTheme.textMain, letterSpacing: -0.2),
         ),
         const SizedBox(height: 4),
         const Text(
@@ -782,7 +782,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Master Operations Roster (.xlsx)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain)),
+                        const Text('Master Operations Roster (.xlsx)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppTheme.textMain)),
                         Text('${_matrixStores.length} Stores • ${_matrixDates.length} Dates • Live Staff & Badges', style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
                       ],
                     ),
@@ -815,7 +815,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
         ),
 
         const SizedBox(height: 20),
-        const Text('Active Campaign Metrics', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain)),
+        const Text('Active Campaign Metrics', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppTheme.textMain)),
         const SizedBox(height: 12),
 
         Row(
