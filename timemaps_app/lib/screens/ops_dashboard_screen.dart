@@ -291,13 +291,29 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           ],
         ),
         actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryDark,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                minimumSize: const Size(0, 34),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusPill)),
+                elevation: 0,
+              ),
+              icon: const Icon(Icons.add_rounded, size: 15),
+              label: const Text('Action', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800)),
+              onPressed: _openActionCenter,
+            ),
+          ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 22),
+            icon: const Icon(Icons.refresh_rounded, size: 21),
             tooltip: 'Refresh Operations',
             onPressed: _loadDashboardData,
           ),
           IconButton(
-            icon: const Icon(Icons.logout_rounded, size: 21, color: AppTheme.textMuted),
+            icon: const Icon(Icons.logout_rounded, size: 20, color: AppTheme.textMuted),
             tooltip: 'Sign Out',
             onPressed: () {
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
@@ -306,42 +322,18 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           const SizedBox(width: 4),
         ],
       ),
-      floatingActionButton: LiquidGlassButton(
-        blur: 24.0,
-        radius: 22.0,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-        tintColor: AppTheme.primaryDark.withOpacity(0.90),
-        borderGradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withOpacity(0.55),
-            Colors.white.withOpacity(0.20),
-            Colors.white.withOpacity(0.06),
-          ],
-        ),
-        onPressed: _openActionCenter,
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add_rounded, size: 20, color: Colors.white),
-            SizedBox(width: 6),
-            Text(
-              'New Action',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white, letterSpacing: -0.1),
-            ),
-          ],
-        ),
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: RefreshIndicator(
-                onRefresh: _loadDashboardData,
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-                  children: [
-                    // Liquid Glass Search Bar
+          : Stack(
+              children: [
+                Positioned.fill(
+                  child: SafeArea(
+                    child: RefreshIndicator(
+                      onRefresh: _loadDashboardData,
+                      child: ListView(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 160),
+                        children: [
+                          // Liquid Glass Search Bar
                     LiquidGlassContainer(
                       radius: 14.0,
                       blur: 16.0,
@@ -470,6 +462,42 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                 ),
               ),
             ),
+          ),
+
+          // Floating Action Pill dynamically positioned cleanly above the Liquid Glass Nav Bar
+          Positioned(
+            right: 16,
+            bottom: MediaQuery.of(context).padding.bottom + 84,
+            child: LiquidGlassButton(
+              blur: 24.0,
+              radius: 22.0,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              tintColor: AppTheme.primaryDark.withOpacity(0.92),
+              borderGradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withOpacity(0.55),
+                  Colors.white.withOpacity(0.20),
+                  Colors.white.withOpacity(0.06),
+                ],
+              ),
+              onPressed: _openActionCenter,
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add_rounded, size: 20, color: Colors.white),
+                  SizedBox(width: 6),
+                  Text(
+                    'New Action',
+                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white, letterSpacing: -0.1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
