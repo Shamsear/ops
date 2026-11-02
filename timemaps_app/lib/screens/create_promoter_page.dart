@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/widgets.dart';
 
 class CreatePromoterPage extends StatefulWidget {
   const CreatePromoterPage({super.key});
@@ -41,9 +42,14 @@ class _CreatePromoterPageState extends State<CreatePromoterPage> {
     final phone = _phoneController.text.trim();
     if (name.isEmpty || phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.danger,
-          content: Text('Please enter Full Name and Phone Number'),
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
+          content: Text(
+            'Please enter Full Name and Phone Number',
+            style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
       );
       return;
@@ -59,27 +65,42 @@ class _CreatePromoterPageState extends State<CreatePromoterPage> {
       nationality: _nationalityController.text.trim().isEmpty ? null : _nationalityController.text.trim(),
     );
 
+    if (!mounted) return;
     setState(() => _isSaving = false);
 
-    if (promoter != null && mounted) {
+    if (promoter != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
           content: Row(
             children: [
-              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-              const SizedBox(width: 8),
-              Text('Promoter "${promoter.name}" registered to national roster!'),
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Promoter "${promoter.name}" registered to roster! 👤',
+                  style: AppText.bodyBold.copyWith(color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),
       );
       Navigator.pop(context, true);
-    } else if (mounted) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.danger,
-          content: Text('Failed to register promoter. Please try again.'),
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
+          content: Text(
+            'Failed to register promoter. Please try again.',
+            style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
       );
     }
@@ -87,207 +108,125 @@ class _CreatePromoterPageState extends State<CreatePromoterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
-      appBar: AppBar(
-        titleSpacing: 16,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Register Promoter', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2)),
-            Text('Onboard Staff to National Operations Roster', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
-          ],
+    return AppScreenScaffold(
+      bottomClearance: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: 'Register Promoter',
+      subtitle: 'Onboard staff to national operations roster',
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: AppSpacing.sm),
+          child: StatusBadge(
+            label: 'Roster',
+            variant: StatusVariant.neutral,
+            showDot: false,
+          ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: TextButton.icon(
-              onPressed: _isSaving ? null : _handleSave,
-              icon: _isSaving
-                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accent))
-                  : const Icon(Icons.check_rounded, size: 18),
-              label: const Text('Save', style: TextStyle(fontWeight: FontWeight.w800)),
+      ],
+      floatingBottom: StickyActionBar(
+        primaryLabel: _isSaving ? 'Registering...' : 'Register to Active Roster',
+        primaryIcon: Icons.person_add_rounded,
+        primaryLoading: _isSaving,
+        onPrimaryPressed: _isSaving ? null : _handleSave,
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Card 1: Staff Identity
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionHeader(
+                  icon: Icons.person_outline_rounded,
+                  iconColor: AppColors.primary,
+                  microLabel: 'STAFF IDENTITY',
+                  title: 'Personal Information',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  controller: _nameController,
+                  label: 'Full Legal Name *',
+                  hint: 'e.g. Sony Mathew',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  controller: _phoneController,
+                  label: 'UAE Mobile Phone *',
+                  hint: '+971 50 123 4567',
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  controller: _emailController,
+                  label: 'Work / Personal Email (Optional)',
+                  hint: 'sony@imlme.com',
+                  keyboardType: TextInputType.emailAddress,
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: AppSpacing.sectionGap),
+
+          // Card 2: Demographics & Nationality
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionHeader(
+                  icon: Icons.public_outlined,
+                  iconColor: AppColors.accent,
+                  microLabel: 'DEMOGRAPHICS',
+                  title: 'Gender & Nationality',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'GENDER *',
+                  style: AppText.micro.copyWith(color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    FilterPill(
+                      label: 'Female',
+                      isSelected: _gender == 'FEMALE',
+                      onTap: () => setState(() => _gender = 'FEMALE'),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    FilterPill(
+                      label: 'Male',
+                      isSelected: _gender == 'MALE',
+                      onTap: () => setState(() => _gender = 'MALE'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  controller: _nationalityController,
+                  label: 'Nationality',
+                  hint: 'Filipino, Indian, etc.',
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: _popularNationalities.map((nat) {
+                    final isSel = _nationalityController.text == nat;
+                    return FilterPill(
+                      label: nat,
+                      isSelected: isSel,
+                      onTap: () => setState(() => _nationalityController.text = nat),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sectionGap),
         ],
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: const Border(top: BorderSide(color: AppTheme.borderSubtle)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: ElevatedButton(
-            onPressed: _isSaving ? null : _handleSave,
-            child: _isSaving
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.person_add_rounded, size: 18),
-                      SizedBox(width: 8),
-                      Text('Register to Active Roster'),
-                    ],
-                  ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Card 1: Personal Details
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-                boxShadow: AppTheme.cardShadow,
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'STAFF IDENTITY',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextField(
-                    controller: _nameController,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                    decoration: const InputDecoration(
-                      labelText: 'Full Legal Name *',
-                      hintText: 'e.g. Sony Mathew',
-                      prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  TextField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain, fontFamily: 'monospace'),
-                    decoration: const InputDecoration(
-                      labelText: 'UAE Mobile Phone *',
-                      hintText: '+971 50 123 4567',
-                      prefixIcon: Icon(Icons.phone_outlined, size: 20),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  TextField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                    decoration: const InputDecoration(
-                      labelText: 'Work / Personal Email (Optional)',
-                      hintText: 'sony@imlme.com',
-                      prefixIcon: Icon(Icons.email_outlined, size: 20),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Card 2: Gender & Nationality
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-                boxShadow: AppTheme.cardShadow,
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'DEMOGRAPHICS & PERMIT INFO',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
-                  ),
-                  const SizedBox(height: 16),
-
-                  const Text('Gender *', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textSecondary)),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      ChoiceChip(
-                        label: const Text('Female'),
-                        selected: _gender == 'FEMALE',
-                        selectedColor: AppTheme.primaryDark,
-                        labelStyle: TextStyle(
-                          color: _gender == 'FEMALE' ? Colors.white : AppTheme.textMain,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                        ),
-                        onSelected: (sel) {
-                          if (sel) setState(() => _gender = 'FEMALE');
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: const Text('Male'),
-                        selected: _gender == 'MALE',
-                        selectedColor: AppTheme.primaryDark,
-                        labelStyle: TextStyle(
-                          color: _gender == 'MALE' ? Colors.white : AppTheme.textMain,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                        ),
-                        onSelected: (sel) {
-                          if (sel) setState(() => _gender = 'MALE');
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextField(
-                    controller: _nationalityController,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                    decoration: const InputDecoration(
-                      labelText: 'Nationality',
-                      hintText: 'Filipino, Indian, etc.',
-                      prefixIcon: Icon(Icons.public_outlined, size: 20),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _popularNationalities.map((nat) {
-                        final isSel = _nationalityController.text == nat;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: ActionChip(
-                            label: Text(nat, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                            backgroundColor: isSel ? AppTheme.accent.withOpacity(0.12) : AppTheme.surfaceSubtle,
-                            side: BorderSide(color: isSel ? AppTheme.accent : AppTheme.borderSubtle),
-                            onPressed: () => setState(() => _nationalityController.text = nat),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

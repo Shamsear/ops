@@ -19,6 +19,7 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final FormFieldValidator<String>? validator;
   final bool autofocus;
+  final FocusNode? focusNode;
 
   const AppTextField({
     super.key,
@@ -39,6 +40,7 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.autofocus = false,
+    this.focusNode,
   });
 
   @override
@@ -56,6 +58,7 @@ class AppTextField extends StatelessWidget {
         ],
         TextFormField(
           controller: controller,
+          focusNode: focusNode,
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,

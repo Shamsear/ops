@@ -1,8 +1,6 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../widgets/liquid_glass.dart';
 import '../theme/app_theme.dart';
-import '../widgets/status_badge.dart';
+import '../widgets/widgets.dart';
 import 'create_drop_page.dart';
 import 'create_collection_page.dart';
 import 'create_schedule_page.dart';
@@ -17,275 +15,139 @@ class OperationsMenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.bgLight,
-      appBar: AppBar(
-        titleSpacing: 0,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        flexibleSpace: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.76),
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.white.withOpacity(0.50),
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textMain),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                border: Border.all(color: AppTheme.borderSubtle),
-              ),
-              padding: const EdgeInsets.all(4),
-              child: Image.asset(
-                'assets/images/iml_app_icon.png',
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  Icons.warehouse_rounded,
-                  color: AppTheme.accent,
-                  size: 18,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'IML Operations Hub',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.textMain,
-                      letterSpacing: -0.3,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    'Warehouse dispatch, scheduling & master data',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.textMuted,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    return AppScreenScaffold(
+      bottomClearance: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        onPressed: () => Navigator.pop(context),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Section 1: Logistics & Field Dispatch
-              _buildSectionHeader(
-                icon: Icons.local_shipping_rounded,
-                color: AppTheme.warning,
-                title: 'FIELD LOGISTICS & DISPATCH',
-                subtitle: 'Deliver stands and retrieve promotional materials',
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.local_shipping_outlined,
-                iconBg: AppTheme.warningBg,
-                iconColor: AppTheme.warning,
-                title: 'Assign Morning Drop-off',
-                subtitle: 'Schedule stand, rollup & stock delivery to store',
-                tag: 'Logistics Drop',
-                tagVariant: StatusVariant.warning,
-                pageBuilder: () => const CreateDropPage(),
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.repeat_rounded,
-                iconBg: AppTheme.successBg,
-                iconColor: AppTheme.success,
-                title: 'Assign Return Collection',
-                subtitle: 'Retrieve promotional fixtures & excess stock after campaign',
-                tag: 'Collection',
-                tagVariant: StatusVariant.success,
-                pageBuilder: () => const CreateCollectionPage(),
-              ),
-              const SizedBox(height: 20),
-
-              // Section 2: Scheduling & Compliance
-              _buildSectionHeader(
-                icon: Icons.event_note_rounded,
-                color: AppTheme.accent,
-                title: 'SCHEDULING & STORE ACCESS',
-                subtitle: 'Batch assign promoter shifts and manage gate passes',
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.calendar_month_rounded,
-                iconBg: AppTheme.infoBg,
-                iconColor: AppTheme.accent,
-                title: 'Batch Shift Scheduler',
-                subtitle: 'Generate multi-day shifts across UAE stores in 1 tap',
-                tag: 'Staff Matrix',
-                tagVariant: StatusVariant.info,
-                pageBuilder: () => const CreateSchedulePage(),
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.badge_outlined,
-                iconBg: const Color(0xFFF3E8FF),
-                iconColor: AppTheme.purple,
-                title: 'Security Badge & Gate Pass',
-                subtitle: 'Apply for Hypermarket security entry permits',
-                tag: 'Mall Pass',
-                tagVariant: StatusVariant.neutral,
-                pageBuilder: () => const CreateBadgePage(),
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.rate_review_outlined,
-                iconBg: const Color(0xFFFEF3C7),
-                iconColor: const Color(0xFFF59E0B),
-                title: 'Promoter Audit Scorecard',
-                subtitle: 'On-site supervisor evaluation for grooming, pitch & hygiene',
-                tag: 'Field Audit',
-                tagVariant: StatusVariant.warning,
-                pageBuilder: () => const PromoterAuditPage(),
-              ),
-              const SizedBox(height: 20),
-
-              // Section 3: Master Data Onboarding
-              _buildSectionHeader(
-                icon: Icons.hub_rounded,
-                color: AppTheme.primary,
-                title: 'MASTER DATA ONBOARDING',
-                subtitle: 'Add new clients, brands, store branches and field staff',
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.campaign_outlined,
-                iconBg: const Color(0xFFFFE4E6),
-                iconColor: AppTheme.accentRose,
-                title: 'New Campaign Project',
-                subtitle: 'Onboard a brand roadshow (Sadia, L\'Oreal, Nestle, etc.)',
-                tag: 'Roadshow',
-                tagVariant: StatusVariant.neutral,
-                pageBuilder: () => const CreateProjectPage(),
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.storefront_outlined,
-                iconBg: const Color(0xFFCCFBF1),
-                iconColor: AppTheme.accentTeal,
-                title: 'New Store Location',
-                subtitle: 'Onboard hypermarket branch with customer code & leads',
-                tag: 'UAE Store',
-                tagVariant: StatusVariant.neutral,
-                pageBuilder: () => const CreateStorePage(),
-              ),
-              const SizedBox(height: 10),
-              _buildActionCard(
-                context: context,
-                icon: Icons.person_add_alt_1_outlined,
-                iconBg: const Color(0xFFFEF3C7),
-                iconColor: AppTheme.accentAmber,
-                title: 'Register Field Promoter',
-                subtitle: 'Create promoter identity with phone and nationality',
-                tag: 'Promoter',
-                tagVariant: StatusVariant.neutral,
-                pageBuilder: () => const CreatePromoterPage(),
-              ),
-              const SizedBox(height: 24),
-            ],
+      title: 'IML Operations Hub',
+      subtitle: 'Warehouse dispatch, scheduling & master data',
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Section 1: Field Logistics & Dispatch
+          const SectionHeader(
+            icon: Icons.local_shipping_rounded,
+            iconColor: AppColors.warning,
+            microLabel: 'FIELD LOGISTICS & DISPATCH',
+            title: 'Equipment & Stock Transfers',
           ),
-        ),
+          const SizedBox(height: AppSpacing.md),
+          _buildActionItem(
+            context: context,
+            icon: Icons.local_shipping_outlined,
+            iconColor: AppColors.warning,
+            title: 'Assign Morning Drop-off',
+            subtitle: 'Schedule stand, rollup & stock delivery to venue',
+            tag: 'Drop',
+            tagVariant: StatusVariant.warning,
+            pageBuilder: () => const CreateDropPage(),
+          ),
+          const SizedBox(height: AppSpacing.itemGap),
+          _buildActionItem(
+            context: context,
+            icon: Icons.repeat_rounded,
+            iconColor: AppColors.accent,
+            title: 'Assign Return Collection',
+            subtitle: 'Retrieve promotional fixtures & excess stock post-campaign',
+            tag: 'Collection',
+            tagVariant: StatusVariant.info,
+            pageBuilder: () => const CreateCollectionPage(),
+          ),
+          const SizedBox(height: AppSpacing.sectionGap),
+
+          // Section 2: Scheduling & Compliance
+          const SectionHeader(
+            icon: Icons.event_note_rounded,
+            iconColor: AppColors.accent,
+            microLabel: 'SCHEDULING & STORE ACCESS',
+            title: 'Roster & Gate Passes',
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildActionItem(
+            context: context,
+            icon: Icons.calendar_month_rounded,
+            iconColor: AppColors.accent,
+            title: 'Batch Shift Scheduler',
+            subtitle: 'Generate multi-day shifts across UAE stores in 1 tap',
+            tag: 'Staff Matrix',
+            tagVariant: StatusVariant.info,
+            pageBuilder: () => const CreateSchedulePage(),
+          ),
+          const SizedBox(height: AppSpacing.itemGap),
+          _buildActionItem(
+            context: context,
+            icon: Icons.badge_outlined,
+            iconColor: AppColors.purple,
+            title: 'Security Badge & Gate Pass',
+            subtitle: 'Apply for Hypermarket security entry permits',
+            tag: 'Permit',
+            tagVariant: StatusVariant.neutral,
+            pageBuilder: () => const CreateBadgePage(),
+          ),
+          const SizedBox(height: AppSpacing.itemGap),
+          _buildActionItem(
+            context: context,
+            icon: Icons.rate_review_outlined,
+            iconColor: AppColors.warning,
+            title: 'Promoter Audit Scorecard',
+            subtitle: 'On-site supervisor evaluation for grooming, pitch & hygiene',
+            tag: 'Audit',
+            tagVariant: StatusVariant.warning,
+            pageBuilder: () => const PromoterAuditPage(),
+          ),
+          const SizedBox(height: AppSpacing.sectionGap),
+
+          // Section 3: Master Data Onboarding
+          const SectionHeader(
+            icon: Icons.hub_rounded,
+            iconColor: AppColors.primary,
+            microLabel: 'MASTER DATA ONBOARDING',
+            title: 'Campaigns, Stores & Staff',
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildActionItem(
+            context: context,
+            icon: Icons.campaign_outlined,
+            iconColor: AppColors.danger,
+            title: 'New Campaign Project',
+            subtitle: 'Onboard a brand roadshow (Sadia, L\'Oreal, Nestle, etc.)',
+            tag: 'Roadshow',
+            tagVariant: StatusVariant.neutral,
+            pageBuilder: () => const CreateProjectPage(),
+          ),
+          const SizedBox(height: AppSpacing.itemGap),
+          _buildActionItem(
+            context: context,
+            icon: Icons.storefront_outlined,
+            iconColor: AppColors.success,
+            title: 'New Store Location',
+            subtitle: 'Onboard hypermarket branch with customer code & leads',
+            tag: 'Store',
+            tagVariant: StatusVariant.neutral,
+            pageBuilder: () => const CreateStorePage(),
+          ),
+          const SizedBox(height: AppSpacing.itemGap),
+          _buildActionItem(
+            context: context,
+            icon: Icons.person_add_alt_1_outlined,
+            iconColor: AppColors.primary,
+            title: 'Register Field Promoter',
+            subtitle: 'Create promoter identity with phone and nationality',
+            tag: 'Promoter',
+            tagVariant: StatusVariant.neutral,
+            pageBuilder: () => const CreatePromoterPage(),
+          ),
+          const SizedBox(height: AppSpacing.sectionGap),
+        ],
       ),
     );
   }
 
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-  }) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(7),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, size: 16, color: color),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.textMuted,
-                  letterSpacing: 0.6,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textSecondary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionCard({
+  Widget _buildActionItem({
     required BuildContext context,
     required IconData icon,
-    required Color iconBg,
     required Color iconColor,
     required String title,
     required String subtitle,
@@ -293,7 +155,7 @@ class OperationsMenuPage extends StatelessWidget {
     required StatusVariant tagVariant,
     required Widget Function() pageBuilder,
   }) {
-    return InkWell(
+    return AppCard(
       onTap: () async {
         final res = await Navigator.push(
           context,
@@ -303,77 +165,49 @@ class OperationsMenuPage extends StatelessWidget {
           Navigator.pop(context, true);
         }
       },
-      borderRadius: BorderRadius.circular(16),
-      child: LiquidGlassContainer(
-        radius: 18.0,
-        blur: 16.0,
-        opacity: 0.82,
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: iconBg,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, size: 22, color: iconColor),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textMain,
-                          ),
-                        ),
+      child: Row(
+        children: [
+          IconBox(icon: icon, color: iconColor),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: AppText.bodyBold,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppTheme.borderSubtle),
-                        ),
-                        child: Text(
-                          tag,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.textMuted,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textMuted,
-                      height: 1.3,
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(width: AppSpacing.sm),
+                    StatusBadge(
+                      label: tag,
+                      variant: tagVariant,
+                      showDot: false,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: AppText.caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppTheme.borderStrong,
-              size: 20,
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.borderStrong,
+            size: 20,
+          ),
+        ],
       ),
     );
   }

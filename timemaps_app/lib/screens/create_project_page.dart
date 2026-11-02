@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/widgets.dart';
 
 class CreateProjectPage extends StatefulWidget {
   const CreateProjectPage({super.key});
@@ -29,9 +30,14 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     final client = _clientController.text.trim();
     if (name.isEmpty || client.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.danger,
-          content: Text('Please enter Campaign Name and Client Name'),
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
+          content: Text(
+            'Please enter Campaign Name and Client Name',
+            style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
       );
       return;
@@ -46,27 +52,42 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
       endDate: DateFormat('yyyy-MM-dd').format(_endDate),
     );
 
+    if (!mounted) return;
     setState(() => _isSaving = false);
 
-    if (project != null && mounted) {
+    if (project != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
           content: Row(
             children: [
-              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-              const SizedBox(width: 8),
-              Text('Campaign "${project.name}" launched successfully! 🚀'),
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Campaign "${project.name}" launched successfully! 🚀',
+                  style: AppText.bodyBold.copyWith(color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),
       );
       Navigator.pop(context, true);
-    } else if (mounted) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.danger,
-          content: Text('Failed to create campaign. Please try again.'),
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
+          content: Text(
+            'Failed to create campaign. Please try again.',
+            style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
       );
     }
@@ -74,160 +95,101 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
-      appBar: AppBar(
-        titleSpacing: 16,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('New Campaign Project', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2)),
-            Text('Create In-Store Activation Roadshow', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
-          ],
+    return AppScreenScaffold(
+      bottomClearance: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: 'New Campaign Project',
+      subtitle: 'In-store activation roadshow',
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: AppSpacing.sm),
+          child: StatusBadge(
+            label: 'Campaign',
+            variant: StatusVariant.neutral,
+            showDot: false,
+          ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: TextButton.icon(
-              onPressed: _isSaving ? null : _handleSave,
-              icon: _isSaving
-                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accent))
-                  : const Icon(Icons.check_rounded, size: 18),
-              label: const Text('Save', style: TextStyle(fontWeight: FontWeight.w800)),
+      ],
+      floatingBottom: StickyActionBar(
+        primaryLabel: _isSaving ? 'Deploying...' : 'Deploy Campaign Project',
+        primaryIcon: Icons.add_rounded,
+        primaryLoading: _isSaving,
+        onPrimaryPressed: _isSaving ? null : _handleSave,
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SectionHeader(
+                  icon: Icons.campaign_outlined,
+                  iconColor: AppColors.primary,
+                  microLabel: 'CAMPAIGN DETAILS',
+                  title: 'Roadshow Specifications',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  controller: _nameController,
+                  label: 'Campaign Project Name *',
+                  hint: 'e.g. Sadia In-Store Sampling Q4',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  controller: _clientController,
+                  label: 'Client / Brand *',
+                  hint: 'e.g. Sadia, L\'Oreal, Nestle',
+                ),
+                const SizedBox(height: AppSpacing.md),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth < 340) {
+                      return Column(
+                        children: [
+                          AppDateField(
+                            label: 'Start Date',
+                            value: _startDate,
+                            onChanged: (d) => setState(() => _startDate = d),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          AppDateField(
+                            label: 'End Date',
+                            value: _endDate,
+                            onChanged: (d) => setState(() => _endDate = d),
+                          ),
+                        ],
+                      );
+                    }
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: AppDateField(
+                            label: 'Start Date',
+                            value: _startDate,
+                            onChanged: (d) => setState(() => _startDate = d),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm + 2),
+                        Expanded(
+                          child: AppDateField(
+                            label: 'End Date',
+                            value: _endDate,
+                            onChanged: (d) => setState(() => _endDate = d),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: AppSpacing.sectionGap),
         ],
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: const Border(top: BorderSide(color: AppTheme.borderSubtle)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: ElevatedButton(
-            onPressed: _isSaving ? null : _handleSave,
-            child: _isSaving
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add_rounded, size: 18),
-                      SizedBox(width: 8),
-                      Text('Deploy Campaign Project'),
-                    ],
-                  ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-                boxShadow: AppTheme.cardShadow,
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'CAMPAIGN DETAILS',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextField(
-                    controller: _nameController,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                    decoration: const InputDecoration(
-                      labelText: 'Campaign Project Name *',
-                      hintText: 'e.g. Sadia In-Store Sampling Q4',
-                      prefixIcon: Icon(Icons.campaign_outlined, size: 20),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  TextField(
-                    controller: _clientController,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                    decoration: const InputDecoration(
-                      labelText: 'Client / Brand *',
-                      hintText: 'e.g. Sadia, L\'Oreal, Nestle',
-                      prefixIcon: Icon(Icons.business_outlined, size: 20),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: _startDate,
-                              firstDate: DateTime(2025),
-                              lastDate: DateTime(2030),
-                            );
-                            if (picked != null) setState(() => _startDate = picked);
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Start Date',
-                              prefixIcon: Icon(Icons.calendar_today_outlined, size: 18),
-                            ),
-                            child: Text(
-                              DateFormat('yyyy-MM-dd').format(_startDate),
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: InkWell(
-                          onTap: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: _endDate,
-                              firstDate: DateTime(2025),
-                              lastDate: DateTime(2030),
-                            );
-                            if (picked != null) setState(() => _endDate = picked);
-                          },
-                          child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'End Date',
-                              prefixIcon: Icon(Icons.event_outlined, size: 18),
-                            ),
-                            child: Text(
-                              DateFormat('yyyy-MM-dd').format(_endDate),
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

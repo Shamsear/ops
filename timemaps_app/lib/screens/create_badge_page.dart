@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/searchable_select_field.dart';
+import '../widgets/widgets.dart';
 
 class CreateBadgePage extends StatefulWidget {
   final int? preselectedStoreId;
@@ -116,9 +116,14 @@ class _CreateBadgePageState extends State<CreateBadgePage> {
     final promoterName = _promoterNameController.text.trim();
     if (promoterName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.danger,
-          content: Text('Please enter Promoter Name'),
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
+          content: Text(
+            'Please enter Promoter Name',
+            style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
       );
       return;
@@ -126,9 +131,14 @@ class _CreateBadgePageState extends State<CreateBadgePage> {
 
     if (_selectedProject == null || _selectedStore == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.danger,
-          content: Text('Please select Campaign Project and Store'),
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
+          content: Text(
+            'Please select Campaign Project and Store',
+            style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
       );
       return;
@@ -152,27 +162,42 @@ class _CreateBadgePageState extends State<CreateBadgePage> {
       notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
     );
 
+    if (!mounted) return;
     setState(() => _isSaving = false);
 
-    if (badge != null && mounted) {
+    if (badge != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
+          backgroundColor: AppColors.success,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
           content: Row(
             children: [
-              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-              const SizedBox(width: 8),
-              Text('Badge application for "$promoterName" submitted!'),
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Badge application for "$promoterName" submitted! 🪪',
+                  style: AppText.bodyBold.copyWith(color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
         ),
       );
       Navigator.pop(context, true);
-    } else if (mounted) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.danger,
-          content: Text('Failed to save badge application. Try again.'),
+        SnackBar(
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
+          content: Text(
+            'Failed to save badge application. Try again.',
+            style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
         ),
       );
     }
@@ -180,296 +205,260 @@ class _CreateBadgePageState extends State<CreateBadgePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
-      appBar: AppBar(
-        titleSpacing: 16,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Store Badge Application', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2)),
-            Text('Permit Submission & Security Clearance', style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: TextButton.icon(
-              onPressed: _isSaving ? null : _handleSave,
-              icon: _isSaving
-                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.accent))
-                  : const Icon(Icons.check_rounded, size: 18),
-              label: const Text('Save', style: TextStyle(fontWeight: FontWeight.w800)),
-            ),
-          ),
-        ],
+    return AppScreenScaffold(
+      bottomClearance: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        onPressed: () => Navigator.pop(context),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: const Border(top: BorderSide(color: AppTheme.borderSubtle)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: ElevatedButton(
-            onPressed: _isSaving ? null : _handleSave,
-            child: _isSaving
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.badge_rounded, size: 18),
-                      SizedBox(width: 8),
-                      Text('Submit Badge Application'),
-                    ],
-                  ),
+      title: 'Store Badge Application',
+      subtitle: 'Permit submission & security clearance',
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: AppSpacing.sm),
+          child: StatusBadge(
+            label: 'Permit',
+            variant: StatusVariant.neutral,
+            showDot: false,
           ),
         ),
+      ],
+      floatingBottom: StickyActionBar(
+        primaryLabel: _isSaving ? 'Submitting...' : 'Submit Badge Application',
+        primaryIcon: Icons.badge_rounded,
+        primaryLoading: _isSaving,
+        onPrimaryPressed: _isSaving ? null : _handleSave,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Info banner
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: AppTheme.infoBg,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                        border: Border.all(color: AppTheme.infoBorder),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.badge_outlined, color: AppTheme.accent, size: 24),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Submit store permit application for hypermarkets. Track status through HR and Mall Security clearance.',
-                              style: TextStyle(fontSize: 12, color: AppTheme.textMain, height: 1.4, fontWeight: FontWeight.w500),
-                            ),
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 60),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          : Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Info banner
+                  AppCard.flat(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      children: [
+                        const IconBox(
+                          icon: Icons.badge_outlined,
+                          color: AppColors.purple,
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Store Security Permit Application', style: AppText.bodyBold),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Submit store permit application for hypermarkets. Track status through HR and Security clearance.',
+                                style: AppText.caption,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
+                  ),
+                  const SizedBox(height: AppSpacing.sectionGap),
 
-                    // Card 1: Promoter & Campaign Details
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-                        boxShadow: AppTheme.cardShadow,
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'PROMOTER & CAMPAIGN',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
-                          ),
-                          const SizedBox(height: 16),
+                  // Card 1: Promoter & Campaign
+                  AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SectionHeader(
+                          icon: Icons.person_pin_circle_rounded,
+                          iconColor: AppColors.primary,
+                          microLabel: 'PROMOTER & CAMPAIGN',
+                          title: 'Staff Identity & Activation',
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Autocomplete<String>(
+                          initialValue: TextEditingValue(text: _promoterNameController.text),
+                          optionsBuilder: (textEditingValue) {
+                            if (textEditingValue.text.isEmpty) {
+                              return const Iterable<String>.empty();
+                            }
+                            return _promoters
+                                .map((p) => p.name)
+                                .where((name) =>
+                                    name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                          },
+                          onSelected: (selection) {
+                            _promoterNameController.text = selection;
+                          },
+                          fieldViewBuilder: (ctx, controller, focusNode, onFieldSubmitted) {
+                            controller.addListener(() {
+                              _promoterNameController.text = controller.text;
+                            });
+                            return AppTextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              label: 'Promoter Full Name *',
+                              hint: 'Type promoter name (e.g. Sony Mathew)',
+                            );
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        SearchableSelectField<ProjectModel>(
+                          label: 'Campaign / Project *',
+                          value: _selectedProject,
+                          options: _projects
+                              .map((p) => SearchableOption<ProjectModel>(
+                                    value: p,
+                                    label: p.name,
+                                    subtitle: p.clientName.isNotEmpty ? p.clientName : 'Direct Client',
+                                  ))
+                              .toList(),
+                          prefixIcon: const Icon(Icons.campaign_outlined, size: 20),
+                          onChanged: (p) => setState(() => _selectedProject = p),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sectionGap),
 
-                          // Promoter Name (Manual text input with suggestions)
-                          Autocomplete<String>(
-                            initialValue: TextEditingValue(text: _promoterNameController.text),
-                            optionsBuilder: (textEditingValue) {
-                              if (textEditingValue.text.isEmpty) {
-                                return const Iterable<String>.empty();
+                  // Card 2: Store & Emirate
+                  AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SectionHeader(
+                          icon: Icons.storefront_rounded,
+                          iconColor: AppColors.accent,
+                          microLabel: 'STORE LOCATION',
+                          title: 'Branch & Location',
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        SearchableSelectField<StoreModel>(
+                          label: 'Store Branch *',
+                          value: _selectedStore,
+                          options: _stores
+                              .map((s) => SearchableOption<StoreModel>(
+                                    value: s,
+                                    label: s.storeName,
+                                    subtitle: '${s.retailer} • ${s.emirate}',
+                                  ))
+                              .toList(),
+                          prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
+                          onChanged: (store) {
+                            setState(() {
+                              _selectedStore = store;
+                              if (store != null) {
+                                _selectedEmirate = store.emirate;
                               }
-                              return _promoters
-                                  .map((p) => p.name)
-                                  .where((name) => name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                            },
-                            onSelected: (selection) {
-                              _promoterNameController.text = selection;
-                            },
-                            fieldViewBuilder: (ctx, controller, focusNode, onFieldSubmitted) {
-                              controller.addListener(() {
-                                _promoterNameController.text = controller.text;
-                              });
-                              return TextField(
-                                controller: controller,
-                                focusNode: focusNode,
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                                decoration: const InputDecoration(
-                                  labelText: 'Promoter Full Name *',
-                                  hintText: 'Type promoter name (e.g. Sony Mathew)',
-                                  prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+                            });
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          'EMIRATE *',
+                          style: AppText.micro.copyWith(color: AppColors.textMuted),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: _emirates.map((em) {
+                            return FilterPill(
+                              label: em,
+                              isSelected: _selectedEmirate == em,
+                              onTap: () => setState(() => _selectedEmirate = em),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sectionGap),
+
+                  // Card 3: Badge Status Lifecycle
+                  AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SectionHeader(
+                          icon: Icons.verified_outlined,
+                          iconColor: AppColors.success,
+                          microLabel: 'PERMIT LIFECYCLE',
+                          title: 'Clearance Status & Pass No.',
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          'INITIAL CLEARANCE STATUS *',
+                          style: AppText.micro.copyWith(color: AppColors.textMuted),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: _statusOptions.map((st) {
+                            return FilterPill(
+                              label: st,
+                              isSelected: _selectedStatus == st,
+                              onTap: () => setState(() => _selectedStatus = st),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            if (constraints.maxWidth < 340) {
+                              return Column(
+                                children: [
+                                  AppTextField(
+                                    controller: _submittedByController,
+                                    label: 'Submitted By',
+                                    hint: 'Operations Lead Name',
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  AppTextField(
+                                    controller: _badgeNumberController,
+                                    label: 'Badge / Pass Number (Optional)',
+                                    hint: 'e.g. LULU-DXB-9842',
+                                  ),
+                                ],
+                              );
+                            }
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: AppTextField(
+                                    controller: _submittedByController,
+                                    label: 'Submitted By',
+                                    hint: 'Operations Lead Name',
+                                  ),
                                 ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 14),
-
-                          // Project Dropdown
-                          DropdownButtonFormField<ProjectModel>(
-                            value: _selectedProject,
-                            decoration: const InputDecoration(
-                              labelText: 'Campaign / Project *',
-                              prefixIcon: Icon(Icons.campaign_outlined, size: 20),
-                            ),
-                            items: _projects.map((p) {
-                              return DropdownMenuItem(
-                                value: p,
-                                child: Text(p.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                              );
-                            }).toList(),
-                            onChanged: (val) => setState(() => _selectedProject = val),
-                          ),
-                        ],
-                      ),
+                                const SizedBox(width: AppSpacing.sm + 2),
+                                Expanded(
+                                  child: AppTextField(
+                                    controller: _badgeNumberController,
+                                    label: 'Badge Number (Optional)',
+                                    hint: 'e.g. LULU-DXB-9842',
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          controller: _notesController,
+                          label: 'Notes / Security Instructions',
+                          hint: 'e.g. Health card renewal submitted; awaiting CID clearance',
+                          maxLines: 2,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-
-                    // Card 2: Store & Emirate
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-                        boxShadow: AppTheme.cardShadow,
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'STORE LOCATION',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Store searchable select
-                          SearchableSelectField<StoreModel>(
-                            label: 'Store Branch *',
-                            value: _selectedStore,
-                            options: _stores.map((s) => SearchableOption<StoreModel>(
-                              value: s,
-                              label: s.storeName,
-                              subtitle: '${s.retailer} • ${s.emirate}',
-                            )).toList(),
-                            prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
-                            onChanged: (store) {
-                              setState(() {
-                                _selectedStore = store;
-                                if (store != null) {
-                                  _selectedEmirate = store.emirate;
-                                }
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 14),
-
-                          // Emirate Dropdown
-                          DropdownButtonFormField<String>(
-                            value: _selectedEmirate,
-                            decoration: const InputDecoration(
-                              labelText: 'Emirate *',
-                              prefixIcon: Icon(Icons.location_on_outlined, size: 20),
-                            ),
-                            items: _emirates.map((em) {
-                              return DropdownMenuItem(
-                                value: em,
-                                child: Text(em, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null) setState(() => _selectedEmirate = val);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Card 3: Badge Status Lifecycle
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-                        boxShadow: AppTheme.cardShadow,
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'BADGE STATUS LIFECYCLE',
-                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMuted, letterSpacing: 0.5),
-                          ),
-                          const SizedBox(height: 16),
-
-                          DropdownButtonFormField<String>(
-                            value: _selectedStatus,
-                            decoration: const InputDecoration(
-                              labelText: 'Initial Clearance Status *',
-                              prefixIcon: Icon(Icons.verified_outlined, size: 20),
-                            ),
-                            items: _statusOptions.map((st) {
-                              return DropdownMenuItem(
-                                value: st,
-                                child: Text(st, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null) setState(() => _selectedStatus = val);
-                            },
-                          ),
-                          const SizedBox(height: 14),
-
-                          TextField(
-                            controller: _submittedByController,
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                            decoration: const InputDecoration(
-                              labelText: 'Submitted By',
-                              hintText: 'Operations Lead Name',
-                              prefixIcon: Icon(Icons.badge_outlined, size: 20),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-
-                          TextField(
-                            controller: _badgeNumberController,
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, fontFamily: 'monospace', color: AppTheme.textMain),
-                            decoration: const InputDecoration(
-                              labelText: 'Badge / Pass Number (Optional)',
-                              hintText: 'e.g. LULU-DXB-9842',
-                              prefixIcon: Icon(Icons.pin_outlined, size: 20),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-
-                          TextField(
-                            controller: _notesController,
-                            maxLines: 2,
-                            style: const TextStyle(fontSize: 13, color: AppTheme.textMain),
-                            decoration: const InputDecoration(
-                              labelText: 'Notes / Security Instructions',
-                              hintText: 'e.g. Health card renewal submitted; awaiting CID clearance',
-                              prefixIcon: Icon(Icons.note_alt_outlined, size: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: AppSpacing.sectionGap),
+                ],
               ),
             ),
     );
