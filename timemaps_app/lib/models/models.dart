@@ -22,6 +22,14 @@ class UserModel {
       role: json['role'] as String,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserModel && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class ProjectModel {
@@ -45,6 +53,14 @@ class ProjectModel {
       status: json['status'] as String? ?? 'ACTIVE',
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProjectModel && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class StoreModel {
@@ -92,6 +108,14 @@ class StoreModel {
       contactPhone: json['contact_phone'] as String?,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StoreModel && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class PromoterModel {
@@ -115,6 +139,14 @@ class PromoterModel {
       nationality: json['nationality'] as String?,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PromoterModel && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class LivePromoterShift {

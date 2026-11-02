@@ -19,7 +19,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
-  String _selectedPersonaRole = 'OPS_ADMIN';
+  String _selectedPersonaEmail = 'ops@imlme.com';
+
+  bool _isPersonaSelected(String email) =>
+      _selectedPersonaEmail == email ||
+      _emailController.text.trim().toLowerCase() == email.toLowerCase();
 
   @override
   void dispose() {
@@ -80,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _emailController.text = email;
       _passwordController.text = password;
-      _selectedPersonaRole = role;
+      _selectedPersonaEmail = email;
       _errorMessage = null;
     });
   }
@@ -308,7 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 title: 'Ops Director',
                                 subtitle: 'Full UAE Command',
                                 accentColor: AppTheme.accent,
-                                isSelected: _selectedPersonaRole == 'OPS_ADMIN',
+                                isSelected: _isPersonaSelected('ops@imlme.com'),
                                 onTap: () => _selectPersona(
                                   email: 'ops@imlme.com',
                                   role: 'OPS_ADMIN',
@@ -323,7 +327,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 title: 'Supervisor',
                                 subtitle: 'Babar (Dubai)',
                                 accentColor: AppTheme.purple,
-                                isSelected: _selectedPersonaRole == 'SUPERVISOR',
+                                isSelected: _isPersonaSelected('babar@imlme.com'),
                                 onTap: () => _selectPersona(
                                   email: 'babar@imlme.com',
                                   role: 'SUPERVISOR',
@@ -342,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 title: 'Supervisor',
                                 subtitle: 'Jasheer (Abu Dhabi)',
                                 accentColor: AppTheme.accentTeal,
-                                isSelected: false,
+                                isSelected: _isPersonaSelected('jasheer@imlme.com'),
                                 onTap: () => _selectPersona(
                                   email: 'jasheer@imlme.com',
                                   role: 'SUPERVISOR',
@@ -357,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 title: 'Promoter',
                                 subtitle: 'Sony (Barsha)',
                                 accentColor: AppTheme.success,
-                                isSelected: _selectedPersonaRole == 'PROMOTER',
+                                isSelected: _isPersonaSelected('sony@imlme.com'),
                                 onTap: () => _selectPersona(
                                   email: 'sony@imlme.com',
                                   role: 'PROMOTER',
