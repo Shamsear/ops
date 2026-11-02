@@ -1,11 +1,8 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../widgets/liquid_glass.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/searchable_select_field.dart';
-import '../widgets/status_badge.dart';
+import '../widgets/widgets.dart';
 
 class PromoterAuditPage extends StatefulWidget {
   final int? promoterId;
@@ -87,7 +84,9 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
           _selectedPromoter = _promoters.where((p) => p.id == widget.promoterId).firstOrNull;
         }
         if (_selectedPromoter == null && widget.promoterName != null) {
-          _selectedPromoter = _promoters.where((p) => p.name.toLowerCase() == widget.promoterName!.toLowerCase()).firstOrNull;
+          _selectedPromoter = _promoters
+              .where((p) => p.name.toLowerCase() == widget.promoterName!.toLowerCase())
+              .firstOrNull;
         }
         _selectedPromoter ??= _promoters.isNotEmpty ? _promoters.first : null;
 
@@ -132,17 +131,19 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
           content: Row(
             children: [
               const Icon(Icons.stars_rounded, color: Colors.white, size: 20),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   'Audit for ${_selectedPromoter!.name} submitted! (${_overallScore.toStringAsFixed(1)} ⭐)',
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  style: AppText.bodyBold.copyWith(color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -158,17 +159,19 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
   void _showWarning(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: AppTheme.danger,
+        backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
         content: Row(
           children: [
             const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -179,493 +182,252 @@ class _PromoterAuditPageState extends State<PromoterAuditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.bgLight,
-      extendBody: true,
-      appBar: AppBar(
-        titleSpacing: 0,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        flexibleSpace: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.76),
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.white.withOpacity(0.50),
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textMain),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Field Audit Scorecard',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.textMain,
-                letterSpacing: -0.3,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              _selectedPromoter != null ? 'Auditing: ${_selectedPromoter!.name}' : 'Promoter quality & compliance review',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppTheme.textMuted,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: StatusBadge(
-              label: '${_overallScore.toStringAsFixed(1)} ⭐',
-              variant: _overallScore >= 4.0 ? StatusVariant.success : StatusVariant.warning,
-              showDot: true,
-            ),
-          ),
-        ],
+    return AppScreenScaffold(
+      bottomClearance: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        onPressed: () => Navigator.pop(context),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: LiquidGlassContainer(
-            radius: 22.0,
-            blur: 24.0,
-            opacity: 0.85,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _overallScore.toStringAsFixed(1),
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFFF59E0B),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Text(
-                        '/ 5.0 Rating',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _selectedPromoter != null ? _selectedPromoter!.name : 'Select promoter',
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: AppTheme.textMuted,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    elevation: 2,
-                  ),
-                  onPressed: _isSaving ? null : _handleSubmit,
-                  icon: _isSaving
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Icon(Icons.rate_review_rounded, size: 18),
-                  label: Text(
-                    _isSaving ? 'Submitting...' : 'Submit Scorecard',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
-                  ),
-                ),
-              ),
-            ],
+      title: 'Field Audit Scorecard',
+      subtitle: _selectedPromoter != null
+          ? 'Auditing: ${_selectedPromoter!.name}'
+          : 'Promoter quality & compliance review',
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: AppSpacing.sm),
+          child: StatusBadge(
+            label: '${_overallScore.toStringAsFixed(1)} ⭐',
+            variant: _overallScore >= 4.0 ? StatusVariant.success : StatusVariant.warning,
+            showDot: true,
           ),
         ),
-      ),
+      ],
+      floatingBottom: StickyActionBar(
+        summaryText: _selectedPromoter != null
+            ? '${_selectedPromoter!.name} • ${_overallScore.toStringAsFixed(1)} / 5.0 Rating'
+            : null,
+        primaryLabel: _isSaving ? 'Submitting...' : 'Submit Scorecard',
+        primaryIcon: Icons.rate_review_rounded,
+        primaryLoading: _isSaving,
+        onPrimaryPressed: _isSaving ? null : _handleSubmit,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header Card
-                    _buildStaffInfoCard(),
-                    const SizedBox(height: 16),
-
-                    // Rating Criteria Cards
-                    _buildCriteriaCard(
-                      title: 'Uniform Grooming & Hygiene',
-                      description: 'Ironed uniform, brand cap, name badge visible, clean footwear',
-                      score: _grooming,
-                      onChanged: (val) => setState(() => _grooming = val),
-                    ),
-                    const SizedBox(height: 12),
-
-                    _buildCriteriaCard(
-                      title: 'Product Pitch & Brand Script',
-                      description: 'Accurate USP benefits, pricing knowledge, customer objection handling',
-                      score: _pitch,
-                      onChanged: (val) => setState(() => _pitch = val),
-                    ),
-                    const SizedBox(height: 12),
-
-                    _buildCriteriaCard(
-                      title: 'Shopper Engagement & Proactivity',
-                      description: 'Active standing, welcoming body posture, proactive sample distribution',
-                      score: _engagement,
-                      onChanged: (val) => setState(() => _engagement = val),
-                    ),
-                    const SizedBox(height: 12),
-
-                    _buildCriteriaCard(
-                      title: 'Punctuality & Stand Floor Cleanliness',
-                      description: 'On-time arrival, sampling tray hygienic, POSM arranged neatly',
-                      score: _punctuality,
-                      onChanged: (val) => setState(() => _punctuality = val),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Coaching Notes Card
-                    _buildNotesCard(),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-            ),
-    );
-  }
-
-  Widget _buildStaffInfoCard() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 60),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.person_pin_circle_rounded, size: 18, color: AppTheme.primary),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
+                // 1. Target Promoter & Store
+                AppCard(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        'PROMOTER & LOCATION DETAILS',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.textMuted,
-                          letterSpacing: 0.6,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      const SectionHeader(
+                        icon: Icons.person_pin_circle_rounded,
+                        iconColor: AppColors.primary,
+                        microLabel: 'AUDIT TARGET',
+                        title: 'Promoter & Location',
                       ),
-                      SizedBox(height: 1),
-                      Text(
-                        'Assigned shift and brand venue',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      const SizedBox(height: AppSpacing.md),
+                      SearchableSelectField<PromoterModel>(
+                        label: 'Audited Promoter *',
+                        value: _selectedPromoter,
+                        options: _promoters
+                            .map((p) => SearchableOption<PromoterModel>(
+                                  value: p,
+                                  label: p.name,
+                                  subtitle: '${p.phone} • ${p.nationality ?? "Promoter"}',
+                                ))
+                            .toList(),
+                        prefixIcon: const Icon(Icons.person_outline_rounded, size: 20),
+                        onChanged: (p) => setState(() => _selectedPromoter = p),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      SearchableSelectField<StoreModel>(
+                        label: 'Store Location *',
+                        value: _selectedStore,
+                        options: _stores
+                            .map((s) => SearchableOption<StoreModel>(
+                                  value: s,
+                                  label: s.storeName,
+                                  subtitle: '${s.retailer} • ${s.emirate}',
+                                ))
+                            .toList(),
+                        prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
+                        onChanged: (s) => setState(() => _selectedStore = s),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      SearchableSelectField<ProjectModel>(
+                        label: 'Campaign Roadshow *',
+                        value: _selectedProject,
+                        options: _projects
+                            .map((p) => SearchableOption<ProjectModel>(
+                                  value: p,
+                                  label: p.name,
+                                  subtitle: p.clientName.isNotEmpty ? p.clientName : 'Direct Client',
+                                ))
+                            .toList(),
+                        prefixIcon: const Icon(Icons.campaign_outlined, size: 20),
+                        onChanged: (p) => setState(() => _selectedProject = p),
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(height: AppSpacing.sectionGap),
+
+                // 2. Performance Dimensions
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SectionHeader(
+                        icon: Icons.star_rounded,
+                        iconColor: AppColors.warning,
+                        microLabel: 'SCORING CRITERIA',
+                        title: 'Performance Dimensions',
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _buildCriteriaRow(
+                        title: 'Uniform Grooming & Hygiene',
+                        description: 'Ironed uniform, brand cap, badge visible, tidy footwear',
+                        score: _grooming,
+                        onChanged: (val) => setState(() => _grooming = val),
+                      ),
+                      const Divider(height: 24),
+                      _buildCriteriaRow(
+                        title: 'Product Pitch & Brand Script',
+                        description: 'Accurate USP benefits, pricing, objection handling',
+                        score: _pitch,
+                        onChanged: (val) => setState(() => _pitch = val),
+                      ),
+                      const Divider(height: 24),
+                      _buildCriteriaRow(
+                        title: 'Shopper Engagement & Proactivity',
+                        description: 'Active posture, welcoming smile, sample handovers',
+                        score: _engagement,
+                        onChanged: (val) => setState(() => _engagement = val),
+                      ),
+                      const Divider(height: 24),
+                      _buildCriteriaRow(
+                        title: 'Punctuality & Stand Cleanliness',
+                        description: 'On-time arrival, sampling tray hygiene, neat POSM',
+                        score: _punctuality,
+                        onChanged: (val) => setState(() => _punctuality = val),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sectionGap),
+
+                // 3. Supervisor Feedback
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SectionHeader(
+                        icon: Icons.edit_note_rounded,
+                        iconColor: AppColors.accent,
+                        microLabel: 'COACHING FEEDBACK',
+                        title: 'Supervisor Observations',
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        controller: _feedbackController,
+                        label: 'Coaching Notes & Recommendations',
+                        hint: 'e.g. Active engagement, neat uniform. Encourage louder greeting during peak footfall.',
+                        maxLines: 4,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sectionGap),
               ],
             ),
-            const SizedBox(height: 16),
-
-            // Promoter Selector
-            SearchableSelectField<PromoterModel>(
-              label: 'Audited Promoter *',
-              value: _selectedPromoter,
-              options: _promoters.map((p) => SearchableOption<PromoterModel>(
-                value: p,
-                label: p.name,
-                subtitle: '${p.phone} • ${p.nationality ?? 'Promoter'}',
-              )).toList(),
-              prefixIcon: const Icon(Icons.person_outline_rounded, size: 20),
-              onChanged: (p) => setState(() => _selectedPromoter = p),
-            ),
-            const SizedBox(height: 12),
-
-            // Store Location Selector
-            SearchableSelectField<StoreModel>(
-              label: 'Store Location *',
-              value: _selectedStore,
-              options: _stores.map((s) => SearchableOption<StoreModel>(
-                value: s,
-                label: s.storeName,
-                subtitle: '${s.retailer} • ${s.emirate}',
-              )).toList(),
-              prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
-              onChanged: (s) => setState(() => _selectedStore = s),
-            ),
-            const SizedBox(height: 12),
-
-            // Campaign Project Selector
-            SearchableSelectField<ProjectModel>(
-              label: 'Campaign Roadshow *',
-              value: _selectedProject,
-              options: _projects.map((p) => SearchableOption<ProjectModel>(
-                value: p,
-                label: p.name,
-                subtitle: p.clientName.isNotEmpty ? p.clientName : 'Direct Client',
-              )).toList(),
-              prefixIcon: const Icon(Icons.campaign_outlined, size: 20),
-              onChanged: (p) => setState(() => _selectedProject = p),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _buildCriteriaCard({
+  Widget _buildCriteriaRow({
     required String title,
     required String description,
     required int score,
     required ValueChanged<int> onChanged,
   }) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppTheme.borderSubtle),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.textMain,
-                      letterSpacing: -0.2,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: score >= 4 ? AppTheme.successBg : AppTheme.warningBg,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '$score / 5 ⭐',
-                    style: TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: score >= 4 ? AppTheme.success : AppTheme.warning,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: const TextStyle(fontSize: 11.5, color: AppTheme.textMuted, height: 1.3),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: List.generate(5, (index) {
-                final starVal = index + 1;
-                final isFilled = starVal <= score;
-                return Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: index == 0 ? 0 : 3,
-                      right: index == 4 ? 0 : 3,
-                    ),
-                    child: InkWell(
-                      onTap: () => onChanged(starVal),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 7),
-                        decoration: BoxDecoration(
-                          color: isFilled ? const Color(0xFFFEF3C7) : AppTheme.surfaceSubtle,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isFilled ? const Color(0xFFF59E0B) : AppTheme.borderSubtle,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.star_rounded,
-                              size: 15,
-                              color: isFilled ? const Color(0xFFF59E0B) : AppTheme.textMuted,
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              '$starVal',
-                              style: TextStyle(
-                                fontFamily: 'monospace',
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w800,
-                                color: isFilled ? const Color(0xFFB45309) : AppTheme.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotesCard() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.accent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.rate_review_outlined, size: 18, color: AppTheme.accent),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'SUPERVISOR COACHING FEEDBACK',
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.textMuted,
-                          letterSpacing: 0.6,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 1),
-                      Text(
-                        'Constructive guidance for promoter development',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: _feedbackController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Coaching Notes & Observations',
-                hintText: 'e.g. Excellent greeting, proactive sampling. Encourage louder pitch during peak footfall.',
-                prefixIcon: Icon(Icons.edit_note_rounded, size: 20),
+            Expanded(
+              child: Text(
+                title,
+                style: AppText.bodyBold,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: AppSpacing.sm),
+            StatusBadge(
+              label: '$score / 5 ⭐',
+              variant: score >= 4 ? StatusVariant.success : StatusVariant.warning,
+              showDot: true,
+            ),
           ],
         ),
-      ),
+        const SizedBox(height: 2),
+        Text(description, style: AppText.caption),
+        const SizedBox(height: AppSpacing.sm + 2),
+        Row(
+          children: List.generate(5, (index) {
+            final starVal = index + 1;
+            final isFilled = starVal <= score;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: index == 0 ? 0 : 3,
+                  right: index == 4 ? 0 : 3,
+                ),
+                child: InkWell(
+                  onTap: () => onChanged(starVal),
+                  borderRadius: BorderRadius.circular(AppRadius.inner),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isFilled ? AppColors.warningSoft : AppColors.surfaceMuted,
+                      borderRadius: BorderRadius.circular(AppRadius.inner),
+                      border: Border.all(
+                        color: isFilled ? AppColors.warning.withOpacity(0.3) : AppColors.borderSubtle,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.star_rounded,
+                          size: 15,
+                          color: isFilled ? AppColors.warning : AppColors.textMuted,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '$starVal',
+                          style: AppText.caption.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: isFilled ? AppColors.warning : AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

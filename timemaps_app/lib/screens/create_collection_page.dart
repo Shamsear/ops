@@ -1,13 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/liquid_glass.dart';
-import '../widgets/searchable_select_field.dart';
-import '../widgets/status_badge.dart';
-import 'create_project_page.dart';
+import '../widgets/widgets.dart';
 import 'create_store_page.dart';
 
 class CreateCollectionPage extends StatefulWidget {
@@ -121,7 +117,7 @@ class _CreateCollectionPageState extends State<CreateCollectionPage> {
       return;
     }
     if (_itemsController.text.trim().isEmpty) {
-      _showWarning('Please specify items to retrieve from store');
+      _showWarning('Please specify items to collect and return');
       return;
     }
 
@@ -141,17 +137,19 @@ class _CreateCollectionPageState extends State<CreateCollectionPage> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
           content: Row(
             children: [
               const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  'Return Collection scheduled for ${_selectedStore!.storeName}!',
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  'Stand collection booked from ${_selectedStore!.storeName}!',
+                  style: AppText.bodyBold.copyWith(color: Colors.white),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -167,17 +165,19 @@ class _CreateCollectionPageState extends State<CreateCollectionPage> {
   void _showWarning(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: AppTheme.danger,
+        backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
         content: Row(
           children: [
             const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -188,721 +188,294 @@ class _CreateCollectionPageState extends State<CreateCollectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
-      extendBody: true,
-      appBar: AppBar(
-        titleSpacing: 0,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        flexibleSpace: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.78),
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.white.withOpacity(0.55),
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textMain),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Return Collection',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.textMain,
-                letterSpacing: -0.3,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              'Schedule teardown & stock retrieval',
-              style: TextStyle(
-                fontSize: 11,
-                color: AppTheme.textMuted,
-                fontWeight: FontWeight.w600,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 14),
-            child: StatusBadge(
-              label: 'Collection',
-              variant: StatusVariant.success,
-              showDot: true,
-            ),
-          ),
-        ],
+    return AppScreenScaffold(
+      bottomClearance: false,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+        onPressed: () => Navigator.pop(context),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: LiquidGlassContainer(
-            radius: 22.0,
-            blur: 24.0,
-            opacity: 0.88,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.calendar_today_rounded, size: 14, color: AppTheme.success),
-                        const SizedBox(width: 6),
-                        Text(
-                          DateFormat('EEE, dd MMM yyyy').format(_collectionDate),
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textMain,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        _selectedStore != null
-                            ? '${_selectedStore!.retailer} • ${_selectedStore!.emirate}'
-                            : 'Select store to collect from',
-                        style: const TextStyle(
-                          fontSize: 11.5,
-                          color: AppTheme.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        textAlign: TextAlign.end,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.success,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      elevation: 2,
-                    ),
-                    onPressed: _isSaving ? null : _handleSave,
-                    icon: _isSaving
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.repeat_rounded, size: 18),
-                    label: Text(
-                      _isSaving ? 'Scheduling...' : 'Confirm Collection',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+      title: 'Stand Collection',
+      subtitle: 'Post-campaign equipment retrieval',
+      actions: const [
+        Padding(
+          padding: EdgeInsets.only(right: AppSpacing.sm),
+          child: StatusBadge(
+            label: 'Collection',
+            variant: StatusVariant.info,
+            showDot: true,
           ),
         ),
+      ],
+      floatingBottom: StickyActionBar(
+        summaryText: _selectedStore != null
+            ? '${_selectedStore!.retailer} • ${_selectedStore!.emirate} (${DateFormat("dd MMM").format(_collectionDate)})'
+            : null,
+        primaryLabel: _isSaving ? 'Dispatching...' : 'Dispatch Retrieval Task',
+        primaryIcon: Icons.repeat_rounded,
+        primaryLoading: _isSaving,
+        onPrimaryPressed: _isSaving ? null : _handleSave,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : AmbientMeshBackground(
-              child: SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+          ? const Padding(
+              padding: EdgeInsets.symmetric(vertical: 60),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Guidance Banner
+                AppCard.flat(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Row(
                     children: [
-                      // Guidance banner
-                      _buildGuideBanner(),
-                      const SizedBox(height: 14),
-
-                      // Section 1: Venue & Campaign Selection
-                      _buildVenueCard(),
-                      const SizedBox(height: 14),
-
-                      // Section 2: Logistics Driver & Scheduled Date
-                      _buildCollectionTimelineCard(),
-                      const SizedBox(height: 14),
-
-                      // Section 3: Items to Collect
-                      _buildItemsCard(),
-                      const SizedBox(height: 14),
-
-                      // Section 4: Return Warehouse & Teardown Notes
-                      _buildDepotAndNotesCard(),
-                      const SizedBox(height: 90),
+                      const IconBox(
+                        icon: Icons.repeat_rounded,
+                        color: AppColors.accent,
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Post-Campaign Material Retrieval', style: AppText.bodyBold),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Schedule stand dismantling and excess stock return with logistics team.',
+                              style: AppText.caption,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ),
-            ),
-    );
-  }
+                const SizedBox(height: AppSpacing.sectionGap),
 
-  Widget _buildGuideBanner() {
-    return GlassCard(
-      radius: 16,
-      opacity: 0.88,
-      padding: const EdgeInsets.all(14),
-      tintColor: const Color(0xFFECFDF5).withOpacity(0.92),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: AppTheme.success.withOpacity(0.14),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.repeat_rounded, color: AppTheme.success, size: 18),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Post-Campaign Material Retrieval',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: AppTheme.textMain,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Schedule stand dismantling and excess stock return with logistics team.',
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    color: AppTheme.textSecondary,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVenueCard() {
-    return GlassCard(
-      radius: 20,
-      opacity: 0.85,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.success.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.storefront_rounded, size: 18, color: AppTheme.success),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'RETRIEVAL STORE LOCATION',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      'Store where equipment will be picked up',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              InkWell(
-                onTap: () async {
-                  final newStore = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CreateStorePage()),
-                  );
-                  if (newStore == true) _loadFormData();
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.accent.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    '+ New Store',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.accent,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Campaign Project Selector
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Campaign Project',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-              ),
-              InkWell(
-                onTap: () async {
-                  final newProj = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CreateProjectPage()),
-                  );
-                  if (newProj == true) _loadFormData();
-                },
-                child: const Text(
-                  '+ New Campaign',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          SearchableSelectField<ProjectModel>(
-            label: 'Campaign Project *',
-            value: _selectedProject,
-            options: _projects.map((p) => SearchableOption<ProjectModel>(
-              value: p,
-              label: p.name,
-              subtitle: p.clientName.isNotEmpty ? p.clientName : 'Direct Client',
-            )).toList(),
-            prefixIcon: const Icon(Icons.campaign_outlined, size: 20),
-            onChanged: (p) => setState(() => _selectedProject = p),
-          ),
-          const SizedBox(height: 14),
-
-          // Store Location Selector
-          SearchableSelectField<StoreModel>(
-            label: 'Store Location to Collect From *',
-            value: _selectedStore,
-            options: _stores.map((s) => SearchableOption<StoreModel>(
-              value: s,
-              label: s.storeName,
-              subtitle: '${s.retailer} • ${s.emirate} • Code: ${s.customerCode ?? 'N/A'}',
-            )).toList(),
-            prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
-            onChanged: (s) => setState(() => _selectedStore = s),
-          ),
-
-          if (_selectedStore != null) ...[
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceSubtle,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.borderSubtle),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primary,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      _selectedStore!.retailer,
-                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '${_selectedStore!.emirate} • Lead: ${_selectedStore!.smnContact ?? 'Operations Team'}',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCollectionTimelineCard() {
-    return GlassCard(
-      radius: 20,
-      opacity: 0.85,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.accent.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.person_pin_circle_rounded, size: 18, color: AppTheme.accent),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'COLLECTION DRIVER & DATE',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      'Assigned supervisor and target retrieval date',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Assigned Supervisor Selector
-          SearchableSelectField<UserModel>(
-            label: 'Assigned Supervisor (to Collect) *',
-            value: _selectedSupervisor,
-            options: _supervisors.map((u) => SearchableOption<UserModel>(
-              value: u,
-              label: u.name,
-              subtitle: '${u.phone} • ${u.role}',
-            )).toList(),
-            prefixIcon: const Icon(Icons.manage_accounts_outlined, size: 20),
-            onChanged: (u) => setState(() => _selectedSupervisor = u),
-          ),
-          const SizedBox(height: 14),
-
-          // Scheduled Date Picker
-          InkWell(
-            onTap: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: _collectionDate,
-                firstDate: DateTime.now().subtract(const Duration(days: 3)),
-                lastDate: DateTime.now().add(const Duration(days: 90)),
-              );
-              if (picked != null) setState(() => _collectionDate = picked);
-            },
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceSubtle,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppTheme.borderSubtle),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.calendar_today_rounded, size: 18, color: AppTheme.accent),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'SCHEDULED COLLECTION DATE',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textMuted,
+                // Section 1: Retrieval Store Location
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SectionHeader(
+                        icon: Icons.storefront_rounded,
+                        iconColor: AppColors.primary,
+                        microLabel: 'RETRIEVAL VENUE',
+                        title: 'Store Location for Pick-up',
+                        trailing: TextButton.icon(
+                          onPressed: () async {
+                            final newStore = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const CreateStorePage()),
+                            );
+                            if (newStore == true) _loadFormData();
+                          },
+                          icon: const Icon(Icons.add_rounded, size: 14, color: AppColors.accent),
+                          label: Text(
+                            'Store',
+                            style: AppText.caption.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.accent,
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          DateFormat('EEEE, dd MMMM yyyy').format(_collectionDate),
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textMain,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      SearchableSelectField<ProjectModel>(
+                        label: 'Campaign Project *',
+                        value: _selectedProject,
+                        options: _projects
+                            .map((p) => SearchableOption<ProjectModel>(
+                                  value: p,
+                                  label: p.name,
+                                  subtitle: p.clientName.isNotEmpty ? p.clientName : 'Direct Client',
+                                ))
+                            .toList(),
+                        prefixIcon: const Icon(Icons.campaign_outlined, size: 20),
+                        onChanged: (p) => setState(() => _selectedProject = p),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      SearchableSelectField<StoreModel>(
+                        label: 'Store Location *',
+                        value: _selectedStore,
+                        options: _stores
+                            .map((s) => SearchableOption<StoreModel>(
+                                  value: s,
+                                  label: s.storeName,
+                                  subtitle: '${s.retailer} • ${s.emirate} • Code: ${s.customerCode ?? "N/A"}',
+                                ))
+                            .toList(),
+                        prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
+                        onChanged: (s) => setState(() => _selectedStore = s),
+                      ),
+                      if (_selectedStore != null) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        AppCard.flat(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          child: Row(
+                            children: [
+                              InitialsAvatar(name: _selectedStore!.retailer, size: 24),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(
+                                  '${_selectedStore!.retailer} • ${_selectedStore!.emirate} • Lead: ${_selectedStore!.smnContact ?? "Operations"}',
+                                  style: AppText.caption.copyWith(fontWeight: FontWeight.w600),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ),
+                    ],
                   ),
-                  const Icon(Icons.arrow_drop_down_rounded, color: AppTheme.textMuted),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildItemsCard() {
-    return GlassCard(
-      radius: 20,
-      opacity: 0.85,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.success.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.inventory_rounded, size: 18, color: AppTheme.success),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'ITEMS TO RETRIEVE',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      'Display fixtures, stock & marketing assets',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
+                const SizedBox(height: AppSpacing.sectionGap),
 
-          // Quick Checklist Pills
-          const Text(
-            'Common Items (Tap to append):',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: _quickCollectionPills.map((item) {
-              return ActionChip(
-                backgroundColor: AppTheme.surfaceSubtle,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                label: Text(
-                  '+ $item',
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                ),
-                onPressed: () => _addCollectionItem(item),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 12),
-
-          TextField(
-            controller: _itemsController,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Items Manifest to Retrieve *',
-              hintText: 'e.g. 1x Pop-up Display Stand, 2x Rollup Banners, Unused POSM',
-              prefixIcon: Icon(Icons.checklist_rounded, size: 20),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDepotAndNotesCard() {
-    return GlassCard(
-      radius: 20,
-      opacity: 0.85,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.primary.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.warehouse_rounded, size: 18, color: AppTheme.primary),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'RETURN WAREHOUSE & INSTRUCTIONS',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
+                // Section 2: Retrieval Schedule & Driver
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SectionHeader(
+                        icon: Icons.person_pin_circle_rounded,
+                        iconColor: AppColors.accent,
+                        microLabel: 'LOGISTICS ASSIGNMENT',
+                        title: 'Assigned Driver & Date',
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      'Destination warehouse and condition notes',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
+                      const SizedBox(height: AppSpacing.md),
+                      SearchableSelectField<UserModel>(
+                        label: 'Assigned Supervisor (to Collect) *',
+                        value: _selectedSupervisor,
+                        options: _supervisors
+                            .map((u) => SearchableOption<UserModel>(
+                                  value: u,
+                                  label: u.name,
+                                  subtitle: '${u.phone} • ${u.role}',
+                                ))
+                            .toList(),
+                        prefixIcon: const Icon(Icons.manage_accounts_outlined, size: 20),
+                        onChanged: (u) => setState(() => _selectedSupervisor = u),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // Destination Warehouse
-          const Text(
-            'Destination Storage Depot:',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-          ),
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                'Main Warehouse - Al Quoz',
-                'Sharjah Depot Hub',
-                'Abu Dhabi Central Depot',
-                'Return Directly to Client',
-              ].map((depot) {
-                final isSelected = _destinationDepot == depot;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(
-                      depot,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                        color: isSelected ? Colors.white : AppTheme.textMain,
+                      const SizedBox(height: AppSpacing.md),
+                      AppDateField(
+                        label: 'Target Collection Date *',
+                        value: _collectionDate,
+                        onChanged: (picked) => setState(() => _collectionDate = picked),
                       ),
-                    ),
-                    selected: isSelected,
-                    selectedColor: AppTheme.primary,
-                    backgroundColor: AppTheme.surfaceSubtle,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    onSelected: (val) {
-                      if (val) setState(() => _destinationDepot = depot);
-                    },
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'RETURN DESTINATION DEPOT',
+                        style: AppText.micro.copyWith(color: AppColors.textMuted),
+                      ),
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          'Main Warehouse - Al Quoz',
+                          'Sharjah Depot',
+                          'Abu Dhabi Hub',
+                        ].map((depot) {
+                          return FilterPill(
+                            label: depot,
+                            isSelected: _destinationDepot == depot,
+                            onTap: () => setState(() => _destinationDepot = depot),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 14),
+                ),
+                const SizedBox(height: AppSpacing.sectionGap),
 
-          TextField(
-            controller: _teardownNotesController,
-            maxLines: 2,
-            decoration: const InputDecoration(
-              labelText: 'Teardown & Handling Notes (Optional)',
-              hintText: 'e.g. Carefully pack acrylic stand in original bubble wrap; verify store stamp',
-              prefixIcon: Icon(Icons.note_alt_outlined, size: 20),
+                // Section 3: Items to Collect
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SectionHeader(
+                        icon: Icons.inventory_2_rounded,
+                        iconColor: AppColors.accent,
+                        microLabel: 'ITEMS TO RETRIEVE',
+                        title: 'Equipment & Stock Recovery',
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'QUICK ADD ITEMS (TAP TO APPEND)',
+                        style: AppText.micro.copyWith(color: AppColors.textMuted),
+                      ),
+                      const SizedBox(height: 6),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: _quickCollectionPills.map((item) {
+                          return InkWell(
+                            onTap: () => _addCollectionItem(item),
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceMuted,
+                                borderRadius: BorderRadius.circular(AppRadius.pill),
+                                border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.add_rounded, size: 12, color: AppColors.accent),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    item,
+                                    style: AppText.caption.copyWith(fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        controller: _itemsController,
+                        label: 'Detailed Items & Hardware to Retrieve *',
+                        hint: 'e.g. 1x Pop-up Display Stand, 2x Rollup Banners, Unused POSM',
+                        maxLines: 3,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sectionGap),
+
+                // Section 4: Teardown & Security Clearance Notes
+                AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SectionHeader(
+                        icon: Icons.assignment_turned_in_rounded,
+                        iconColor: AppColors.accent,
+                        microLabel: 'CLEARANCE NOTES',
+                        title: 'Dismantling & Security Permit',
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      AppTextField(
+                        controller: _teardownNotesController,
+                        label: 'Teardown Instructions (Optional)',
+                        hint: 'e.g. Collect after 10 PM mall closing; gate pass approval on file with store manager',
+                        maxLines: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sectionGap),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
