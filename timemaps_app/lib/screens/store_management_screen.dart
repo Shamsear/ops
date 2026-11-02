@@ -387,8 +387,8 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
                                         const SizedBox(width: 8),
                                         StatusBadge(
                                           label: store.customerCode != null
-                                              ? '#'
-                                              : (store.branchCode != null ? 'Br #' : store.emirate),
+                                              ? '#${store.customerCode}'
+                                              : (store.branchCode != null ? 'Br #${store.branchCode}' : store.emirate),
                                           variant: StatusVariant.info,
                                           fontSize: 10,
                                           maxWidth: 95,

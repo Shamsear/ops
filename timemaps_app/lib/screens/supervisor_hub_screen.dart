@@ -269,16 +269,20 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
         const SizedBox(height: 18),
 
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Assigned Store Inspection Queue',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+            const Expanded(
+              child: Text(
+                'Store Inspection Queue',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            const SizedBox(width: 8),
             StatusBadge(
               label: '${_myStores.length} Stores',
               variant: StatusVariant.purple,
-              fontSize: 10,
+              fontSize: 11,
             ),
           ],
         ),
@@ -311,16 +315,20 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
       children: [
         // Drops Section
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Morning Drops (Deliveries to Stores)',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+            const Expanded(
+              child: Text(
+                'Morning Drops',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            const SizedBox(width: 8),
             StatusBadge(
               label: '${_myDrops.length} Pending',
               variant: StatusVariant.warning,
-              fontSize: 10,
+              fontSize: 11,
             ),
           ],
         ),
@@ -349,16 +357,20 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
 
         // Collections Section
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Return Collections (End of Campaign)',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+            const Expanded(
+              child: Text(
+                'Return Collections',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            const SizedBox(width: 8),
             StatusBadge(
               label: '${_myCollections.length} Scheduled',
               variant: StatusVariant.success,
-              fontSize: 10,
+              fontSize: 11,
             ),
           ],
         ),
@@ -420,7 +432,9 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '\ • ',
+                      drop.projectName.isNotEmpty
+                          ? (drop.emirate.isNotEmpty ? '${drop.projectName} • ${drop.emirate}' : drop.projectName)
+                          : (drop.emirate.isNotEmpty ? drop.emirate : 'Morning Drop Delivery'),
                       style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -504,7 +518,9 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '\ • ',
+                      col.projectName.isNotEmpty
+                          ? (col.emirate.isNotEmpty ? '${col.projectName} • ${col.emirate}' : col.projectName)
+                          : (col.emirate.isNotEmpty ? col.emirate : 'Return Collection'),
                       style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -590,9 +606,19 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(store.storeName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2)),
+                    Text(
+                      store.storeName,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 2),
-                    Text('${store.retailer} • ${store.emirate}', style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500)),
+                    Text(
+                      '${store.retailer} • ${store.emirate}',
+                      style: const TextStyle(fontSize: 12, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),

@@ -410,13 +410,17 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                       children: [
                         Row(
                           children: [
-                            const Text(
-                              'Live Deployment Roster',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                color: AppTheme.textMain,
-                                letterSpacing: -0.3,
+                            const Expanded(
+                              child: Text(
+                                'Live Deployment Roster',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.textMain,
+                                  letterSpacing: -0.3,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -1017,7 +1021,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                       ),
                       const SizedBox(width: 8),
                       StatusBadge(
-                        label: '${project.promoters.length} Staff On Duty',
+                        label: '${project.promoters.length} On Duty',
                         variant: StatusVariant.neutral,
                         fontSize: 10,
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),

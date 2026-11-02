@@ -254,14 +254,18 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 100),
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Today's Shift Coverage Breakdown",
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppTheme.textMain),
+            const Expanded(
+              child: Text(
+                'Shift Coverage Breakdown',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppTheme.textMain),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            const SizedBox(width: 8),
             StatusBadge(
-              label: '${_schedules.length} Stores Active',
+              label: '${_schedules.length} Active',
               variant: StatusVariant.success,
               fontSize: 10,
             ),
@@ -283,14 +287,17 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Text(
                         store.storeName,
                         style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain, letterSpacing: -0.2),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
                     StatusBadge(
                       label: store.emirate,
                       variant: StatusVariant.neutral,

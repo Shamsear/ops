@@ -563,33 +563,42 @@ class _PromoterHomeScreenState extends State<PromoterHomeScreen> {
                           ),
                           const SizedBox(height: 12),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 18,
-                                    backgroundColor: AppTheme.purpleBg,
-                                    child: const Icon(Icons.supervisor_account_rounded, color: AppTheme.purple, size: 20),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _assignedStore?.supervisorName.isNotEmpty == true ? _assignedStore!.supervisorName : 'Babar (Lead)',
-                                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: AppTheme.purpleBg,
+                                      child: const Icon(Icons.supervisor_account_rounded, color: AppTheme.purple, size: 20),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _assignedStore?.supervisorName.isNotEmpty == true ? _assignedStore!.supervisorName : 'Babar (Lead)',
+                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textMain),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            _assignedStore?.supervisorPhone.isNotEmpty == true ? _assignedStore!.supervisorPhone : '+971 50 123 4567',
+                                            style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace'),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        _assignedStore?.supervisorPhone.isNotEmpty == true ? _assignedStore!.supervisorPhone : '+971 50 123 4567',
-                                        style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace'),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                  ],
+                                ),
                               ),
+                              const SizedBox(width: 8),
                               Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton.filled(
                                     style: IconButton.styleFrom(backgroundColor: AppTheme.infoBg, foregroundColor: AppTheme.accent),
