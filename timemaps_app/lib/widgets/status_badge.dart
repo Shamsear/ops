@@ -25,8 +25,8 @@ class StatusBadge extends StatelessWidget {
     this.variant = StatusVariant.neutral,
     this.icon,
     this.showDot = false,
-    this.fontSize = 10.5,
-    this.padding = const EdgeInsets.symmetric(horizontal: 9.0, vertical: 0.0),
+    this.fontSize = 10.0,
+    this.padding = const EdgeInsets.symmetric(horizontal: 7.0, vertical: 0.0),
     this.maxWidth,
   });
 
@@ -153,18 +153,31 @@ class StatusBadge extends StatelessWidget {
             Icon(icon, size: fontSize + 2, color: _text),
             const SizedBox(width: 4),
           ],
-          Flexible(
-            child: Text(
+          if (maxWidth != null)
+            Flexible(
+              child: Text(
+                label.toUpperCase(),
+                style: AppText.micro.copyWith(
+                  fontSize: fontSize,
+                  color: _text,
+                  height: 1.1,
+                  letterSpacing: 0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            )
+          else
+            Text(
               label.toUpperCase(),
               style: AppText.micro.copyWith(
                 fontSize: fontSize,
                 color: _text,
                 height: 1.1,
+                letterSpacing: 0.3,
               ),
               maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
         ],
       ),
     );

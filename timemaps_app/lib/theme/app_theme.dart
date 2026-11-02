@@ -140,7 +140,7 @@ abstract final class AppSpacing {
   static const double itemGap = 10.0;
 
   // Nav Clearance: accounts for LiquidGlassNavBar height + margin + breathing room
-  static const double navClearance = 96.0;
+  static const double navClearance = 76.0;
 }
 
 /// 1.4 Radius Tokens

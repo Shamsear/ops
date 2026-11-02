@@ -6,7 +6,6 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/widgets.dart';
 import 'timemap_calendar_screen.dart';
-import 'login_screen.dart';
 import 'create_schedule_page.dart';
 import 'create_store_page.dart';
 import 'create_promoter_page.dart';
@@ -183,26 +182,18 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           variant: StatusVariant.success,
           showDot: true,
         ),
-        const SizedBox(width: AppSpacing.sm),
+        const SizedBox(width: 4),
         IconButton(
           icon: const Icon(Icons.grid_view_rounded, size: 20, color: AppColors.primary),
           tooltip: 'Operations Menu',
+          visualDensity: VisualDensity.compact,
           onPressed: _openActionCenter,
         ),
         IconButton(
           icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textPrimary),
           tooltip: 'Refresh Operations',
+          visualDensity: VisualDensity.compact,
           onPressed: _loadDashboardData,
-        ),
-        IconButton(
-          icon: const Icon(Icons.logout_rounded, size: 20, color: AppColors.textMuted),
-          tooltip: 'Sign Out',
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-            );
-          },
         ),
       ],
       body: Column(
@@ -210,12 +201,15 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
         children: [
           // 1. Date Switcher Card
           AppCard.compact(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
                   icon: const Icon(Icons.chevron_left_rounded, size: 22, color: AppColors.textPrimary),
                   tooltip: 'Previous Day',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                   onPressed: () {
                     setState(() {
                       _selectedDate = _selectedDate.subtract(const Duration(days: 1));
@@ -223,47 +217,65 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     _loadDashboardData();
                   },
                 ),
-                InkWell(
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2025),
-                      lastDate: DateTime(2030),
-                    );
-                    if (picked != null) {
-                      setState(() => _selectedDate = picked);
-                      _loadDashboardData();
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(AppRadius.inner),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const IconBox(
-                          icon: Icons.calendar_today_rounded,
-                          color: AppColors.primary,
-                          isCompact: true,
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(dateDisplay, style: AppText.bodyBold),
-                            Text('Tap to change date', style: AppText.caption),
-                          ],
-                        ),
-                        const SizedBox(width: 4),
-                        const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppColors.textMuted),
-                      ],
+                Expanded(
+                  child: InkWell(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedDate,
+                        firstDate: DateTime(2025),
+                        lastDate: DateTime(2030),
+                      );
+                      if (picked != null) {
+                        setState(() => _selectedDate = picked);
+                        _loadDashboardData();
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(AppRadius.inner),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const IconBox(
+                            icon: Icons.calendar_today_rounded,
+                            color: AppColors.primary,
+                            isCompact: true,
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  dateDisplay,
+                                  style: AppText.bodyBold,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const Text(
+                                  'Tap to change date',
+                                  style: AppText.caption,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppColors.textMuted),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.chevron_right_rounded, size: 22, color: AppColors.textPrimary),
                   tooltip: 'Next Day',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                   onPressed: () {
                     setState(() {
                       _selectedDate = _selectedDate.add(const Duration(days: 1));
@@ -274,11 +286,11 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.itemGap),
 
           // 2. KPI Section (2x2 Grid)
           _buildKpiGrid(filteredStores),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.itemGap),
 
           // 3. Quick Action Shortcuts Carousel
           SizedBox(
@@ -290,7 +302,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                   label: 'Batch Schedule',
                   icon: Icons.bolt_rounded,
                   height: 36,
-                  width: 140,
+                  autoWidth: true,
                   onPressed: () async {
                     final res = await Navigator.push(
                       context,
@@ -299,12 +311,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     if (res == true) _loadDashboardData();
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 AppButton.secondary(
                   label: '+ Campaign',
                   icon: Icons.campaign_outlined,
                   height: 36,
-                  width: 125,
+                  autoWidth: true,
                   onPressed: () async {
                     final res = await Navigator.push(
                       context,
@@ -313,12 +325,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     if (res == true) _loadDashboardData();
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 AppButton.secondary(
                   label: '+ Store',
                   icon: Icons.storefront_outlined,
                   height: 36,
-                  width: 105,
+                  autoWidth: true,
                   onPressed: () async {
                     final res = await Navigator.push(
                       context,
@@ -327,12 +339,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     if (res == true) _loadDashboardData();
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 AppButton.secondary(
                   label: '+ Promoter',
                   icon: Icons.person_add_alt_outlined,
                   height: 36,
-                  width: 120,
+                  autoWidth: true,
                   onPressed: () async {
                     final res = await Navigator.push(
                       context,
@@ -341,12 +353,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     if (res == true) _loadDashboardData();
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 AppButton.secondary(
                   label: 'Drop',
                   icon: Icons.local_shipping_outlined,
                   height: 36,
-                  width: 90,
+                  autoWidth: true,
                   onPressed: () async {
                     final res = await Navigator.push(
                       context,
@@ -355,12 +367,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                     if (res == true) _loadDashboardData();
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 AppButton.secondary(
                   label: 'Collection',
                   icon: Icons.repeat_rounded,
                   height: 36,
-                  width: 120,
+                  autoWidth: true,
                   onPressed: () async {
                     final res = await Navigator.push(
                       context,
@@ -372,7 +384,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.itemGap),
 
           // 4. Search & Filter Bar
           AppCard.compact(
@@ -478,7 +490,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.itemGap,
       crossAxisSpacing: AppSpacing.itemGap,
-      childAspectRatio: 1.45,
+      childAspectRatio: 1.36,
       children: [
         KpiTile(
           label: 'Live Stores',
@@ -683,6 +695,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                                   label: 'Call',
                                   icon: Icons.phone_rounded,
                                   height: 32,
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
                                   onPressed: () => _makeCall(p.promoterPhone),
                                 ),
                               ),
@@ -692,6 +705,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                                   label: 'WhatsApp',
                                   icon: Icons.chat_bubble_rounded,
                                   height: 32,
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
                                   onPressed: () => _openWhatsApp(p.promoterPhone),
                                 ),
                               ),
@@ -701,6 +715,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                                   label: 'Audit',
                                   icon: Icons.star_rounded,
                                   height: 32,
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
                                   onPressed: () {
                                     Navigator.push(
                                       context,

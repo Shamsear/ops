@@ -28,13 +28,13 @@ class KpiTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppCard(
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       border: isSelected
           ? const BorderSide(color: AppColors.primary, width: 1.5)
           : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,7 +46,7 @@ class KpiTile extends StatelessWidget {
               ),
               if (delta != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                   decoration: BoxDecoration(
                     color: (isPositive ?? true) ? AppColors.successSoft : AppColors.dangerSoft,
                     borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -54,27 +54,26 @@ class KpiTile extends StatelessWidget {
                   child: Text(
                     delta!,
                     style: AppText.micro.copyWith(
+                      fontSize: 9.5,
                       color: (isPositive ?? true) ? AppColors.success : AppColors.danger,
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 4),
-          Flexible(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                value,
-                style: AppText.display,
-              ),
+          const SizedBox(height: 3),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: AppText.display,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             label.toUpperCase(),
-            style: AppText.micro.copyWith(color: AppColors.textMuted),
+            style: AppText.micro.copyWith(color: AppColors.textMuted, letterSpacing: 0.2),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

@@ -113,7 +113,8 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
           label: 'New Pass',
           icon: Icons.add_rounded,
           height: 36,
-          width: 110,
+          autoWidth: true,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           onPressed: () async {
             final res = await Navigator.push(
               context,

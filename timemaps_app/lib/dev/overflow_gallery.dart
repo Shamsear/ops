@@ -53,7 +53,7 @@ class OverflowGalleryScreen extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: AppSpacing.itemGap,
             crossAxisSpacing: AppSpacing.itemGap,
-            childAspectRatio: 1.35,
+            childAspectRatio: 1.25,
             children: const [
               KpiTile(
                 label: 'Active Promoters',

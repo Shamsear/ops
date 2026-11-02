@@ -616,7 +616,8 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                             label: 'Audit',
                             icon: Icons.star_rounded,
                             height: 30,
-                            width: 72,
+                            autoWidth: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
                             onPressed: () {
                               Navigator.push(
                                 context,
