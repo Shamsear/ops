@@ -715,11 +715,12 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('$pName$role', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.textMain)),
-                          Text('Shift: $startTime - $endTime • $breakInfo', style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace')),
+                          Text('$pName$role', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.textMain), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          Text('Shift: $startTime - $endTime • $breakInfo', style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontFamily: 'monospace'), maxLines: 1, overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
+                    const SizedBox(width: 8),
                     StatusBadge.fromStatus(badgeStatus.toString()),
                   ],
                 ),

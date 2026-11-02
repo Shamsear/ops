@@ -288,7 +288,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
         children: [
           // Top Row: Promoter Name + Avatar + Status Badge
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
                 radius: 17,
@@ -306,15 +306,20 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
                     Text(
                       badge.promoterName,
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       badge.projectName.toUpperCase(),
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.accent, letterSpacing: 0.3),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               StatusBadge.fromStatus(badge.status),
             ],
           ),

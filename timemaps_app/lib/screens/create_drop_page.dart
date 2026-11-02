@@ -1,10 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../widgets/liquid_glass.dart';
 import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/liquid_glass.dart';
 import '../widgets/searchable_select_field.dart';
 import '../widgets/status_badge.dart';
 import 'create_project_page.dart';
@@ -184,7 +184,7 @@ class _CreateDropPageState extends State<CreateDropPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.bgLight,
+      backgroundColor: AppTheme.canvasBg,
       extendBody: true,
       appBar: AppBar(
         titleSpacing: 0,
@@ -195,10 +195,10 @@ class _CreateDropPageState extends State<CreateDropPage> {
             filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.76),
+                color: Colors.white.withOpacity(0.78),
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.white.withOpacity(0.50),
+                    color: Colors.white.withOpacity(0.55),
                     width: 1.0,
                   ),
                 ),
@@ -215,27 +215,31 @@ class _CreateDropPageState extends State<CreateDropPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Assign Morning Drop-off',
+              'Morning Drop-off',
               style: TextStyle(
-                fontSize: 17,
+                fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppTheme.textMain,
                 letterSpacing: -0.3,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
-              'Schedule POSM & promotional stand delivery to store',
+              'Dispatch POSM & stands to venue',
               style: TextStyle(
                 fontSize: 11,
                 color: AppTheme.textMuted,
                 fontWeight: FontWeight.w600,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
         actions: const [
           Padding(
-            padding: EdgeInsets.only(right: 12),
+            padding: EdgeInsets.only(right: 14),
             child: StatusBadge(
               label: 'Drop-off',
               variant: StatusVariant.warning,
@@ -250,101 +254,108 @@ class _CreateDropPageState extends State<CreateDropPage> {
           child: LiquidGlassContainer(
             radius: 22.0,
             blur: 24.0,
-            opacity: 0.85,
+            opacity: 0.88,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today_rounded, size: 14, color: AppTheme.accent),
-                      const SizedBox(width: 6),
-                      Text(
-                        DateFormat('EEE, dd MMM yyyy').format(_dropDate),
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: AppTheme.textMain,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.calendar_today_rounded, size: 14, color: AppTheme.accent),
+                        const SizedBox(width: 6),
+                        Text(
+                          DateFormat('EEE, dd MMM yyyy').format(_dropDate),
+                          style: const TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.textMain,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    _selectedStore != null
-                        ? '${_selectedStore!.retailer} • ${_selectedStore!.emirate}'
-                        : 'Select destination store',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textSecondary,
-                      fontWeight: FontWeight.w600,
+                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.warning,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    elevation: 2,
-                  ),
-                  onPressed: _isSaving ? null : _handleSave,
-                  icon: _isSaving
-                      ? const SizedBox(
-                          height: 18,
-                          width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Icon(Icons.local_shipping_rounded, size: 18),
-                  label: Text(
-                    _isSaving ? 'Dispatching...' : 'Dispatch Drop Task',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _selectedStore != null
+                            ? '${_selectedStore!.retailer} • ${_selectedStore!.emirate}'
+                            : 'Select destination store',
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          color: AppTheme.textSecondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.end,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.warning,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 2,
+                    ),
+                    onPressed: _isSaving ? null : _handleSave,
+                    icon: _isSaving
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Icon(Icons.local_shipping_rounded, size: 18),
+                    label: Text(
+                      _isSaving ? 'Dispatching...' : 'Dispatch Drop Task',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header Guidance Banner
-                    _buildGuideBanner(),
-                    const SizedBox(height: 16),
+          : AmbientMeshBackground(
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Header Guidance Banner
+                      _buildGuideBanner(),
+                      const SizedBox(height: 14),
 
-                    // Section 1: Venue & Campaign Selection
-                    _buildVenueCard(),
-                    const SizedBox(height: 16),
+                      // Section 1: Venue & Campaign Selection
+                      _buildVenueCard(),
+                      const SizedBox(height: 14),
 
-                    // Section 2: Logistics Driver & Scheduled Date
-                    _buildDispatchScheduleCard(),
-                    const SizedBox(height: 16),
+                      // Section 2: Logistics Driver & Scheduled Date
+                      _buildDispatchScheduleCard(),
+                      const SizedBox(height: 14),
 
-                    // Section 3: Items Manifest to Deliver
-                    _buildManifestCard(),
-                    const SizedBox(height: 16),
+                      // Section 3: Items Manifest to Deliver
+                      _buildManifestCard(),
+                      const SizedBox(height: 14),
 
-                    // Section 4: Loading Bay & Store Access Instructions
-                    _buildAccessNotesCard(),
-                    const SizedBox(height: 24),
-                  ],
+                      // Section 4: Loading Bay & Store Access Instructions
+                      _buildAccessNotesCard(),
+                      const SizedBox(height: 90),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -352,13 +363,11 @@ class _CreateDropPageState extends State<CreateDropPage> {
   }
 
   Widget _buildGuideBanner() {
-    return Container(
+    return GlassCard(
+      radius: 16,
+      opacity: 0.88,
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.warningBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.warningBorder),
-      ),
+      tintColor: const Color(0xFFFFFBEB).withOpacity(0.92),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -382,12 +391,14 @@ class _CreateDropPageState extends State<CreateDropPage> {
                     fontWeight: FontWeight.w800,
                     color: AppTheme.textMain,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'Assign promotional display stands, rollups, and product cartons to a supervisor. Delivery tasks appear directly in their field hub.',
+                  'Assign promotional stands, rollups, and stock to field supervisor.',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11.5,
                     color: AppTheme.textSecondary,
                     height: 1.35,
                   ),
@@ -401,194 +412,195 @@ class _CreateDropPageState extends State<CreateDropPage> {
   }
 
   Widget _buildVenueCard() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.storefront_rounded, size: 18, color: AppTheme.primary),
-                    ),
-                    const SizedBox(width: 10),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'DESTINATION VENUE',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textMuted,
-                            letterSpacing: 0.6,
-                          ),
-                        ),
-                        Text(
-                          'Store location receiving the drop-off',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+    return GlassCard(
+      radius: 20,
+      opacity: 0.85,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                InkWell(
-                  onTap: () async {
-                    final newStore = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CreateStorePage()),
-                    );
-                    if (newStore == true) _loadFormData();
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                    child: Text(
-                      '+ New Store',
+                child: const Icon(Icons.storefront_rounded, size: 18, color: AppTheme.primary),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'DESTINATION VENUE',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: AppTheme.accent,
+                        color: AppTheme.textMuted,
+                        letterSpacing: 0.6,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Campaign Project Selector
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Campaign Project',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-                ),
-                InkWell(
-                  onTap: () async {
-                    final newProj = await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const CreateProjectPage()),
-                    );
-                    if (newProj == true) _loadFormData();
-                  },
-                  child: const Text(
-                    '+ New Campaign',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            SearchableSelectField<ProjectModel>(
-              label: 'Campaign Project *',
-              value: _selectedProject,
-              options: _projects.map((p) => SearchableOption<ProjectModel>(
-                value: p,
-                label: p.name,
-                subtitle: p.clientName.isNotEmpty ? p.clientName : 'Direct Client',
-              )).toList(),
-              prefixIcon: const Icon(Icons.campaign_outlined, size: 20),
-              onChanged: (p) => setState(() => _selectedProject = p),
-            ),
-            const SizedBox(height: 14),
-
-            // Store Location Selector
-            SearchableSelectField<StoreModel>(
-              label: 'Destination Store *',
-              value: _selectedStore,
-              options: _stores.map((s) => SearchableOption<StoreModel>(
-                value: s,
-                label: s.storeName,
-                subtitle: '${s.retailer} • ${s.emirate} • Code: ${s.customerCode ?? 'N/A'}',
-              )).toList(),
-              prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
-              onChanged: (s) => setState(() => _selectedStore = s),
-            ),
-
-            if (_selectedStore != null) ...[
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSubtle,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.borderSubtle),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary,
-                        borderRadius: BorderRadius.circular(6),
+                    Text(
+                      'Store receiving promotional delivery',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
                       ),
-                      child: Text(
-                        _selectedStore!.retailer,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '${_selectedStore!.emirate} • Lead: ${_selectedStore!.smnContact ?? 'Operations Team'}',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: () async {
+                  final newStore = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CreateStorePage()),
+                  );
+                  if (newStore == true) _loadFormData();
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.accent.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '+ New Store',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.accent,
+                    ),
+                  ),
+                ),
+              ),
             ],
+          ),
+          const SizedBox(height: 16),
+
+          // Campaign Project Selector
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Campaign Project',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+              ),
+              InkWell(
+                onTap: () async {
+                  final newProj = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CreateProjectPage()),
+                  );
+                  if (newProj == true) _loadFormData();
+                },
+                child: const Text(
+                  '+ New Campaign',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.accent),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          SearchableSelectField<ProjectModel>(
+            label: 'Campaign Project *',
+            value: _selectedProject,
+            options: _projects.map((p) => SearchableOption<ProjectModel>(
+              value: p,
+              label: p.name,
+              subtitle: p.clientName.isNotEmpty ? p.clientName : 'Direct Client',
+            )).toList(),
+            prefixIcon: const Icon(Icons.campaign_outlined, size: 20),
+            onChanged: (p) => setState(() => _selectedProject = p),
+          ),
+          const SizedBox(height: 14),
+
+          // Store Location Selector
+          SearchableSelectField<StoreModel>(
+            label: 'Destination Store *',
+            value: _selectedStore,
+            options: _stores.map((s) => SearchableOption<StoreModel>(
+              value: s,
+              label: s.storeName,
+              subtitle: '${s.retailer} • ${s.emirate} • Code: ${s.customerCode ?? 'N/A'}',
+            )).toList(),
+            prefixIcon: const Icon(Icons.storefront_outlined, size: 20),
+            onChanged: (s) => setState(() => _selectedStore = s),
+          ),
+
+          if (_selectedStore != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceSubtle,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppTheme.borderSubtle),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      _selectedStore!.retailer,
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${_selectedStore!.emirate} • Lead: ${_selectedStore!.smnContact ?? 'Operations Team'}',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildDispatchScheduleCard() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.accent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.person_pin_circle_rounded, size: 18, color: AppTheme.accent),
+    return GlassCard(
+      radius: 20,
+      opacity: 0.85,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.accent.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 10),
-                const Column(
+                child: const Icon(Icons.person_pin_circle_rounded, size: 18, color: AppTheme.accent),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -599,6 +611,8 @@ class _CreateDropPageState extends State<CreateDropPage> {
                         color: AppTheme.textMuted,
                         letterSpacing: 0.6,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Assigned supervisor and target drop date',
@@ -607,51 +621,55 @@ class _CreateDropPageState extends State<CreateDropPage> {
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textSecondary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
 
-            // Assigned Supervisor Selector
-            SearchableSelectField<UserModel>(
-              label: 'Assigned Supervisor (to Deliver) *',
-              value: _selectedSupervisor,
-              options: _supervisors.map((u) => SearchableOption<UserModel>(
-                value: u,
-                label: u.name,
-                subtitle: '${u.phone} • ${u.role}',
-              )).toList(),
-              prefixIcon: const Icon(Icons.manage_accounts_outlined, size: 20),
-              onChanged: (u) => setState(() => _selectedSupervisor = u),
-            ),
-            const SizedBox(height: 14),
+          // Assigned Supervisor Selector
+          SearchableSelectField<UserModel>(
+            label: 'Assigned Supervisor (to Deliver) *',
+            value: _selectedSupervisor,
+            options: _supervisors.map((u) => SearchableOption<UserModel>(
+              value: u,
+              label: u.name,
+              subtitle: '${u.phone} • ${u.role}',
+            )).toList(),
+            prefixIcon: const Icon(Icons.manage_accounts_outlined, size: 20),
+            onChanged: (u) => setState(() => _selectedSupervisor = u),
+          ),
+          const SizedBox(height: 14),
 
-            // Scheduled Date Picker
-            InkWell(
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: _dropDate,
-                  firstDate: DateTime.now().subtract(const Duration(days: 3)),
-                  lastDate: DateTime.now().add(const Duration(days: 90)),
-                );
-                if (picked != null) setState(() => _dropDate = picked);
-              },
-              borderRadius: BorderRadius.circular(14),
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceSubtle,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppTheme.borderSubtle),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today_rounded, size: 18, color: AppTheme.accent),
-                    const SizedBox(width: 12),
-                    Column(
+          // Scheduled Date Picker
+          InkWell(
+            onTap: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _dropDate,
+                firstDate: DateTime.now().subtract(const Duration(days: 3)),
+                lastDate: DateTime.now().add(const Duration(days: 90)),
+              );
+              if (picked != null) setState(() => _dropDate = picked);
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceSubtle,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppTheme.borderSubtle),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.calendar_today_rounded, size: 18, color: AppTheme.accent),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
@@ -667,86 +685,84 @@ class _CreateDropPageState extends State<CreateDropPage> {
                           DateFormat('EEEE, dd MMMM yyyy').format(_dropDate),
                           style: const TextStyle(
                             fontFamily: 'monospace',
-                            fontSize: 13,
+                            fontSize: 12.5,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.textMain,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                    const Spacer(),
-                    const Icon(Icons.arrow_drop_down_rounded, color: AppTheme.textMuted),
-                  ],
-                ),
+                  ),
+                  const Icon(Icons.arrow_drop_down_rounded, color: AppTheme.textMuted),
+                ],
               ),
             ),
-            const SizedBox(height: 14),
+          ),
+          const SizedBox(height: 14),
 
-            // Priority Selector Chips
-            const Text(
-              'Delivery Priority Window:',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                'Standard Morning',
-                'Urgent Pre-Opening',
-                'Mid-day Restock',
-              ].map((p) {
-                final isSelected = _priority == p;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(
-                      p,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                        color: isSelected ? Colors.white : AppTheme.textMain,
-                      ),
-                    ),
-                    selected: isSelected,
-                    selectedColor: AppTheme.warning,
-                    backgroundColor: AppTheme.surfaceSubtle,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    onSelected: (val) {
-                      if (val) setState(() => _priority = p);
-                    },
+          // Priority Selector Chips
+          const Text(
+            'Delivery Priority Window:',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              'Standard Morning',
+              'Urgent Pre-Opening',
+              'Mid-day Restock',
+            ].map((p) {
+              final isSelected = _priority == p;
+              return ChoiceChip(
+                label: Text(
+                  p,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    color: isSelected ? Colors.white : AppTheme.textMain,
                   ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+                ),
+                selected: isSelected,
+                selectedColor: AppTheme.warning,
+                backgroundColor: AppTheme.surfaceSubtle,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                onSelected: (val) {
+                  if (val) setState(() => _priority = p);
+                },
+              );
+            }).toList(),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildManifestCard() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.warning.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.inventory_2_rounded, size: 18, color: AppTheme.warning),
+    return GlassCard(
+      radius: 20,
+      opacity: 0.85,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.warning.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 10),
-                const Column(
+                child: const Icon(Icons.inventory_2_rounded, size: 18, color: AppTheme.warning),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -757,6 +773,8 @@ class _CreateDropPageState extends State<CreateDropPage> {
                         color: AppTheme.textMuted,
                         letterSpacing: 0.6,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Promotional stands, banners & stock kits',
@@ -765,75 +783,75 @@ class _CreateDropPageState extends State<CreateDropPage> {
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textSecondary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 14),
-
-            // Quick Item Pills
-            const Text(
-              'Quick Add Common Items (Tap to append):',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: _quickManifestPills.map((item) {
-                return ActionChip(
-                  backgroundColor: AppTheme.surfaceSubtle,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  label: Text(
-                    '+ $item',
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                  ),
-                  onPressed: () => _addManifestItem(item),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 12),
-
-            TextField(
-              controller: _manifestController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Detailed Manifest & Items List *',
-                hintText: 'e.g. 1x Pop-up Display Stand, 2x Rollup Banners, 5x Sampling Cartons',
-                prefixIcon: Icon(Icons.checklist_rounded, size: 20),
               ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Quick Item Pills
+          const Text(
+            'Quick Add Common Items (Tap to append):',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: _quickManifestPills.map((item) {
+              return ActionChip(
+                backgroundColor: AppTheme.surfaceSubtle,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                label: Text(
+                  '+ $item',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                ),
+                onPressed: () => _addManifestItem(item),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 12),
+
+          TextField(
+            controller: _manifestController,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              labelText: 'Detailed Manifest & Items List *',
+              hintText: 'e.g. 1x Pop-up Display Stand, 2x Rollup Banners, 5x Sampling Cartons',
+              prefixIcon: Icon(Icons.checklist_rounded, size: 20),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildAccessNotesCard() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppTheme.accentTeal.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.assignment_turned_in_rounded, size: 18, color: AppTheme.accentTeal),
+    return GlassCard(
+      radius: 20,
+      opacity: 0.85,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.accentTeal.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 10),
-                const Column(
+                child: const Icon(Icons.assignment_turned_in_rounded, size: 18, color: AppTheme.accentTeal),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -844,6 +862,8 @@ class _CreateDropPageState extends State<CreateDropPage> {
                         color: AppTheme.textMuted,
                         letterSpacing: 0.6,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'Security clearance, dock entrance & contact',
@@ -852,24 +872,26 @@ class _CreateDropPageState extends State<CreateDropPage> {
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textSecondary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 14),
-
-            TextField(
-              controller: _accessNotesController,
-              maxLines: 2,
-              decoration: const InputDecoration(
-                labelText: 'Access Instructions (Optional)',
-                hintText: 'e.g. Enter via Loading Bay 3; present Hypermarket gate pass at security desk',
-                prefixIcon: Icon(Icons.door_sliding_outlined, size: 20),
               ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          TextField(
+            controller: _accessNotesController,
+            maxLines: 2,
+            decoration: const InputDecoration(
+              labelText: 'Access Instructions (Optional)',
+              hintText: 'e.g. Enter via Loading Bay 3; present Hypermarket gate pass at security desk',
+              prefixIcon: Icon(Icons.door_sliding_outlined, size: 20),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

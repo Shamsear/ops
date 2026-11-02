@@ -355,15 +355,19 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
                       ),
                     ],
                   ),
-                  Text(
-                    _selectedStore != null ? _selectedStore!.storeName : 'Select store & dates',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.textMuted,
-                      fontWeight: FontWeight.w600,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _selectedStore != null ? _selectedStore!.storeName : 'Select store & dates',
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: AppTheme.textMuted,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.end,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -399,32 +403,34 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Modern Guide Banner
-                    _buildGuideBanner(),
-                    const SizedBox(height: 16),
+          : AmbientMeshBackground(
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Modern Guide Banner
+                      _buildGuideBanner(),
+                      const SizedBox(height: 14),
 
-                    // Section 1: Campaign & Store Assignment
-                    _buildVenueCard(),
-                    const SizedBox(height: 16),
+                      // Section 1: Campaign & Store Assignment
+                      _buildVenueCard(),
+                      const SizedBox(height: 14),
 
-                    // Section 2: Shift Date Matrix (Calendar)
-                    _buildCalendarMatrixCard(),
-                    const SizedBox(height: 16),
+                      // Section 2: Shift Date Matrix (Calendar)
+                      _buildCalendarMatrixCard(),
+                      const SizedBox(height: 14),
 
-                    // Section 3: Shift Timings & Break Rotation
-                    _buildTimingsCard(totalHoursPerShift),
-                    const SizedBox(height: 16),
+                      // Section 3: Shift Timings & Break Rotation
+                      _buildTimingsCard(totalHoursPerShift),
+                      const SizedBox(height: 14),
 
-                    // Section 4: Brief & Special Instructions
-                    _buildBriefCard(),
-                    const SizedBox(height: 24),
-                  ],
+                      // Section 4: Brief & Special Instructions
+                      _buildBriefCard(),
+                      const SizedBox(height: 90),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -432,13 +438,11 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
   }
 
   Widget _buildGuideBanner() {
-    return Container(
+    return GlassCard(
+      radius: 16,
+      opacity: 0.88,
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.infoBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.infoBorder),
-      ),
+      tintColor: const Color(0xFFEFF6FF).withOpacity(0.92),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -483,16 +487,18 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
   Widget _buildVenueCard() {
     return Card(
       elevation: 0,
+      color: Colors.white.withOpacity(0.85),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.white.withOpacity(0.6)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -503,27 +509,33 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
                   child: const Icon(Icons.store_mall_directory_rounded, size: 18, color: AppTheme.primary),
                 ),
                 const SizedBox(width: 10),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'VENUE & STAFF ASSIGNMENT',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'VENUE & STAFF ASSIGNMENT',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMuted,
+                          letterSpacing: 0.6,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      'Where and who will execute this shift',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
+                      Text(
+                        'Where and who will execute this shift',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -621,55 +633,59 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
   Widget _buildCalendarMatrixCard() {
     return Card(
       elevation: 0,
+      color: Colors.white.withOpacity(0.85),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.white.withOpacity(0.6)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.accent.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.calendar_month_rounded, size: 18, color: AppTheme.accent),
-                    ),
-                    const SizedBox(width: 10),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'SHIFT DATES MATRIX',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textMuted,
-                            letterSpacing: 0.6,
-                          ),
-                        ),
-                        Text(
-                          'Tap dates to toggle shift days',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.accent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.calendar_month_rounded, size: 18, color: AppTheme.accent),
                 ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'SHIFT DATES MATRIX',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMuted,
+                          letterSpacing: 0.6,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Tap dates to toggle shift days',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
                 StatusBadge(
-                  label: '${_selectedDates.length} Days Active',
+                  label: ' Days Active',
                   variant: _selectedDates.isNotEmpty ? StatusVariant.success : StatusVariant.neutral,
                   showDot: _selectedDates.isNotEmpty,
                 ),
@@ -903,55 +919,59 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
   Widget _buildTimingsCard(double totalHoursPerShift) {
     return Card(
       elevation: 0,
+      color: Colors.white.withOpacity(0.85),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.white.withOpacity(0.6)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.warning.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.schedule_rounded, size: 18, color: AppTheme.warning),
-                    ),
-                    const SizedBox(width: 10),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'SHIFT TIMING & ROTATION',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.textMuted,
-                            letterSpacing: 0.6,
-                          ),
-                        ),
-                        Text(
-                          'Hours per shift and break schedules',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.warning.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.schedule_rounded, size: 18, color: AppTheme.warning),
                 ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'SHIFT TIMING & ROTATION',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMuted,
+                          letterSpacing: 0.6,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Hours per shift and break schedules',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
                 StatusBadge(
-                  label: '${totalHoursPerShift}h / shift',
+                  label: 'h / shift',
                   variant: StatusVariant.info,
                 ),
               ],
@@ -1165,16 +1185,18 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
   Widget _buildBriefCard() {
     return Card(
       elevation: 0,
+      color: Colors.white.withOpacity(0.85),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: AppTheme.borderSubtle),
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.white.withOpacity(0.6)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -1185,31 +1207,38 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
                   child: const Icon(Icons.notes_rounded, size: 18, color: AppTheme.success),
                 ),
                 const SizedBox(width: 10),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'IN-STORE BRIEF & INSTRUCTIONS',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMuted,
-                        letterSpacing: 0.6,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'IN-STORE BRIEF & INSTRUCTIONS',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMuted,
+                          letterSpacing: 0.6,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      'Promoter task notes & entrance location',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.textSecondary,
+                      Text(
+                        'Promoter task notes & entrance location',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 14),
+
             TextField(
               controller: _notesController,
               maxLines: 2,

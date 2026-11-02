@@ -941,9 +941,13 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                       ),
                     ),
                     const SizedBox(width: 5),
-                    Text(
-                      store.supervisorName,
-                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                    Flexible(
+                      child: Text(
+                        store.supervisorName,
+                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
@@ -974,30 +978,37 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            width: 3,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: accentColor,
-                              borderRadius: BorderRadius.circular(2),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 3,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: accentColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            project.projectName.toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: accentColor,
-                              letterSpacing: 0.4,
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                project.projectName.toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: accentColor,
+                                  letterSpacing: 0.4,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       StatusBadge(
                         label: '${project.promoters.length} Staff On Duty',
                         variant: StatusVariant.neutral,
@@ -1023,27 +1034,28 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 13,
-                                    backgroundColor: AppTheme.infoBg,
-                                    child: const Icon(Icons.person, size: 15, color: AppTheme.accent),
-                                  ),
-                                  const SizedBox(width: 9),
-                                  Text(
-                                    p.promoterName,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.textMain,
-                                      letterSpacing: -0.2,
-                                    ),
-                                  ),
-                                ],
+                              CircleAvatar(
+                                radius: 13,
+                                backgroundColor: AppTheme.infoBg,
+                                child: const Icon(Icons.person, size: 15, color: AppTheme.accent),
                               ),
+                              const SizedBox(width: 9),
+                              Expanded(
+                                child: Text(
+                                  p.promoterName,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppTheme.textMain,
+                                    letterSpacing: -0.2,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
                               StatusBadge.fromStatus('ON DUTY'),
                             ],
                           ),
