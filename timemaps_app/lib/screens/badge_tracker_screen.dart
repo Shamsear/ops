@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/status_badge.dart';
+import '../widgets/widgets.dart';
 import 'create_badge_page.dart';
 
 class BadgeTrackerScreen extends StatefulWidget {
@@ -68,14 +68,15 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
+          backgroundColor: AppColors.success,
           content: Row(
             children: [
               const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   '${badge.promoterName} permit updated to "$newStatus"',
+                  style: AppText.bodyBold.copyWith(color: Colors.white),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -91,318 +92,324 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        automaticallyImplyLeading: !widget.isEmbedded,
-        titleSpacing: 16,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Store Badge Tracker',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
-            ),
-            Text(
-              'Hypermarket Gate Passes & Mall Permits',
-              style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-            ),
-          ],
+
+    final hrCount = _badges.where((b) => b.status.toLowerCase().contains('hr')).length;
+    final securityCount = _badges.where((b) => b.status.toLowerCase().contains('security')).length;
+    final approvedCount = _badges.where((b) => b.status.toLowerCase().contains('approved')).length;
+
+    return AppScreenScaffold(
+      title: 'Store Badge Tracker',
+      subtitle: 'Hypermarket Gate Passes & Mall Permits',
+      leading: widget.isEmbedded ? null : const BackButton(color: AppColors.textPrimary),
+      bottomClearance: widget.isEmbedded,
+      onRefresh: _loadBadges,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textPrimary),
+          tooltip: 'Refresh Badges',
+          onPressed: _loadBadges,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 22),
-            tooltip: 'Refresh Badges',
-            onPressed: _loadBadges,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryDark,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                minimumSize: const Size(0, 38),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusPill)),
+        AppButton(
+          label: 'New Pass',
+          icon: Icons.add_rounded,
+          height: 36,
+          width: 110,
+          onPressed: () async {
+            final res = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CreateBadgePage()),
+            );
+            if (res == true) _loadBadges();
+          },
+        ),
+      ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 1. Stage KPI Summary Strip
+          Row(
+            children: [
+              Expanded(
+                child: KpiTile(
+                  label: 'HR Review',
+                  value: '$hrCount',
+                  icon: Icons.business_outlined,
+                  iconColor: AppColors.warning,
+                  isSelected: _selectedFilter == 'Pending with HR',
+                  onTap: () => _onFilterChanged(_selectedFilter == 'Pending with HR' ? 'All' : 'Pending with HR'),
+                ),
               ),
-              icon: const Icon(Icons.add_rounded, size: 16),
-              label: const Text('Apply Badge', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-              onPressed: () async {
-                final result = await Navigator.push(
+              const SizedBox(width: AppSpacing.itemGap),
+              Expanded(
+                child: KpiTile(
+                  label: 'Security Check',
+                  value: '$securityCount',
+                  icon: Icons.security_outlined,
+                  iconColor: AppColors.accent,
+                  isSelected: _selectedFilter == 'Pending with security',
+                  onTap: () => _onFilterChanged(_selectedFilter == 'Pending with security' ? 'All' : 'Pending with security'),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.itemGap),
+              Expanded(
+                child: KpiTile(
+                  label: 'Approved',
+                  value: '$approvedCount',
+                  icon: Icons.verified_user_rounded,
+                  iconColor: AppColors.success,
+                  isSelected: _selectedFilter == 'Approved',
+                  onTap: () => _onFilterChanged(_selectedFilter == 'Approved' ? 'All' : 'Approved'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // 2. Search & Filter Bar
+          AppCard.compact(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AppTextField(
+                  controller: _searchController,
+                  hint: 'Search promoter, store, or pass #...',
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.accent),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded, size: 16),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                            _loadBadges();
+                          },
+                        )
+                      : null,
+                  onChanged: (val) {
+                    setState(() => _searchQuery = val.trim());
+                    _loadBadges();
+                  },
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                SizedBox(
+                  height: 32,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _filterTabs.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 6),
+                    itemBuilder: (ctx, i) {
+                      final tab = _filterTabs[i];
+                      return FilterPill(
+                        label: StatusBadge.formatStatusLabel(tab),
+                        isSelected: _selectedFilter == tab,
+                        onTap: () => _onFilterChanged(tab),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // 3. Section Header
+          SectionHeader(
+            icon: Icons.badge_outlined,
+            iconColor: AppColors.primary,
+            microLabel: 'Active Pipeline',
+            title: 'Permit Applications',
+            trailing: StatusBadge(
+              label: '${_badges.length} Applications',
+              variant: StatusVariant.info,
+            ),
+          ),
+
+          // 4. Badges List
+          if (_isLoading)
+            const AppSkeletonList(count: 4)
+          else if (_badges.isEmpty)
+            EmptyState(
+              icon: Icons.badge_outlined,
+              title: 'No badge applications found',
+              description: 'Try adjusting your filter criteria or apply for a new store permit.',
+              actionLabel: 'Apply Store Badge',
+              onAction: () async {
+                final res = await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const CreateBadgePage()),
                 );
-                if (result == true) _loadBadges();
+                if (res == true) _loadBadges();
               },
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _badges.length,
+              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.itemGap),
+              itemBuilder: (ctx, index) => _buildBadgeCard(_badges[index]),
             ),
-          ),
         ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Search & Filter Header
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(bottom: BorderSide(color: AppTheme.borderSubtle)),
-              ),
-              child: Column(
-                children: [
-                  // Search Input
-                  TextField(
-                    controller: _searchController,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                    decoration: InputDecoration(
-                      hintText: 'Search by promoter, store, or project...',
-                      hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textLight),
-                      prefixIcon: const Icon(Icons.search_rounded, size: 19, color: AppTheme.purple),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 17),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() => _searchQuery = '');
-                                _loadBadges();
-                              },
-                            )
-                          : null,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-                      isDense: true,
-                      filled: true,
-                      fillColor: AppTheme.surfaceSubtle,
-                    ),
-                    onSubmitted: (query) {
-                      setState(() => _searchQuery = query.trim());
-                      _loadBadges();
-                    },
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Filter Tabs (Horizontal Scroll)
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _filterTabs.map((tab) {
-                        final isSelected = _selectedFilter == tab;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: ChoiceChip(
-                            label: Text(tab),
-                            selected: isSelected,
-                            onSelected: (_) => _onFilterChanged(tab),
-                            selectedColor: AppTheme.primaryDark,
-                            labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : AppTheme.textMain,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                              fontSize: 11,
-                            ),
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                              side: BorderSide(color: isSelected ? AppTheme.primaryDark : AppTheme.borderSubtle),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Badges List View
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _badges.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(18),
-                                decoration: const BoxDecoration(
-                                  color: AppTheme.surfaceSubtle,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.badge_outlined, size: 40, color: AppTheme.textMuted),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'No Badge Applications Found',
-                                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain),
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'Submit a new store permit application to get started',
-                                style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppTheme.primaryDark,
-                                  foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusMedium)),
-                                ),
-                                icon: const Icon(Icons.add_rounded, size: 16),
-                                label: const Text('Apply Store Badge'),
-                                onPressed: () async {
-                                  final res = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const CreateBadgePage()),
-                                  );
-                                  if (res == true) _loadBadges();
-                                },
-                              ),
-                            ],
-                          ),
-                        )
-                      : RefreshIndicator(
-                          onRefresh: _loadBadges,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 100),
-                            itemCount: _badges.length,
-                            itemBuilder: (ctx, index) {
-                              final badge = _badges[index];
-                              return _buildBadgeCard(badge);
-                            },
-                          ),
-                        ),
-            ),
-          ],
-        ),
       ),
     );
   }
 
   Widget _buildBadgeCard(BadgeModel badge) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-        boxShadow: AppTheme.cardShadow,
-      ),
-      padding: const EdgeInsets.all(16),
+    final statusLower = badge.status.toLowerCase();
+    int currentStage = 1;
+    if (statusLower.contains('security') || statusLower.contains('collection')) {
+      currentStage = 2;
+    } else if (statusLower.contains('approved')) {
+      currentStage = 3;
+    }
+
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Row: Promoter Name + Avatar + Status Badge
+          // Header: Avatar, Name, Campaign, Status Badge
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 17,
-                backgroundColor: AppTheme.purpleBg,
-                child: Text(
-                  badge.promoterName.isNotEmpty ? badge.promoterName[0] : 'P',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.purple),
-                ),
-              ),
-              const SizedBox(width: 12),
+              InitialsAvatar(name: badge.promoterName, size: 36),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       badge.promoterName,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
+                      style: AppText.bodyBold,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
                     Text(
                       badge.projectName.toUpperCase(),
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.accent, letterSpacing: 0.3),
+                      style: AppText.micro.copyWith(color: AppColors.accent),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               StatusBadge.fromStatus(badge.status),
             ],
           ),
+          const SizedBox(height: AppSpacing.md),
 
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: AppTheme.borderSubtle),
-          const SizedBox(height: 10),
-
-          // Store Info Row
+          // Store Venue & Submitter Info
           Row(
             children: [
-              const Icon(Icons.storefront_rounded, size: 16, color: AppTheme.textMuted),
-              const SizedBox(width: 8),
+              const Icon(Icons.storefront_rounded, size: 15, color: AppColors.textMuted),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   '${badge.storeName} • ${badge.emirate}',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                  style: AppText.body.copyWith(fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-
-          // Submitter & Pass Number
+          const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Submitted by: ${badge.submittedBy}',
-                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                style: AppText.caption,
               ),
               if (badge.badgeNumber != null)
                 Text(
                   'Pass #: ${badge.badgeNumber}',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.textMain, fontFamily: 'monospace'),
+                  style: AppText.caption.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'monospace',
+                  ),
                 ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // 3-Segment Stage Progress Bar
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: currentStage >= 1 ? AppColors.warning : AppColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: currentStage >= 2 ? AppColors.accent : AppColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: currentStage >= 3 ? AppColors.success : AppColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('1. HR Review', style: AppText.micro.copyWith(fontSize: 9.5, color: currentStage >= 1 ? AppColors.textPrimary : AppColors.textMuted)),
+              Text('2. Security Check', style: AppText.micro.copyWith(fontSize: 9.5, color: currentStage >= 2 ? AppColors.textPrimary : AppColors.textMuted)),
+              Text('3. Gate Pass', style: AppText.micro.copyWith(fontSize: 9.5, color: currentStage >= 3 ? AppColors.textPrimary : AppColors.textMuted)),
             ],
           ),
 
           if (badge.notes != null && badge.notes!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceSubtle,
-                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-              ),
+            const SizedBox(height: AppSpacing.sm),
+            AppCard.flat(
+              padding: const EdgeInsets.all(8),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.info_outline_rounded, size: 15, color: AppTheme.textMuted),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.info_outline_rounded, size: 14, color: AppColors.textMuted),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       badge.notes!,
-                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
+                      style: AppText.caption,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
             ),
           ],
+          const SizedBox(height: AppSpacing.md),
+          const Divider(height: 1, color: AppColors.borderSubtle),
+          const SizedBox(height: AppSpacing.sm),
 
-          const SizedBox(height: 12),
-
-          // Action Row: Advance Lifecycle Status
+          // Stage Advancement Action Button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Permit Stage:',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+              Text(
+                'Current: ${StatusBadge.formatStatusLabel(badge.status)}',
+                style: AppText.caption.copyWith(fontWeight: FontWeight.w700),
               ),
               PopupMenuButton<String>(
-                tooltip: 'Change Status',
+                tooltip: 'Change Stage',
                 onSelected: (newStatus) => _updateStatus(badge, newStatus),
                 itemBuilder: (ctx) => [
                   _popupItem('Documents ready for collection', 'Ready for collection', Icons.inventory_2_outlined),
@@ -413,17 +420,21 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
                   _popupItem('Rejected', 'Reject Application', Icons.cancel_outlined),
                 ],
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceSubtle,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                    border: Border.all(color: AppTheme.borderSubtle),
+                    color: AppColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    border: Border.all(color: AppColors.borderSubtle),
                   ),
-                  child: const Row(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Update Stage', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.primaryDark)),
-                      SizedBox(width: 4),
-                      Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppTheme.primaryDark),
+                      Text(
+                        'Advance Stage',
+                        style: AppText.micro.copyWith(color: AppColors.primary),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: AppColors.primary),
                     ],
                   ),
                 ),
@@ -440,9 +451,9 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 16, color: AppTheme.primaryDark),
+          Icon(icon, size: 16, color: AppColors.primary),
           const SizedBox(width: 10),
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+          Text(label, style: AppText.bodyBold.copyWith(fontSize: 12)),
         ],
       ),
     );

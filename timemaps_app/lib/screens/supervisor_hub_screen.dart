@@ -1,15 +1,13 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../widgets/liquid_glass.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/widgets.dart';
 import 'login_screen.dart';
 import 'promoter_audit_page.dart';
-import '../widgets/status_badge.dart';
 
 class SupervisorHubScreen extends StatefulWidget {
   final UserModel supervisor;
@@ -97,8 +95,8 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
       if (photo != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: AppTheme.success,
-            content: Text('📸 Stand photo verified & uploaded for ${store.storeName}!'),
+            backgroundColor: AppColors.success,
+            content: Text('Stand photo verified & uploaded for ${store.storeName}!'),
           ),
         );
       }
@@ -112,8 +110,8 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
         if (photo != null && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              backgroundColor: AppTheme.success,
-              content: Text('📸 Stand photo verified & uploaded for ${store.storeName}!'),
+              backgroundColor: AppColors.success,
+              content: Text('Stand photo verified & uploaded for ${store.storeName}!'),
             ),
           );
         }
@@ -132,8 +130,8 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
-          content: Text('✅ Drop marked as DELIVERED to ${drop.storeName}!'),
+          backgroundColor: AppColors.success,
+          content: Text('Drop marked as DELIVERED to ${drop.storeName}!'),
         ),
       );
       _loadSupervisorData();
@@ -145,8 +143,8 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: AppTheme.success,
-          content: Text('✅ Return collection confirmed from ${col.storeName}!'),
+          backgroundColor: AppColors.success,
+          content: Text('Return collection confirmed from ${col.storeName}!'),
         ),
       );
       _loadSupervisorData();
@@ -155,580 +153,484 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
-      appBar: AppBar(
-        titleSpacing: 16,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        flexibleSpace: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.76),
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.white.withOpacity(0.50),
-                    width: 1.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
+    return AppScreenScaffold(
+      title: 'Supervisor Field Hub',
+      subtitle: 'Field Inspection & Logistics Dispatch',
+      onRefresh: _loadSupervisorData,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textPrimary),
+          tooltip: 'Refresh Hub Data',
+          onPressed: _loadSupervisorData,
         ),
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 17,
-              backgroundColor: AppTheme.purpleBg,
-              child: Text(
-                widget.supervisor.name.isNotEmpty ? widget.supervisor.name[0] : 'S',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.purple),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.supervisor.name,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Text(
-                    'IML Regional Operations Supervisor',
-                    style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
+        IconButton(
+          icon: const Icon(Icons.logout_rounded, size: 20, color: AppColors.textMuted),
+          tooltip: 'Sign Out',
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+            );
+          },
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppTheme.primaryDark,
-          unselectedLabelColor: AppTheme.textMuted,
-          indicatorColor: AppTheme.purple,
-          indicatorSize: TabBarIndicatorSize.tab,
-          tabs: [
-            Tab(text: 'Store Audits (${_myStores.length})'),
-            Tab(text: 'Logistics (${_myDrops.length + _myCollections.length})'),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 22),
-            onPressed: _loadSupervisorData,
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, size: 21, color: AppTheme.textMuted),
-            onPressed: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-            },
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
+      ],
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 1. Profile & Mini-stats Header Card
+          AppCard(
+            child: Column(
               children: [
-                _buildStoresTab(),
-                _buildLogisticsTab(),
+                Row(
+                  children: [
+                    InitialsAvatar(
+                      name: widget.supervisor.name,
+                      size: 48,
+                      backgroundColor: AppColors.primarySoft,
+                      foregroundColor: AppColors.primary,
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.supervisor.name,
+                            style: AppText.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'IML Regional Operations Supervisor',
+                            style: AppText.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    const StatusBadge(
+                      label: 'ON DUTY',
+                      variant: StatusVariant.success,
+                      showDot: true,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                const Divider(height: 1, color: AppColors.borderSubtle),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _miniStat('My Stores', '${_myStores.length}', AppColors.primary),
+                    ),
+                    Container(width: 1, height: 28, color: AppColors.borderSubtle),
+                    Expanded(
+                      child: _miniStat('Drops Due', '${_myDrops.length}', AppColors.warning),
+                    ),
+                    Container(width: 1, height: 28, color: AppColors.borderSubtle),
+                    Expanded(
+                      child: _miniStat('Collections', '${_myCollections.length}', AppColors.success),
+                    ),
+                  ],
+                ),
               ],
             ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // 2. Segmented Tab Selector
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              borderRadius: BorderRadius.circular(AppRadius.inner),
+            ),
+            padding: const EdgeInsets.all(4),
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppRadius.inner - 2),
+                boxShadow: AppShadows.card,
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              labelColor: AppColors.textPrimary,
+              unselectedLabelColor: AppColors.textMuted,
+              labelStyle: AppText.bodyBold,
+              unselectedLabelStyle: AppText.body,
+              tabs: [
+                Tab(text: 'Store Inspections (${_myStores.length})'),
+                Tab(text: 'Logistics Tasks (${_myDrops.length + _myCollections.length})'),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // 3. Tab Content Area
+          if (_isLoading)
+            const AppSkeletonList(count: 3)
+          else
+            AnimatedBuilder(
+              animation: _tabController,
+              builder: (context, _) {
+                if (_tabController.index == 0) {
+                  return _buildStoresTab();
+                } else {
+                  return _buildLogisticsTab();
+                }
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _miniStat(String label, String value, Color color) {
+    return Column(
+      children: [
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value,
+            style: AppText.titleLarge.copyWith(color: color),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label.toUpperCase(),
+          style: AppText.micro.copyWith(color: AppColors.textMuted),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 
   Widget _buildStoresTab() {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+    if (_myStores.isEmpty) {
+      return const EmptyState(
+        icon: Icons.storefront_outlined,
+        title: 'No stores assigned today',
+        description: 'All current shift store inspections are completed or unassigned.',
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // KPI Summary Bar
-        LiquidGlassContainer(
-          radius: 20.0,
-          blur: 20.0,
-          opacity: 0.78,
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _summaryStat('My Stores', '${_myStores.length}', Icons.storefront_rounded, AppTheme.textMain),
-              _summaryStat('Drops Due', '${_myDrops.length}', Icons.local_shipping_rounded, AppTheme.warning),
-              _summaryStat('Collections', '${_myCollections.length}', Icons.repeat_rounded, AppTheme.success),
-            ],
+        SectionHeader(
+          icon: Icons.checklist_rounded,
+          iconColor: AppColors.purple,
+          microLabel: 'Field Queue',
+          title: 'Store Audit & Stand Queue',
+          trailing: StatusBadge(
+            label: '${_myStores.length} Stores',
+            variant: StatusVariant.purple,
           ),
         ),
-        const SizedBox(height: 18),
-
-        Row(
-          children: [
-            const Expanded(
-              child: Text(
-                'Store Inspection Queue',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            StatusBadge(
-              label: '${_myStores.length} Stores',
-              variant: StatusVariant.purple,
-              fontSize: 11,
-            ),
-          ],
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _myStores.length,
+          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.itemGap),
+          itemBuilder: (ctx, i) => _buildSupervisorStoreCard(_myStores[i]),
         ),
-        const SizedBox(height: 12),
-
-        if (_myStores.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-              border: Border.all(color: AppTheme.borderSubtle),
-            ),
-            child: const Center(
-              child: Text(
-                'No stores assigned for field audit today.',
-                style: TextStyle(fontWeight: FontWeight.w700, color: AppTheme.textMuted),
-              ),
-            ),
-          )
-        else
-          ..._myStores.map((store) => _buildSupervisorStoreCard(store)),
       ],
     );
   }
 
   Widget _buildLogisticsTab() {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Drops Section
-        Row(
-          children: [
-            const Expanded(
-              child: Text(
-                'Morning Drops',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            StatusBadge(
-              label: '${_myDrops.length} Pending',
-              variant: StatusVariant.warning,
-              fontSize: 11,
-            ),
-          ],
+        SectionHeader(
+          icon: Icons.local_shipping_rounded,
+          iconColor: AppColors.warning,
+          microLabel: 'Morning Dispatch',
+          title: 'POSM Drop-offs',
+          trailing: StatusBadge(
+            label: '${_myDrops.length} Due',
+            variant: StatusVariant.warning,
+          ),
         ),
-        const SizedBox(height: 10),
-
         if (_myDrops.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              border: Border.all(color: AppTheme.borderSubtle),
-            ),
-            child: const Row(
+          AppCard.flat(
+            child: Row(
               children: [
-                Icon(Icons.check_circle_rounded, color: AppTheme.success, size: 20),
-                SizedBox(width: 10),
-                Text('All morning drops completed!', style: TextStyle(fontWeight: FontWeight.w700, color: AppTheme.successText)),
+                const IconBox(icon: Icons.check_circle_rounded, color: AppColors.success, isCompact: true),
+                const SizedBox(width: AppSpacing.sm),
+                Text('All morning drops completed!', style: AppText.bodyBold.copyWith(color: AppColors.success)),
               ],
             ),
           )
         else
-          ..._myDrops.map((drop) => _buildDropCard(drop)),
-
-        const SizedBox(height: 22),
+          ..._myDrops.map((drop) {
+            final isDelivered = drop.status == 'DELIVERED';
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.itemGap),
+              child: AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const IconBox(icon: Icons.local_shipping_rounded, color: AppColors.warning, isCompact: true),
+                        const SizedBox(width: AppSpacing.sm + 2),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(drop.storeName, style: AppText.bodyBold, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              Text('Project: ${drop.projectName} • Date: ${drop.scheduledDate}', style: AppText.caption),
+                            ],
+                          ),
+                        ),
+                        StatusBadge(
+                          label: drop.status,
+                          variant: isDelivered ? StatusVariant.success : StatusVariant.warning,
+                          showDot: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    AppCard.flat(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        'Manifest: ${drop.itemsManifest.isNotEmpty ? drop.itemsManifest : "Standard POP Display Stand"}',
+                        style: AppText.caption,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    if (!isDelivered)
+                      AppButton(
+                        label: 'Confirm Drop Delivery',
+                        icon: Icons.check_circle_rounded,
+                        height: 36,
+                        onPressed: () => _markDropDelivered(drop),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          }),
+        const SizedBox(height: AppSpacing.sectionGap),
 
         // Collections Section
-        Row(
-          children: [
-            const Expanded(
-              child: Text(
-                'Return Collections',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppTheme.textMain, letterSpacing: -0.2),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 8),
-            StatusBadge(
-              label: '${_myCollections.length} Scheduled',
-              variant: StatusVariant.success,
-              fontSize: 11,
-            ),
-          ],
+        SectionHeader(
+          icon: Icons.repeat_rounded,
+          iconColor: AppColors.accent,
+          microLabel: 'Evening Retrieval',
+          title: 'Stand Collections',
+          trailing: StatusBadge(
+            label: '${_myCollections.length} Pending',
+            variant: StatusVariant.info,
+          ),
         ),
-        const SizedBox(height: 10),
-
         if (_myCollections.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              border: Border.all(color: AppTheme.borderSubtle),
-            ),
-            child: const Row(
+          AppCard.flat(
+            child: Row(
               children: [
-                Icon(Icons.inventory_2_outlined, color: AppTheme.textMuted, size: 20),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'No return collections scheduled for today.',
-                    style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.w600),
-                  ),
-                ),
+                const IconBox(icon: Icons.check_circle_rounded, color: AppColors.success, isCompact: true),
+                const SizedBox(width: AppSpacing.sm),
+                Text('All collections retrieved!', style: AppText.bodyBold.copyWith(color: AppColors.success)),
               ],
             ),
           )
         else
-          ..._myCollections.map((col) => _buildCollectionCard(col)),
-      ],
-    );
-  }
-
-  Widget _buildDropCard(LogisticsDropItem drop) {
-    final isDelivered = drop.status == 'DELIVERED';
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-        boxShadow: AppTheme.cardShadow,
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
+          ..._myCollections.map((col) {
+            final isCollected = col.status == 'COLLECTED';
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.itemGap),
+              child: AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      drop.storeName,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        const IconBox(icon: Icons.repeat_rounded, color: AppColors.accent, isCompact: true),
+                        const SizedBox(width: AppSpacing.sm + 2),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(col.storeName, style: AppText.bodyBold, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              Text('Project: ${col.projectName} • Date: ${col.scheduledDate}', style: AppText.caption),
+                            ],
+                          ),
+                        ),
+                        StatusBadge(
+                          label: col.status,
+                          variant: isCollected ? StatusVariant.success : StatusVariant.info,
+                          showDot: true,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      drop.projectName.isNotEmpty
-                          ? (drop.emirate.isNotEmpty ? '${drop.projectName} • ${drop.emirate}' : drop.projectName)
-                          : (drop.emirate.isNotEmpty ? drop.emirate : 'Morning Drop Delivery'),
-                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    if (!isCollected)
+                      AppButton(
+                        label: 'Confirm Stand Retrieval',
+                        icon: Icons.check_circle_rounded,
+                        height: 36,
+                        onPressed: () => _markCollectionComplete(col),
+                      ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              StatusBadge(
-                label: drop.status,
-                variant: isDelivered ? StatusVariant.success : StatusVariant.warning,
-                fontSize: 10,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceSubtle,
-              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.inventory_2_outlined, size: 16, color: AppTheme.accent),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Items: ${drop.itemsManifest}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (!isDelivered) ...[
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.success,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(36),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
-              ),
-              icon: const Icon(Icons.check_circle_rounded, size: 16),
-              label: const Text('Confirm Drop Delivered to Store', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-              onPressed: () => _markDropDelivered(drop),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCollectionCard(LogisticsCollectionItem col) {
-    final isCollected = col.status == 'COLLECTED';
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-        boxShadow: AppTheme.cardShadow,
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      col.storeName,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      col.projectName.isNotEmpty
-                          ? (col.emirate.isNotEmpty ? '${col.projectName} • ${col.emirate}' : col.projectName)
-                          : (col.emirate.isNotEmpty ? col.emirate : 'Return Collection'),
-                      style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              StatusBadge(
-                label: col.status,
-                variant: isCollected ? StatusVariant.success : StatusVariant.info,
-                fontSize: 10,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceSubtle,
-              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.repeat_rounded, size: 16, color: AppTheme.success),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Collect: ${col.itemsToCollect}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (!isCollected) ...[
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryDark,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(36),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
-              ),
-              icon: const Icon(Icons.check_rounded, size: 16),
-              label: const Text('Confirm Equipment Collected Back', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-              onPressed: () => _markCollectionComplete(col),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _summaryStat(String label, String value, IconData icon, Color accentColor) {
-    return Column(
-      children: [
-        Icon(icon, color: accentColor, size: 16),
-        const SizedBox(height: 3),
-        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: accentColor, fontFamily: 'monospace')),
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppTheme.textMuted)),
+            );
+          }),
       ],
     );
   }
 
   Widget _buildSupervisorStoreCard(LiveStoreHub store) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-        boxShadow: AppTheme.cardShadow,
-      ),
-      padding: const EdgeInsets.all(16),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              InitialsAvatar(name: store.retailer, size: 36),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       store.storeName,
-                      style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppTheme.textMain, letterSpacing: -0.2),
-                      maxLines: 1,
+                      style: AppText.bodyBold,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      '${store.retailer} • ${store.emirate}',
-                      style: const TextStyle(fontSize: 10.5, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            store.retailer,
+                            style: AppText.caption.copyWith(fontWeight: FontWeight.w700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text('•', style: AppText.caption),
+                        const SizedBox(width: 4),
+                        Text(store.emirate, style: AppText.caption),
+                      ],
                     ),
                   ],
                 ),
               ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  minimumSize: const Size(40, 36),
-                  backgroundColor: AppTheme.primaryDark,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
-                ),
-                icon: const Icon(Icons.camera_alt_rounded, size: 15),
-                label: const Text('Stand Photo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
-                onPressed: () => _captureStandPhoto(store),
+              const SizedBox(width: AppSpacing.sm),
+              StatusBadge(
+                label: store.emirate,
+                variant: StatusVariant.neutral,
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: AppTheme.borderSubtle),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.md),
 
-          // Active Projects & IML Promoters in this store
-          ...store.projects.map((proj) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceSubtle,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                border: Border.all(color: AppTheme.borderSubtle),
+          // Action Toolbar: Camera, WhatsApp, Call
+          Row(
+            children: [
+              Expanded(
+                child: AppButton.secondary(
+                  label: 'Stand Photo',
+                  icon: Icons.camera_alt_rounded,
+                  height: 34,
+                  onPressed: () => _captureStandPhoto(store),
+                ),
               ),
+              const SizedBox(width: 6),
+              IconButton(
+                icon: const Icon(Icons.phone_rounded, size: 18, color: AppColors.success),
+                tooltip: 'Call Store Lead',
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(8),
+                onPressed: () => _makeCall(store.supervisorPhone),
+              ),
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.chat_bubble_rounded, size: 18, color: AppColors.accent),
+                tooltip: 'WhatsApp Store Lead',
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(8),
+                onPressed: () => _openWhatsApp(store.supervisorPhone),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Projects & Staff Roster
+          ...store.projects.map((proj) {
+            return AppCard.flat(
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Campaign: ${proj.projectName.toUpperCase()}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.accent, letterSpacing: 0.3)),
-                  const SizedBox(height: 8),
+                  Text(
+                    'CAMPAIGN: ${proj.projectName.toUpperCase()}',
+                    style: AppText.micro.copyWith(color: AppColors.accent),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
                   ...proj.promoters.map((p) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          const IconBox(
+                            icon: Icons.person_rounded,
+                            color: AppColors.primary,
+                            isCompact: true,
+                          ),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   p.promoterName,
-                                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5, color: AppTheme.textMain),
+                                  style: AppText.bodyBold.copyWith(fontSize: 12.5),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
                                   '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)} • Break: ${p.breakTimings ?? "None"}',
-                                  style: const TextStyle(fontSize: 10.5, color: AppTheme.textMuted, fontFamily: 'monospace'),
+                                  style: AppText.caption.copyWith(fontFamily: 'monospace'),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
                           ),
-                          Row(
-                            children: [
-                              IconButton.filled(
-                                constraints: const BoxConstraints(),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: AppTheme.infoBg,
-                                  foregroundColor: AppTheme.accent,
-                                  padding: const EdgeInsets.all(7),
+                          const SizedBox(width: 6),
+                          AppButton.secondary(
+                            label: 'Audit',
+                            icon: Icons.star_rounded,
+                            height: 30,
+                            width: 72,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PromoterAuditPage(
+                                    promoterId: p.promoterId,
+                                    promoterName: p.promoterName,
+                                    promoterPhone: p.promoterPhone,
+                                    storeId: store.storeId,
+                                    storeName: store.storeName,
+                                  ),
                                 ),
-                                icon: const Icon(Icons.phone_rounded, size: 15),
-                                onPressed: () => _makeCall(p.promoterPhone),
-                              ),
-                              const SizedBox(width: 6),
-                              IconButton.filled(
-                                constraints: const BoxConstraints(),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: AppTheme.successBg,
-                                  foregroundColor: AppTheme.success,
-                                  padding: const EdgeInsets.all(7),
-                                ),
-                                icon: const Icon(Icons.chat_bubble_rounded, size: 15),
-                                onPressed: () => _openWhatsApp(p.promoterPhone),
-                              ),
-                              const SizedBox(width: 8),
-                              OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  minimumSize: const Size(40, 32),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
-                                ),
-                                icon: const Icon(Icons.star_rounded, size: 14, color: AppTheme.warning),
-                                label: const Text('Audit ⭐', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => PromoterAuditPage(
-                                        promoterId: p.promoterId,
-                                        promoterName: p.promoterName,
-                                        promoterPhone: p.promoterPhone,
-                                        projectId: proj.projectId,
-                                        storeId: store.storeId,
-                                        storeName: store.storeName,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
+                              );
+                            },
                           ),
                         ],
                       ),
