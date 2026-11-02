@@ -6,9 +6,11 @@ import '../models/models.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/status_badge.dart';
+import '../widgets/liquid_glass.dart';
 
 class TimeMapCalendarScreen extends StatefulWidget {
-  const TimeMapCalendarScreen({super.key});
+  final bool isEmbedded;
+  const TimeMapCalendarScreen({super.key, this.isEmbedded = false});
 
   @override
   State<TimeMapCalendarScreen> createState() => _TimeMapCalendarScreenState();
@@ -129,9 +131,11 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
+    return AmbientMeshBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
       appBar: AppBar(
+        automaticallyImplyLeading: !widget.isEmbedded,
         titleSpacing: 16,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -156,11 +160,11 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Master TimeMap™ Calendar',
+              'TimeMap™ Calendar',
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
-              'Multi-Store Roster, Coverage & Matrix Grid',
+              'Roster & Coverage Matrix',
               style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
             ),
           ],
@@ -204,6 +208,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
                 _buildReportsView(),
               ],
             ),
+      ),
     );
   }
 
@@ -241,7 +246,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
     }
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 100),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -508,6 +513,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
               : SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 100),
                     child: DataTable(
                       headingRowColor: WidgetStateProperty.all(AppTheme.surfaceSubtle),
                       headingTextStyle: const TextStyle(fontWeight: FontWeight.w800, color: AppTheme.textMain, fontSize: 11),
@@ -550,10 +556,11 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
                             DataCell(Text(store.customerCode ?? '—', style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.w700))),
                             DataCell(
                               SizedBox(
-                                width: 160,
+                                width: 220,
                                 child: Text(
                                   store.storeName,
-                                  style: const TextStyle(fontWeight: FontWeight.w700),
+                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -721,7 +728,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
 
   Widget _buildReportsView() {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         const Text(
           'Operational Excel Exporter & Sync',

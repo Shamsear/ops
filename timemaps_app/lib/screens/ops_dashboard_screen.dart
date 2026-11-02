@@ -22,13 +22,15 @@ import '../widgets/status_badge.dart';
 
 
 class OpsDashboardScreen extends StatefulWidget {
-  const OpsDashboardScreen({super.key});
+  final int initialTab;
+  const OpsDashboardScreen({super.key, this.initialTab = 0});
 
   @override
   State<OpsDashboardScreen> createState() => _OpsDashboardScreenState();
 }
 
 class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
+  late int _currentNavIndex;
   String _selectedEmirate = 'All';
   DateTime _selectedDate = DateTime(2026, 10, 14);
   bool _isLoading = true;
@@ -51,6 +53,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _currentNavIndex = widget.initialTab;
     _loadDashboardData();
   }
 
@@ -94,6 +97,55 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return AmbientMeshBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        extendBody: true,
+        body: IndexedStack(
+          index: _currentNavIndex,
+          children: [
+            _buildDashboardView(context),
+            const TimeMapCalendarScreen(isEmbedded: true),
+            const BadgeTrackerScreen(isEmbedded: true),
+            const StoreManagementScreen(isEmbedded: true),
+          ],
+        ),
+        bottomNavigationBar: LiquidGlassNavBar(
+          currentIndex: _currentNavIndex,
+          items: const [
+            LiquidGlassNavItem(
+              icon: Icons.dashboard_outlined,
+              activeIcon: Icons.dashboard_rounded,
+              label: 'Dashboard',
+            ),
+            LiquidGlassNavItem(
+              icon: Icons.calendar_month_outlined,
+              activeIcon: Icons.calendar_month_rounded,
+              label: 'Calendar',
+            ),
+            LiquidGlassNavItem(
+              icon: Icons.badge_outlined,
+              activeIcon: Icons.badge_rounded,
+              label: 'Badges',
+            ),
+            LiquidGlassNavItem(
+              icon: Icons.storefront_outlined,
+              activeIcon: Icons.storefront_rounded,
+              label: 'Stores',
+            ),
+          ],
+          onTap: (idx) {
+            setState(() {
+              _currentNavIndex = idx;
+            });
+            if (idx == 0) _loadDashboardData();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardView(BuildContext context) {
     final dateDisplay = DateFormat('EEE, dd MMM yyyy').format(_selectedDate);
     final query = _searchQuery.toLowerCase().trim();
     final filteredStores = query.isEmpty
@@ -108,7 +160,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           }).toList();
 
     return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
+      backgroundColor: Colors.transparent,
       extendBody: true,
       appBar: AppBar(
         titleSpacing: 16,
@@ -281,71 +333,44 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: LiquidGlassNavBar(
-        currentIndex: 0,
-        items: const [
-          LiquidGlassNavItem(
-            icon: Icons.dashboard_outlined,
-            activeIcon: Icons.dashboard_rounded,
-            label: 'Dashboard',
-          ),
-          LiquidGlassNavItem(
-            icon: Icons.calendar_month_outlined,
-            activeIcon: Icons.calendar_month_rounded,
-            label: 'Calendar',
-          ),
-          LiquidGlassNavItem(
-            icon: Icons.badge_outlined,
-            activeIcon: Icons.badge_rounded,
-            label: 'Badges',
-          ),
-          LiquidGlassNavItem(
-            icon: Icons.storefront_outlined,
-            activeIcon: Icons.storefront_rounded,
-            label: 'Stores',
-          ),
-        ],
-        onTap: (idx) {
-          if (idx == 1) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const TimeMapCalendarScreen()));
-          } else if (idx == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const BadgeTrackerScreen()))
-                .then((_) => _loadDashboardData());
-          } else if (idx == 3) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreManagementScreen()))
-                .then((_) => _loadDashboardData());
-          }
-        },
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
               child: RefreshIndicator(
                 onRefresh: _loadDashboardData,
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
                   children: [
-                    // Search Bar
-                    TextField(
-                      controller: _searchController,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                      decoration: InputDecoration(
-                        hintText: 'Search stores, promoters, chains, or supervisors...',
-                        hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textLight),
-                        prefixIcon: const Icon(Icons.search_rounded, size: 19, color: AppTheme.accent),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear_rounded, size: 16),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() => _searchQuery = '');
-                                },
-                              )
-                            : null,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        fillColor: Colors.white,
+                    // Liquid Glass Search Bar
+                    LiquidGlassContainer(
+                      radius: 14.0,
+                      blur: 16.0,
+                      opacity: 0.85,
+                      padding: EdgeInsets.zero,
+                      child: TextField(
+                        controller: _searchController,
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textMain),
+                        decoration: InputDecoration(
+                          hintText: 'Search stores, promoters, chains, or supervisors...',
+                          hintStyle: const TextStyle(fontSize: 12, color: AppTheme.textLight),
+                          prefixIcon: const Icon(Icons.search_rounded, size: 19, color: AppTheme.accent),
+                          suffixIcon: _searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear_rounded, size: 16),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    setState(() => _searchQuery = '');
+                                  },
+                                )
+                              : null,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          fillColor: Colors.transparent,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                        ),
+                        onChanged: (val) => setState(() => _searchQuery = val),
                       ),
-                      onChanged: (val) => setState(() => _searchQuery = val),
                     ),
                     const SizedBox(height: 14),
 
@@ -519,14 +544,9 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     required Color color,
     required Color bgTint,
   }) {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.borderSubtle),
-        boxShadow: AppTheme.cardShadow,
-      ),
+      radius: 16.0,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -611,12 +631,8 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             ),
             icon: const Icon(Icons.badge_outlined, size: 16, color: AppTheme.purple),
             label: const Text('Badges', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const BadgeTrackerScreen()),
-              );
-              _loadDashboardData();
+            onPressed: () {
+              setState(() => _currentNavIndex = 2);
             },
           ),
           const SizedBox(width: 8),
@@ -771,36 +787,31 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   Widget _buildStoreCard(LiveStoreHub store) {
     final retailerColor = _getRetailerColor(store.retailer);
 
-    return Container(
+    return GlassCard(
       margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.borderSubtle, width: 1.1),
-        boxShadow: AppTheme.cardShadow,
-      ),
       padding: const EdgeInsets.all(16),
+      radius: AppTheme.radiusLarge,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Store Header Row
+          // Store Header: Full-Width Title Row
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Retailer Avatar Emblem
               Container(
-                width: 44,
-                height: 44,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: retailerColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: retailerColor.withOpacity(0.25)),
                 ),
                 child: Center(
                   child: Text(
                     store.retailer.isNotEmpty ? store.retailer[0] : 'S',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.w900,
                       color: retailerColor,
                     ),
@@ -808,45 +819,55 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                 ),
               ),
               const SizedBox(width: 12),
+              // Full Width Store Name
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      store.storeName,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMain,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        StatusBadge(
-                          label: store.emirate,
-                          variant: StatusVariant.neutral,
-                          fontSize: 10,
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          store.retailer,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: retailerColor,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                child: Text(
+                  store.storeName,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.textMain,
+                    letterSpacing: -0.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // Metadata Row: Retailer Chip, Emirate Badge, and Field Lead Pill
+          Row(
+            children: [
+              StatusBadge(
+                label: store.emirate,
+                variant: StatusVariant.neutral,
+                fontSize: 10,
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: retailerColor.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                  border: Border.all(color: retailerColor.withOpacity(0.20)),
+                ),
+                child: Text(
+                  store.retailer,
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: retailerColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const Spacer(),
               // Field Lead / Supervisor Pill
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceSubtle,
                   borderRadius: BorderRadius.circular(AppTheme.radiusPill),
@@ -856,17 +877,17 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CircleAvatar(
-                      radius: 9,
+                      radius: 8,
                       backgroundColor: AppTheme.primaryDark,
                       child: Text(
                         store.supervisorName.isNotEmpty ? store.supervisorName[0] : 'S',
                         style: const TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.w800),
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 5),
                     Text(
                       store.supervisorName,
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
+                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: AppTheme.textMain),
                     ),
                   ],
                 ),
@@ -874,7 +895,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
             ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           const Divider(height: 1, color: AppTheme.borderSubtle),
           const SizedBox(height: 12),
 
@@ -976,7 +997,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                               const Icon(Icons.access_time_rounded, size: 13, color: AppTheme.textMuted),
                               const SizedBox(width: 5),
                               Text(
-                                '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)}',
+                                '${_formatTime(p.startTime)} – ${_formatTime(p.endTime)}',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
@@ -999,44 +1020,32 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                           ),
                           const SizedBox(height: 10),
 
-                          // Thumb-zone action pills (Call, WhatsApp, Audit)
+                          // Thumb-zone action pills (Call, WhatsApp, Audit) - Single-line guaranteed
                           Row(
                             children: [
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(0, 34),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
-                                  ),
-                                  icon: const Icon(Icons.phone_rounded, size: 14, color: AppTheme.success),
-                                  label: const Text('Call', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                child: _promoterActionButton(
+                                  icon: Icons.phone_rounded,
+                                  iconColor: AppTheme.success,
+                                  label: 'Call',
                                   onPressed: () => _makeCall(p.promoterPhone),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(0, 34),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
-                                  ),
-                                  icon: const Icon(Icons.chat_bubble_rounded, size: 14, color: AppTheme.accent),
-                                  label: const Text('WhatsApp', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                child: _promoterActionButton(
+                                  icon: Icons.chat_bubble_rounded,
+                                  iconColor: AppTheme.accent,
+                                  label: 'WhatsApp',
                                   onPressed: () => _openWhatsApp(p.promoterPhone),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               Expanded(
-                                child: OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    minimumSize: const Size(0, 34),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
-                                  ),
-                                  icon: const Icon(Icons.star_rounded, size: 14, color: AppTheme.warning),
-                                  label: const Text('Audit ⭐', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                child: _promoterActionButton(
+                                  icon: Icons.star_rounded,
+                                  iconColor: AppTheme.warning,
+                                  label: 'Audit',
                                   onPressed: () {
                                     Navigator.push(
                                       context,
@@ -1063,6 +1072,51 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
               ),
             );
           }),
+        ],
+      ),
+    );
+  }
+
+  String _formatTime(String time) {
+    if (time.length >= 5) return time.substring(0, 5);
+    return time;
+  }
+
+  Widget _promoterActionButton({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size(0, 32),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSmall)),
+        side: const BorderSide(color: AppTheme.borderSubtle, width: 1.0),
+        backgroundColor: Colors.white,
+      ),
+      onPressed: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: iconColor),
+          const SizedBox(width: 4),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textMain,
+                ),
+                maxLines: 1,
+              ),
+            ),
+          ),
         ],
       ),
     );

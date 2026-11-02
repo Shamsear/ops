@@ -6,7 +6,8 @@ import '../widgets/status_badge.dart';
 import 'create_badge_page.dart';
 
 class BadgeTrackerScreen extends StatefulWidget {
-  const BadgeTrackerScreen({super.key});
+  final bool isEmbedded;
+  const BadgeTrackerScreen({super.key, this.isEmbedded = false});
 
   @override
   State<BadgeTrackerScreen> createState() => _BadgeTrackerScreenState();
@@ -81,8 +82,9 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        automaticallyImplyLeading: !widget.isEmbedded,
         titleSpacing: 16,
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +254,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> {
                       : RefreshIndicator(
                           onRefresh: _loadBadges,
                           child: ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 32),
+                            padding: const EdgeInsets.fromLTRB(16, 14, 16, 100),
                             itemCount: _badges.length,
                             itemBuilder: (ctx, index) {
                               final badge = _badges[index];

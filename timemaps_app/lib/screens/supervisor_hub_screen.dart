@@ -376,7 +376,12 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
               children: [
                 Icon(Icons.inventory_2_outlined, color: AppTheme.textMuted, size: 20),
                 SizedBox(width: 10),
-                Text('No return collections scheduled for today.', style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.w600)),
+                Expanded(
+                  child: Text(
+                    'No return collections scheduled for today.',
+                    style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+                  ),
+                ),
               ],
             ),
           )

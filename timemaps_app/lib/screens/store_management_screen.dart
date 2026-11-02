@@ -7,7 +7,8 @@ import '../widgets/status_badge.dart';
 import 'create_store_page.dart';
 
 class StoreManagementScreen extends StatefulWidget {
-  const StoreManagementScreen({super.key});
+  final bool isEmbedded;
+  const StoreManagementScreen({super.key, this.isEmbedded = false});
 
   @override
   State<StoreManagementScreen> createState() => _StoreManagementScreenState();
@@ -106,8 +107,9 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
     final stores = _filteredStores;
 
     return Scaffold(
-      backgroundColor: AppTheme.canvasBg,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
+        automaticallyImplyLeading: !widget.isEmbedded,
         titleSpacing: 16,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,7 +305,7 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> {
                             ),
                           )
                         : ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
                             itemCount: stores.length,
                             itemBuilder: (ctx, idx) {
                               final store = stores[idx];

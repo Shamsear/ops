@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -85,9 +85,9 @@ class LiquidGlassContainer extends StatelessWidget {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        Colors.white.withOpacity(0.75), // Top-left specular catch
-        Colors.white.withOpacity(0.35), // Mid reflection
-        Colors.white.withOpacity(0.12), // Bottom-right shadow fade
+        Colors.white.withOpacity(0.95), // Top-left brilliant specular highlight
+        Colors.white.withOpacity(0.40), // Mid reflection
+        const Color(0xFFCBD5E1).withOpacity(0.50), // Bottom-right refractive edge
       ],
       stops: const [0.0, 0.45, 1.0],
     );
@@ -127,14 +127,13 @@ class LiquidGlassContainer extends StatelessWidget {
             child: Container(
               padding: padding,
               decoration: BoxDecoration(
-                color: effectiveTint,
                 borderRadius: BorderRadius.circular(radius),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Colors.white.withOpacity(0.20),
-                    Colors.white.withOpacity(0.04),
+                    effectiveTint,
+                    effectiveTint.withOpacity((effectiveTint.opacity * 0.88).clamp(0.0, 1.0)),
                   ],
                 ),
               ),
@@ -419,6 +418,145 @@ class _LiquidGlassButtonState extends State<LiquidGlassButton> {
           child: widget.child,
         ),
       ),
+    );
+  }
+}
+
+/// Ambient Mesh Background that gives the entire viewport subtle light refraction
+/// so that BackdropFilter and LiquidGlass panels have real ambient color gradients to blur.
+class AmbientMeshBackground extends StatelessWidget {
+  final Widget child;
+
+  const AmbientMeshBackground({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Base Subtle Ambient Mesh
+        Positioned.fill(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: AppTheme.canvasBg,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFF1F5F9), // Slate 100
+                  Color(0xFFF8FAFC), // Slate 50
+                  Color(0xFFEFF6FF), // Soft Sky/Cobalt glow
+                ],
+                stops: [0.0, 0.55, 1.0],
+              ),
+            ),
+          ),
+        ),
+        // Soft top-right atmospheric orb
+        Positioned(
+          top: -60,
+          right: -40,
+          width: 220,
+          height: 220,
+          child: IgnorePointer(
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF3B82F6).withOpacity(0.08), // Soft cobalt
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Soft mid-left atmospheric orb
+        Positioned(
+          top: 320,
+          left: -80,
+          width: 240,
+          height: 240,
+          child: IgnorePointer(
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF10B981).withOpacity(0.05), // Soft emerald
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Foreground Content
+        child,
+      ],
+    );
+  }
+}
+
+/// High-performance Frosted Liquid Glass Card
+/// Replaces plain white containers with specular 3D acrylic glass
+class GlassCard extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+  final double radius;
+  final VoidCallback? onTap;
+  final Color? tintColor;
+  final double opacity;
+  final double blur;
+
+  const GlassCard({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+    this.margin,
+    this.radius = 20.0,
+    this.onTap,
+    this.tintColor,
+    this.opacity = 0.82,
+    this.blur = 20.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LiquidGlassContainer(
+      radius: radius,
+      blur: blur,
+      opacity: opacity,
+      tintColor: tintColor,
+      borderWidth: 1.2,
+      padding: padding,
+      margin: margin,
+      onTap: onTap,
+      borderGradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.white.withOpacity(0.95), // Top specular reflection
+          Colors.white.withOpacity(0.35),
+          const Color(0xFFCBD5E1).withOpacity(0.45), // Subtle lower edge definition
+        ],
+        stops: const [0.0, 0.45, 1.0],
+      ),
+      shadows: [
+        BoxShadow(
+          color: const Color(0xFF0F172A).withOpacity(0.05),
+          blurRadius: 18,
+          spreadRadius: -2,
+          offset: const Offset(0, 6),
+        ),
+        BoxShadow(
+          color: const Color(0xFF0F172A).withOpacity(0.02),
+          blurRadius: 4,
+          offset: const Offset(0, 1),
+        ),
+      ],
+      child: child,
     );
   }
 }
