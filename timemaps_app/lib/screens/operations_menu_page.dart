@@ -43,25 +43,55 @@ class OperationsMenuPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.textMain),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+        title: Row(
           children: [
-            Text(
-              'Operations Action Center',
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.textMain,
-                letterSpacing: -0.3,
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                border: Border.all(color: AppTheme.borderSubtle),
+              ),
+              padding: const EdgeInsets.all(4),
+              child: Image.asset(
+                'assets/images/iml_app_icon.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.warehouse_rounded,
+                  color: AppTheme.accent,
+                  size: 18,
+                ),
               ),
             ),
-            Text(
-              'Launch field logistics, scheduling & master data workflows',
-              style: TextStyle(
-                fontSize: 11,
-                color: AppTheme.textMuted,
-                fontWeight: FontWeight.w600,
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'IML Operations Hub',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.textMain,
+                      letterSpacing: -0.3,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    'Warehouse dispatch, scheduling & master data',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.textMuted,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
           ],

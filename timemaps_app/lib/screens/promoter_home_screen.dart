@@ -231,7 +231,7 @@ class _PromoterHomeScreenState extends State<PromoterHomeScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    'Field Specialist • $_todayDateStr',
+                    'IML Field Specialist • $_todayDateStr',
                     style: const TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

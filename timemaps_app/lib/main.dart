@@ -4,19 +4,22 @@ import 'theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const TimeMapsApp());
+  runApp(const IMLOpsApp());
 }
 
-class TimeMapsApp extends StatelessWidget {
-  const TimeMapsApp({super.key});
+class IMLOpsApp extends StatelessWidget {
+  const IMLOpsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TimeMaps™ Operations',
+      title: 'IML Ops Hub',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const LoginScreen(),
     );
   }
 }
+
+/// Backward compatibility alias
+typedef TimeMapsApp = IMLOpsApp;

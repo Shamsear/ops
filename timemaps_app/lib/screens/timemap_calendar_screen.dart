@@ -165,7 +165,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'TimeMap™ Calendar',
+              'Operations Shift Calendar',
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.textMain, letterSpacing: -0.2),
             ),
             Text(
@@ -185,7 +185,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
           unselectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           tabs: const [
             Tab(icon: Icon(Icons.view_day_rounded, size: 18), text: 'Timeline'),
-            Tab(icon: Icon(Icons.grid_view_rounded, size: 18), text: 'TimeMap Grid'),
+            Tab(icon: Icon(Icons.grid_view_rounded, size: 18), text: 'Roster Grid'),
             Tab(icon: Icon(Icons.table_view_rounded, size: 18), text: 'Reports'),
           ],
         ),
@@ -240,7 +240,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
               ),
               const SizedBox(height: 6),
               const Text(
-                'Use the TimeMap Grid or Batch Scheduler to plan shifts.',
+                'Use the Roster Grid or Batch Scheduler to plan shifts.',
                 style: TextStyle(fontSize: 12, color: AppTheme.textMuted),
                 textAlign: TextAlign.center,
               ),
@@ -775,7 +775,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Master TimeMap Roster (.xlsx)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain)),
+                        const Text('Master Operations Roster (.xlsx)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.textMain)),
                         Text('${_matrixStores.length} Stores • ${_matrixDates.length} Dates • Live Staff & Badges', style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
                       ],
                     ),

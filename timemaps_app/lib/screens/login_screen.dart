@@ -107,32 +107,38 @@ class _LoginScreenState extends State<LoginScreen> {
                     Center(
                       child: Column(
                         children: [
+                          // Official IML Brand Logo
                           Container(
-                            width: 68,
-                            height: 68,
+                            constraints: const BoxConstraints(maxWidth: 220),
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [AppTheme.primaryDark, AppTheme.primaryLight],
-                              ),
-                              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                              border: Border.all(color: Colors.white.withOpacity(0.20), width: 1.5),
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(AppTheme.radiusExtraLarge),
+                              border: Border.all(color: AppTheme.borderSubtle, width: 1.2),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.accent.withOpacity(0.25),
-                                  blurRadius: 22,
-                                  offset: const Offset(0, 8),
+                                  color: AppTheme.primaryDark.withOpacity(0.08),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 6),
                                 ),
                               ],
                             ),
-                            child: const Icon(Icons.explore_rounded, color: Colors.white, size: 36),
+                            child: Image.asset(
+                              'assets/images/iml_logo_dark.png',
+                              height: 44,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) => const Icon(
+                                Icons.warehouse_rounded,
+                                color: AppTheme.accent,
+                                size: 36,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 14),
                           const Text(
-                            'TimeMaps™',
+                            'IML Operations Hub',
                             style: TextStyle(
-                              fontSize: 27,
+                              fontSize: 25,
                               fontWeight: FontWeight.w900,
                               color: AppTheme.textMain,
                               letterSpacing: -0.6,
@@ -140,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 4),
                           const Text(
-                            'UAE National Field Operations Platform',
+                            'Warehouse & UAE National Field Operations',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,

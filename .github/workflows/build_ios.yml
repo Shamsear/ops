@@ -1,4 +1,4 @@
-name: Build Mobile Apps (iOS IPA & Android APK)
+name: Build Mobile Apps (IML Ops - iOS IPA & Android APK)
 
 on:
   workflow_dispatch:
@@ -63,17 +63,17 @@ jobs:
           echo "Found Runner.app at: $APP_DIR"
 
           # Package into standard IPA format
-          rm -rf Payload TimeMaps.ipa
+          rm -rf Payload IML-Ops.ipa TimeMaps.ipa
           mkdir -p Payload
           cp -R "$APP_DIR" Payload/
-          zip -r TimeMaps.ipa Payload
-          ls -lh TimeMaps.ipa
+          zip -r IML-Ops.ipa Payload
+          ls -lh IML-Ops.ipa
 
       - name: Upload iOS IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TimeMaps-iOS-IPA
-          path: timemaps_app/TimeMaps.ipa
+          name: IML-Ops-iOS-IPA
+          path: timemaps_app/IML-Ops.ipa
 
   build-android:
     name: Build Android APK
@@ -109,5 +109,5 @@ jobs:
       - name: Upload Android APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TimeMaps-Android-APK
+          name: IML-Ops-Android-APK
           path: timemaps_app/build/app/outputs/flutter-apk/app-release.apk

@@ -200,7 +200,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Text(
-                    'Regional Operations Supervisor Hub',
+                    'IML Regional Operations Supervisor',
                     style: TextStyle(fontSize: 11, color: AppTheme.textMuted, fontWeight: FontWeight.w500),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

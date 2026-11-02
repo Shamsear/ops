@@ -204,25 +204,32 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              height: 38,
+              width: 38,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppTheme.primaryDark, AppTheme.primaryLight],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                border: Border.all(color: AppTheme.borderSubtle, width: 1.0),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.accent.withOpacity(0.20),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
+                    color: AppTheme.primaryDark.withOpacity(0.06),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              child: const Icon(Icons.explore_rounded, color: Colors.white, size: 20),
+              padding: const EdgeInsets.all(5),
+              child: Image.asset(
+                'assets/images/iml_app_icon.png',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.warehouse_rounded,
+                  color: AppTheme.accent,
+                  size: 20,
+                ),
+              ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,7 +238,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                   Row(
                     children: [
                       const Text(
-                        'TimeMaps™',
+                        'IML Ops',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,

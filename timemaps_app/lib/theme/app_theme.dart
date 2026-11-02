@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// TimeMaps™ Enterprise Native Design System
+/// IML Operations Platform Enterprise Native Design System
 /// Inspired by top-tier native mobile interfaces (Linear, Airbnb, Revolut, Phantom).
 /// Implements 60/30/10 color hierarchy, 8-pt spacing, organic depth, and thumb-zone ergonomics.
 class AppTheme {
