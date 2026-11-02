@@ -111,14 +111,15 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
         IconButton(
           icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textPrimary),
           tooltip: 'Refresh Stores',
+          visualDensity: VisualDensity.compact,
           onPressed: _loadStores,
         ),
         AppButton(
-          label: 'Add Store',
+          label: 'Store',
           icon: Icons.add_rounded,
-          height: 36,
+          height: 32,
           autoWidth: true,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           onPressed: () => _openCreateOrEditStore(),
         ),
       ],

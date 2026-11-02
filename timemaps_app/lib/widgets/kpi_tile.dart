@@ -43,6 +43,8 @@ class KpiTile extends StatelessWidget {
                 icon: icon,
                 color: iconColor,
                 isCompact: true,
+                size: 24,
+                iconSize: 13,
               ),
               if (delta != null)
                 Container(
@@ -71,11 +73,14 @@ class KpiTile extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 1),
-          Text(
-            label.toUpperCase(),
-            style: AppText.micro.copyWith(color: AppColors.textMuted, letterSpacing: 0.2),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              label.toUpperCase(),
+              style: AppText.micro.copyWith(color: AppColors.textMuted, letterSpacing: 0.2),
+              maxLines: 1,
+            ),
           ),
         ],
       ),

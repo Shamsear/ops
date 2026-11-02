@@ -156,6 +156,10 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
             padding: const EdgeInsets.all(4),
             child: TabBar(
               controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              padding: EdgeInsets.zero,
+              labelPadding: const EdgeInsets.symmetric(horizontal: 14),
               indicator: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppRadius.inner - 2),
@@ -298,7 +302,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                           const SizedBox(height: 6),
                           ...proj.promoters.map((p) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 3),
                               child: Row(
                                 children: [
                                   const Icon(Icons.person_outline_rounded, size: 14, color: AppColors.textMuted),
@@ -306,14 +310,26 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                                   Expanded(
                                     child: Text(
                                       p.promoterName,
-                                      style: AppText.body.copyWith(fontWeight: FontWeight.w600),
+                                      style: AppText.bodySmall.copyWith(fontWeight: FontWeight.w600),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  Text(
-                                    '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)}',
-                                    style: AppText.caption.copyWith(fontFamily: 'monospace'),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surfaceMuted,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      '${p.startTime.substring(0, 5)} – ${p.endTime.substring(0, 5)}',
+                                      style: AppText.caption.copyWith(
+                                        fontFamily: 'monospace',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 10.5,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),

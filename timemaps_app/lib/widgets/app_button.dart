@@ -134,11 +134,13 @@ class AppButton extends StatelessWidget {
           )
         else
           Flexible(
-            child: Text(
-              label,
-              style: textStyle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                style: textStyle,
+                maxLines: 1,
+              ),
             ),
           ),
       ],

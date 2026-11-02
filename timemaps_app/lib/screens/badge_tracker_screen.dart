@@ -107,14 +107,15 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
         IconButton(
           icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textPrimary),
           tooltip: 'Refresh Badges',
+          visualDensity: VisualDensity.compact,
           onPressed: _loadBadges,
         ),
         AppButton(
-          label: 'New Pass',
+          label: 'Pass',
           icon: Icons.add_rounded,
-          height: 36,
+          height: 32,
           autoWidth: true,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           onPressed: () async {
             final res = await Navigator.push(
               context,
@@ -314,13 +315,17 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
           ),
           const SizedBox(height: 4),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Submitted by: ${badge.submittedBy}',
-                style: AppText.caption,
+              Expanded(
+                child: Text(
+                  'Submitted by: ${badge.submittedBy}',
+                  style: AppText.caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              if (badge.badgeNumber != null)
+              if (badge.badgeNumber != null) ...[
+                const SizedBox(width: 8),
                 Text(
                   'Pass #: ${badge.badgeNumber}',
                   style: AppText.caption.copyWith(
@@ -329,6 +334,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
                     fontFamily: 'monospace',
                   ),
                 ),
+              ],
             ],
           ),
           const SizedBox(height: AppSpacing.md),

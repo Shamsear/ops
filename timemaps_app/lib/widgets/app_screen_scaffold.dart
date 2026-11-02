@@ -69,19 +69,25 @@ class AppScreenScaffold extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              title,
-              style: AppText.titleLarge,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                title,
+                style: AppText.titleLarge,
+                maxLines: 1,
+              ),
             ),
             if (subtitle != null) ...[
               const SizedBox(height: 1),
-              Text(
-                subtitle!,
-                style: AppText.caption,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  subtitle!,
+                  style: AppText.caption,
+                  maxLines: 1,
+                ),
               ),
             ],
           ],

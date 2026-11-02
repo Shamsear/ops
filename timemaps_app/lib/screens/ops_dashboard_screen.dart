@@ -102,7 +102,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       extendBody: true,
       body: PageView(
         controller: _pageController,
-        physics: const BouncingScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         onPageChanged: (idx) {
           setState(() {
             _currentNavIndex = idx;
@@ -490,7 +490,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: AppSpacing.itemGap,
       crossAxisSpacing: AppSpacing.itemGap,
-      childAspectRatio: 1.36,
+      childAspectRatio: 1.75,
       children: [
         KpiTile(
           label: 'Live Stores',
@@ -678,11 +678,14 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                               Text('•', style: AppText.caption),
                               const SizedBox(width: 6),
                               Expanded(
-                                child: Text(
-                                  'Break: ${p.breakTimings ?? "None"}',
-                                  style: AppText.caption,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Break: ${p.breakTimings ?? "None"}',
+                                    style: AppText.caption,
+                                    maxLines: 1,
+                                  ),
                                 ),
                               ),
                             ],
