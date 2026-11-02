@@ -11,6 +11,7 @@ class KpiTile extends StatelessWidget {
   final bool? isPositive;
   final VoidCallback? onTap;
   final bool isSelected;
+  final bool isHorizontal;
 
   const KpiTile({
     super.key,
@@ -22,10 +23,97 @@ class KpiTile extends StatelessWidget {
     this.isPositive,
     this.onTap,
     this.isSelected = false,
+    this.isHorizontal = false,
   });
+
+  const KpiTile.horizontal({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.iconColor = AppColors.primary,
+    this.delta,
+    this.isPositive,
+    this.onTap,
+    this.isSelected = false,
+  }) : isHorizontal = true;
 
   @override
   Widget build(BuildContext context) {
+    if (isHorizontal) {
+      return AppCard(
+        onTap: onTap,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        border: isSelected
+            ? const BorderSide(color: AppColors.primary, width: 1.5)
+            : null,
+        child: Row(
+          children: [
+            IconBox(
+              icon: icon,
+              color: iconColor,
+              size: 36,
+              iconSize: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      value,
+                      style: AppText.display.copyWith(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      label.toUpperCase(),
+                      style: AppText.micro.copyWith(
+                        color: AppColors.textMuted,
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (delta != null) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                decoration: BoxDecoration(
+                  color: (isPositive ?? true) ? AppColors.successSoft : AppColors.dangerSoft,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+                child: Text(
+                  delta!,
+                  style: AppText.micro.copyWith(
+                    fontSize: 9.0,
+                    color: (isPositive ?? true) ? AppColors.success : AppColors.danger,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
     return AppCard(
       onTap: onTap,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),

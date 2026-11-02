@@ -248,17 +248,23 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  dateDisplay,
-                                  style: AppText.bodyBold,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    dateDisplay,
+                                    style: AppText.bodyBold,
+                                    maxLines: 1,
+                                  ),
                                 ),
-                                const Text(
-                                  'Tap to change date',
-                                  style: AppText.caption,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                const FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Tap to change date',
+                                    style: AppText.caption,
+                                    maxLines: 1,
+                                  ),
                                 ),
                               ],
                             ),
@@ -484,37 +490,51 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     final pendingDrops = _kpis['pending_drops'] ?? 0;
     final pendingCollections = _kpis['pending_collections'] ?? 0;
 
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: AppSpacing.itemGap,
-      crossAxisSpacing: AppSpacing.itemGap,
-      childAspectRatio: 1.75,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        KpiTile(
-          label: 'Live Stores',
-          value: '$liveStoresCount',
-          icon: Icons.storefront_rounded,
-          iconColor: AppColors.accent,
+        Row(
+          children: [
+            Expanded(
+              child: KpiTile.horizontal(
+                label: 'Live Stores',
+                value: '$liveStoresCount',
+                icon: Icons.storefront_rounded,
+                iconColor: AppColors.accent,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.itemGap),
+            Expanded(
+              child: KpiTile.horizontal(
+                label: 'Active Staff',
+                value: '$activePromotersCount',
+                icon: Icons.people_alt_rounded,
+                iconColor: AppColors.success,
+              ),
+            ),
+          ],
         ),
-        KpiTile(
-          label: 'Active Staff',
-          value: '$activePromotersCount',
-          icon: Icons.people_alt_rounded,
-          iconColor: AppColors.success,
-        ),
-        KpiTile(
-          label: 'Drops Due',
-          value: '$pendingDrops',
-          icon: Icons.local_shipping_rounded,
-          iconColor: AppColors.warning,
-        ),
-        KpiTile(
-          label: 'Collections',
-          value: '$pendingCollections',
-          icon: Icons.repeat_rounded,
-          iconColor: AppColors.purple,
+        const SizedBox(height: AppSpacing.itemGap),
+        Row(
+          children: [
+            Expanded(
+              child: KpiTile.horizontal(
+                label: 'Drops Due',
+                value: '$pendingDrops',
+                icon: Icons.local_shipping_rounded,
+                iconColor: AppColors.warning,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.itemGap),
+            Expanded(
+              child: KpiTile.horizontal(
+                label: 'Collections',
+                value: '$pendingCollections',
+                icon: Icons.repeat_rounded,
+                iconColor: AppColors.purple,
+              ),
+            ),
+          ],
         ),
       ],
     );
