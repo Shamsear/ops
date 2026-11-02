@@ -196,10 +196,10 @@ class LiquidGlassNavBar extends StatelessWidget {
       child: Padding(
         padding: margin,
         child: LiquidGlassContainer(
-          radius: 26.0,
+          radius: 28.0,
           blur: blur,
-          opacity: 0.82,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          opacity: 0.85,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           shadows: [
             BoxShadow(
               color: const Color(0xFF0F172A).withOpacity(0.09),
@@ -221,18 +221,26 @@ class LiquidGlassNavBar extends StatelessWidget {
                 children: [
                   // Smooth Gliding Active Pill Indicator (Morphing Animation)
                   AnimatedPositioned(
-                    duration: const Duration(milliseconds: 280),
+                    duration: const Duration(milliseconds: 260),
                     curve: Curves.easeOutCubic,
-                    left: currentIndex * itemWidth + 4,
-                    width: itemWidth - 8,
-                    height: 48,
+                    left: currentIndex * itemWidth + 2,
+                    width: itemWidth - 4,
+                    height: 52,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryDark,
-                        borderRadius: BorderRadius.circular(18),
+                        gradient: const LinearGradient(
+                          colors: [AppTheme.primaryDark, AppTheme.primaryLight],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.18),
+                          width: 1.0,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryDark.withOpacity(0.24),
+                            color: AppTheme.primaryDark.withOpacity(0.28),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -241,7 +249,7 @@ class LiquidGlassNavBar extends StatelessWidget {
                     ),
                   ),
 
-                  // Interactive Navigation Items Row
+                  // Interactive Navigation Items Row (Vertical stacking to prevent horizontal clipping)
                   Row(
                     children: List.generate(items.length, (index) {
                       final item = items[index];
@@ -250,66 +258,40 @@ class LiquidGlassNavBar extends StatelessWidget {
                       return Expanded(
                         child: InkWell(
                           onTap: () => onTap(index),
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(20),
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           child: Container(
-                            height: 48,
+                            height: 52,
                             alignment: Alignment.center,
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              transitionBuilder: (child, animation) => FadeTransition(
-                                opacity: animation,
-                                child: ScaleTransition(scale: animation, child: child),
-                              ),
-                              child: isSelected
-                                  ? Row(
-                                      key: ValueKey('active_$index'),
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          item.activeIcon ?? item.icon,
-                                          size: 19,
-                                          color: Colors.white,
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Flexible(
-                                          child: Text(
-                                            item.label,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w800,
-                                              letterSpacing: -0.2,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : Column(
-                                      key: ValueKey('inactive_$index'),
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          item.icon,
-                                          size: 20,
-                                          color: AppTheme.textMuted,
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          item.label,
-                                          style: const TextStyle(
-                                            color: AppTheme.textMuted,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedScale(
+                                  duration: const Duration(milliseconds: 180),
+                                  scale: isSelected ? 1.08 : 1.0,
+                                  child: Icon(
+                                    isSelected ? (item.activeIcon ?? item.icon) : item.icon,
+                                    size: 20,
+                                    color: isSelected ? Colors.white : AppTheme.textMuted,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  item.label,
+                                  style: TextStyle(
+                                    color: isSelected ? Colors.white : AppTheme.textMuted,
+                                    fontSize: 10.5,
+                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                    letterSpacing: -0.1,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.visible,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                           ),
                         ),

@@ -311,84 +311,85 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
             blur: 24.0,
             opacity: 0.85,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Summary counter
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          '${_selectedDates.length}',
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: AppTheme.primary,
-                          ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primary.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'shifts',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.textSecondary,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${_selectedDates.length}',
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
+                                color: AppTheme.primary,
+                              ),
+                            ),
+                            const Text(
+                              ' shifts • ',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.textSecondary),
+                            ),
+                            Text(
+                              '${cumulativeHours}h total',
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.accent,
+                              ),
+                            ),
+                          ],
                         ),
-                        const Text(
-                          ' • ',
-                          style: TextStyle(color: AppTheme.textMuted),
-                        ),
-                        Text(
-                          '${cumulativeHours}h',
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.accent,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      _selectedStore != null ? _selectedStore!.storeName : 'Select store & dates',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppTheme.textMuted,
-                        fontWeight: FontWeight.w500,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    ],
+                  ),
+                  Text(
+                    _selectedStore != null ? _selectedStore!.storeName : 'Select store & dates',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textMuted,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
-                ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-
-              // Action button
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 2,
-                ),
-                onPressed: _isSaving ? null : _handleBatchSave,
-                icon: _isSaving
-                    ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Icon(Icons.event_available_rounded, size: 18),
-                label: Text(
-                  _isSaving ? 'Scheduling...' : 'Confirm Shifts (${_selectedDates.length})',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 2,
+                  ),
+                  onPressed: _isSaving ? null : _handleBatchSave,
+                  icon: _isSaving
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Icon(Icons.event_available_rounded, size: 18),
+                  label: Text(
+                    _isSaving ? 'Scheduling...' : 'Confirm Shifts (${_selectedDates.length})',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                  ),
                 ),
               ),
             ],

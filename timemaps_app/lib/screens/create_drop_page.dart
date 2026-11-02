@@ -252,57 +252,64 @@ class _CreateDropPageState extends State<CreateDropPage> {
             blur: 24.0,
             opacity: 0.85,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      DateFormat('EEE, dd MMM yyyy').format(_dropDate),
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.textMain,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today_rounded, size: 14, color: AppTheme.accent),
+                      const SizedBox(width: 6),
+                      Text(
+                        DateFormat('EEE, dd MMM yyyy').format(_dropDate),
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.textMain,
+                        ),
                       ),
+                    ],
+                  ),
+                  Text(
+                    _selectedStore != null
+                        ? '${_selectedStore!.retailer} • ${_selectedStore!.emirate}'
+                        : 'Select destination store',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textSecondary,
+                      fontWeight: FontWeight.w600,
                     ),
-                    Text(
-                      _selectedStore != null
-                          ? '${_selectedStore!.retailer} • ${_selectedStore!.emirate}'
-                          : 'Select destination store',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppTheme.textMuted,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.warning,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 2,
-                ),
-                onPressed: _isSaving ? null : _handleSave,
-                icon: _isSaving
-                    ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Icon(Icons.local_shipping_rounded, size: 18),
-                label: Text(
-                  _isSaving ? 'Dispatching...' : 'Dispatch Drop Task',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.warning,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 2,
+                  ),
+                  onPressed: _isSaving ? null : _handleSave,
+                  icon: _isSaving
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Icon(Icons.local_shipping_rounded, size: 18),
+                  label: Text(
+                    _isSaving ? 'Dispatching...' : 'Dispatch Drop Task',
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                  ),
                 ),
               ),
             ],

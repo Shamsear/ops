@@ -168,13 +168,16 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen> with Sing
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppTheme.accent,
+          indicatorWeight: 2.5,
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: AppTheme.primaryDark,
+          labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
           unselectedLabelColor: AppTheme.textMuted,
+          unselectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           tabs: const [
-            Tab(icon: Icon(Icons.view_day_rounded, size: 18), text: 'Today Timeline'),
+            Tab(icon: Icon(Icons.view_day_rounded, size: 18), text: 'Timeline'),
             Tab(icon: Icon(Icons.grid_view_rounded, size: 18), text: 'TimeMap Grid'),
-            Tab(icon: Icon(Icons.table_view_rounded, size: 18), text: 'Export & Reports'),
+            Tab(icon: Icon(Icons.table_view_rounded, size: 18), text: 'Reports'),
           ],
         ),
         actions: [

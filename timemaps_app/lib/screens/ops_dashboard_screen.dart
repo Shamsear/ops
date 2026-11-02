@@ -454,33 +454,76 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     final pendingDrops = _kpis['pending_drops'] ?? 0;
     final pendingCollections = _kpis['pending_collections'] ?? 0;
 
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: _kpiTile('Live Stores', '$liveStoresCount', Icons.storefront_rounded, AppTheme.accentTeal, AppTheme.surfaceSubtle),
+        Row(
+          children: [
+            Expanded(
+              child: _kpiTile(
+                title: 'Live Stores',
+                subtitle: 'Active hypermarkets',
+                count: '$liveStoresCount',
+                icon: Icons.storefront_rounded,
+                color: AppTheme.accentTeal,
+                bgTint: const Color(0xFFCCFBF1),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _kpiTile(
+                title: 'Active Staff',
+                subtitle: 'Promoters on duty',
+                count: '$activePromotersCount',
+                icon: Icons.people_alt_rounded,
+                color: AppTheme.accent,
+                bgTint: AppTheme.infoBg,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _kpiTile('Promoters', '$activePromotersCount', Icons.people_alt_rounded, AppTheme.accent, AppTheme.infoBg),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _kpiTile('Drops Due', '$pendingDrops', Icons.local_shipping_rounded, AppTheme.warning, AppTheme.warningBg),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _kpiTile('Collections', '$pendingCollections', Icons.repeat_rounded, AppTheme.success, AppTheme.successBg),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _kpiTile(
+                title: 'Drops Due',
+                subtitle: 'Stand deliveries',
+                count: '$pendingDrops',
+                icon: Icons.local_shipping_rounded,
+                color: AppTheme.warning,
+                bgTint: AppTheme.warningBg,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _kpiTile(
+                title: 'Collections',
+                subtitle: 'Teardowns pending',
+                count: '$pendingCollections',
+                icon: Icons.repeat_rounded,
+                color: AppTheme.success,
+                bgTint: AppTheme.successBg,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _kpiTile(String title, String count, IconData icon, Color color, Color bgTint) {
+  Widget _kpiTile({
+    required String title,
+    required String subtitle,
+    required String count,
+    required IconData icon,
+    required Color color,
+    required Color bgTint,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.borderSubtle),
         boxShadow: AppTheme.cardShadow,
       ),
@@ -490,31 +533,46 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: bgTint,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 18, color: color),
+              ),
               Text(
                 count,
-                style: TextStyle(
-                  fontSize: 20,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 22,
                   fontWeight: FontWeight.w900,
                   color: AppTheme.textMain,
                   letterSpacing: -0.5,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: bgTint,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, size: 14, color: color),
-              ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
           Text(
             title,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.textMuted),
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.textMain,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            maxLines: 1,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.textMuted,
+            ),
           ),
         ],
       ),
