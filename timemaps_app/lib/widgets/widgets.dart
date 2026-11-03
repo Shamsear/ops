@@ -12,4 +12,5 @@ export 'searchable_select_field.dart';
 export 'section_header.dart';
 export 'status_badge.dart';
 export 'sticky_action_bar.dart';
+export 'operator_profile_sheet.dart';
 export 'liquid_glass.dart';

@@ -9,6 +9,7 @@ import 'create_project_page.dart';
 import 'create_store_page.dart';
 import 'create_promoter_page.dart';
 import 'promoter_audit_page.dart';
+import 'login_screen.dart';
 
 class OperationsMenuPage extends StatelessWidget {
   const OperationsMenuPage({super.key});
@@ -23,6 +24,10 @@ class OperationsMenuPage extends StatelessWidget {
       ),
       title: 'IML Operations Hub',
       subtitle: 'Warehouse dispatch, scheduling & master data',
+      actions: const [
+        OperatorHeaderButton(),
+        SizedBox(width: AppSpacing.sm),
+      ],
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -138,6 +143,26 @@ class OperationsMenuPage extends StatelessWidget {
             tag: 'Promoter',
             tagVariant: StatusVariant.neutral,
             pageBuilder: () => const CreatePromoterPage(),
+          ),
+          const SizedBox(height: AppSpacing.sectionGap),
+
+          // Section 4: Operator Authentication & Session
+          const SectionHeader(
+            icon: Icons.account_circle_rounded,
+            iconColor: AppColors.primary,
+            microLabel: 'OPERATOR SESSION',
+            title: 'Account & Authentication',
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _buildActionItem(
+            context: context,
+            icon: Icons.switch_account_rounded,
+            iconColor: AppColors.primary,
+            title: 'Operator Login / Switch Role',
+            subtitle: 'Log in as a different operator or switch active session',
+            tag: 'Session',
+            tagVariant: StatusVariant.info,
+            pageBuilder: () => const LoginScreen(),
           ),
           const SizedBox(height: AppSpacing.sectionGap),
         ],

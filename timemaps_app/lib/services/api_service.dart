@@ -334,37 +334,43 @@ class ApiService {
             'supervisor_id': supData['id'] ?? 1,
             'supervisor_name': supData['name'] ?? 'Supervisor',
             'supervisor_phone': supData['phone'] ?? '+971 50 000 0000',
-            '_projects': <int, Map<String, dynamic>>{},
+            '_projects': <String, Map<String, dynamic>>{},
           };
         }
 
-        final pMap = storeMap[storeId]!['_projects'] as Map<int, Map<String, dynamic>>;
-        final pId = projData['id'] as int? ?? 1;
+        final pMap = storeMap[storeId]!['_projects'] as Map<String, Map<String, dynamic>>;
+        final pName = (projData['name'] as String?)?.trim() ?? 'Campaign';
+        final pKey = pName.toLowerCase();
 
-        if (!pMap.containsKey(pId)) {
-          pMap[pId] = {
-            'project_id': pId,
-            'project_name': projData['name'] ?? 'Campaign',
+        if (!pMap.containsKey(pKey)) {
+          pMap[pKey] = {
+            'project_id': projData['id'] as int? ?? 1,
+            'project_name': pName,
             'promoters': <Map<String, dynamic>>[],
           };
         }
 
-        (pMap[pId]!['promoters'] as List<Map<String, dynamic>>).add({
-          'schedule_id': s['id'],
-          'promoter_id': promoterId,
-          'promoter_name': promData['name'] ?? 'Staff',
-          'promoter_phone': promData['phone'] ?? '+971 55 000 0000',
-          'start_time': s['start_time'] ?? '10:00:00',
-          'end_time': s['end_time'] ?? '18:00:00',
-          'break_timings': s['break_timings'],
-          'status': s['status'] ?? 'SCHEDULED',
-        });
+        final promoterList = pMap[pKey]!['promoters'] as List<Map<String, dynamic>>;
+        final schedId = s['id'];
+        final isDuplicate = promoterList.any((ep) => ep['schedule_id'] == schedId);
+        if (!isDuplicate) {
+          promoterList.add({
+            'schedule_id': schedId,
+            'promoter_id': promoterId,
+            'promoter_name': promData['name'] ?? 'Staff',
+            'promoter_phone': promData['phone'] ?? '+971 55 000 0000',
+            'start_time': s['start_time'] ?? '10:00:00',
+            'end_time': s['end_time'] ?? '18:00:00',
+            'break_timings': s['break_timings'],
+            'status': s['status'] ?? 'SCHEDULED',
+          });
+        }
       }
 
       final List<LiveStoreHub> liveStores = [];
       for (final sId in storeMap.keys) {
         final entry = storeMap[sId]!;
-        final pMap = entry['_projects'] as Map<int, Map<String, dynamic>>;
+        final pMap = entry['_projects'] as Map<String, Map<String, dynamic>>;
         final projectsList = pMap.values.map((p) => LiveProjectStore.fromJson(p)).toList();
 
         liveStores.add(LiveStoreHub(

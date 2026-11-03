@@ -147,6 +147,8 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
       bottomClearance: widget.isEmbedded,
       onRefresh: _loadAllData,
       actions: [
+        const OperatorHeaderButton(),
+        const SizedBox(width: 4),
         IconButton(
           icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.textPrimary),
           tooltip: 'Refresh Matrix Data',
@@ -165,10 +167,9 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
             padding: const EdgeInsets.all(4),
             child: TabBar(
               controller: _tabController,
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
+              isScrollable: false,
               padding: EdgeInsets.zero,
-              labelPadding: const EdgeInsets.symmetric(horizontal: 14),
+              labelPadding: EdgeInsets.zero,
               indicator: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppRadius.inner - 2),
@@ -178,10 +179,10 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
               dividerColor: Colors.transparent,
               labelColor: AppColors.textPrimary,
               unselectedLabelColor: AppColors.textMuted,
-              labelStyle: AppText.bodyBold,
-              unselectedLabelStyle: AppText.body,
+              labelStyle: AppText.bodyBold.copyWith(fontSize: 12.5),
+              unselectedLabelStyle: AppText.body.copyWith(fontSize: 12.5),
               tabs: const [
-                Tab(text: 'Store Timeline'),
+                Tab(text: 'Timeline'),
                 Tab(text: 'Matrix Grid'),
                 Tab(text: 'Excel Export'),
               ],
@@ -234,10 +235,10 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
         SectionHeader(
           icon: Icons.view_timeline_rounded,
           iconColor: AppColors.primary,
-          microLabel: 'Active Shift Queue',
-          title: 'Store Deployment Timeline',
+          microLabel: 'ROSTER QUEUE',
+          title: 'Store Timeline',
           trailing: StatusBadge(
-            label: '${activeCampaigns.length} Campaigns • ${_schedules.length} Stores',
+            label: '${activeCampaigns.length} Cmp • ${_schedules.length} Stores',
             variant: StatusVariant.info,
           ),
         ),
@@ -285,9 +286,11 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                   ),
                   const SizedBox(height: AppSpacing.md),
                   ...store.projects.map((proj) {
-                    return AppCard.flat(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: AppCard.flat(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
@@ -353,8 +356,9 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                           }),
                         ],
                       ),
-                    );
-                  }),
+                    ),
+                  );
+                }),
                 ],
               ),
             );

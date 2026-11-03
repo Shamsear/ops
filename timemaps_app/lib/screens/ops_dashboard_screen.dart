@@ -240,11 +240,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       bottomClearance: true,
       onRefresh: _loadDashboardData,
       actions: [
-        const StatusBadge(
-          label: 'LIVE',
-          variant: StatusVariant.success,
-          showDot: true,
-        ),
+        const OperatorHeaderButton(),
         const SizedBox(width: 4),
         IconButton(
           icon: const Icon(Icons.grid_view_rounded, size: 20, color: AppColors.primary),
