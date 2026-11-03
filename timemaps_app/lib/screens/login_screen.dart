@@ -391,7 +391,7 @@ class _PersonaCard extends StatelessWidget {
                   Text(
                     details,
                     style: AppText.caption,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

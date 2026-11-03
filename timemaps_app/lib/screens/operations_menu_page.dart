@@ -191,6 +191,7 @@ class OperationsMenuPage extends StatelessWidget {
         }
       },
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IconBox(icon: icon, color: iconColor),
           const SizedBox(width: AppSpacing.md),
@@ -198,39 +199,32 @@ class OperationsMenuPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: AppText.bodyBold,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    StatusBadge(
-                      label: tag,
-                      variant: tagVariant,
-                      showDot: false,
-                    ),
-                  ],
+                StatusBadge(
+                  label: tag,
+                  variant: tagVariant,
+                  showDot: false,
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  title,
+                  style: AppText.bodyBold,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
                   style: AppText.caption,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          const SizedBox(width: AppSpacing.sm),
-          const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.borderStrong,
-            size: 20,
+          const SizedBox(width: AppSpacing.xs),
+          const Padding(
+            padding: EdgeInsets.only(top: 6.0),
+            child: Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.borderStrong,
+              size: 20,
+            ),
           ),
         ],
       ),

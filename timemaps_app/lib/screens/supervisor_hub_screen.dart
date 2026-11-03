@@ -384,7 +384,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(drop.storeName, style: AppText.bodyBold, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              Text(drop.storeName, style: AppText.bodyBold, maxLines: 2, overflow: TextOverflow.ellipsis),
                               Text('Project: ${drop.projectName} • Date: ${drop.scheduledDate}', style: AppText.caption),
                             ],
                           ),
@@ -459,7 +459,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(col.storeName, style: AppText.bodyBold, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              Text(col.storeName, style: AppText.bodyBold, maxLines: 2, overflow: TextOverflow.ellipsis),
                               Text('Project: ${col.projectName} • Date: ${col.scheduledDate}', style: AppText.caption),
                             ],
                           ),

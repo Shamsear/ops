@@ -45,7 +45,7 @@ class SectionHeader extends StatelessWidget {
                     Text(
                       microLabel!.toUpperCase(),
                       style: AppText.micro.copyWith(color: AppColors.textMuted),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
@@ -53,7 +53,7 @@ class SectionHeader extends StatelessWidget {
                   Text(
                     title,
                     style: AppText.title,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

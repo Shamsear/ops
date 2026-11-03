@@ -347,7 +347,7 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
                                 child: Text(
                                   '${_selectedStore!.retailer} • ${_selectedStore!.emirate} • SMN: ${_selectedStore!.smnContact ?? "Operations"}',
                                   style: AppText.caption.copyWith(fontWeight: FontWeight.w600),
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),

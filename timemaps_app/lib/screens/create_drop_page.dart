@@ -324,7 +324,7 @@ class _CreateDropPageState extends State<CreateDropPage> {
                                 child: Text(
                                   '${_selectedStore!.retailer} • ${_selectedStore!.emirate} • Lead: ${_selectedStore!.smnContact ?? "Operations"}',
                                   style: AppText.caption.copyWith(fontWeight: FontWeight.w600),
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),

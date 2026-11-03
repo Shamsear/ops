@@ -307,7 +307,7 @@ class _BadgeTrackerScreenState extends State<BadgeTrackerScreen> with AutomaticK
                 child: Text(
                   '${badge.storeName} • ${badge.emirate}',
                   style: AppText.body.copyWith(fontWeight: FontWeight.w600),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
