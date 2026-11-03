@@ -23,8 +23,8 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
     'P&G',
     'IFFCO',
   ];
-  DateTime _startDate = DateTime(2026, 10, 14);
-  DateTime _endDate = DateTime(2026, 11, 30);
+  DateTime _startDate = DateTime.now();
+  DateTime _endDate = DateTime.now().add(const Duration(days: 30));
   bool _isSaving = false;
 
   @override

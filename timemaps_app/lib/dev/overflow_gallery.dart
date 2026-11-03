@@ -128,7 +128,7 @@ class OverflowGalleryScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.md),
                 AppDateField(
                   label: 'Scheduled Shift Date',
-                  value: DateTime(2026, 10, 14),
+                  value: DateTime.now(),
                   onChanged: (_) {},
                 ),
                 const SizedBox(height: AppSpacing.md),

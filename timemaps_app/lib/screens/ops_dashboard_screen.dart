@@ -29,7 +29,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   late int _currentNavIndex;
   late PageController _pageController;
   String _selectedEmirate = 'All';
-  DateTime _selectedDate = DateTime(2026, 10, 14);
+  DateTime _selectedDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   bool _isLoading = true;
   Map<String, dynamic> _kpis = {};
   List<LiveStoreHub> _allLiveStores = [];
@@ -54,6 +54,8 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    final now = DateTime.now();
+    _selectedDate = DateTime(now.year, now.month, now.day);
     _currentNavIndex = widget.initialTab;
     _pageController = PageController(initialPage: _currentNavIndex);
     _dateStripController = ScrollController();
@@ -210,6 +212,10 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   }
 
   Widget _buildDashboardView(BuildContext context) {
+    final now = DateTime.now();
+    final isToday = _selectedDate.year == now.year &&
+        _selectedDate.month == now.month &&
+        _selectedDate.day == now.day;
     final dateDisplay = DateFormat('EEE, dd MMM yyyy').format(_selectedDate);
     final query = _searchQuery.toLowerCase().trim();
     final filteredStores = _allLiveStores.where((s) {
@@ -236,7 +242,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
 
     return AppScreenScaffold(
       title: 'Command Dashboard',
-      subtitle: '$dateDisplay • UAE Operations',
+      subtitle: '${isToday ? "Today, " : ""}$dateDisplay • UAE Operations',
       bottomClearance: true,
       onRefresh: _loadDashboardData,
       actions: [

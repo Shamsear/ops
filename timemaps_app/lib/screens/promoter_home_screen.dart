@@ -28,13 +28,13 @@ class _PromoterHomeScreenState extends State<PromoterHomeScreen> {
   @override
   void initState() {
     super.initState();
-    _todayDateStr = DateFormat('EEEE, dd MMMM yyyy').format(DateTime(2026, 10, 14));
+    _todayDateStr = DateFormat('EEEE, dd MMMM yyyy').format(DateTime.now());
     _loadPromoterShift();
   }
 
   Future<void> _loadPromoterShift() async {
     setState(() => _isLoading = true);
-    final today = DateFormat('yyyy-MM-dd').format(DateTime(2026, 10, 14));
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final data = await ApiService.getLiveDashboard(date: today);
     final allStores = (data['live_stores'] as List<LiveStoreHub>?) ?? [];
 

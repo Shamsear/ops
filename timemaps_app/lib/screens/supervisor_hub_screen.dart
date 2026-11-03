@@ -41,7 +41,7 @@ class _SupervisorHubScreenState extends State<SupervisorHubScreen> with SingleTi
 
   Future<void> _loadSupervisorData() async {
     setState(() => _isLoading = true);
-    final today = DateFormat('yyyy-MM-dd').format(DateTime(2026, 10, 14));
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     final dashData = await ApiService.getLiveDashboard(date: today);
     final allStores = (dashData['live_stores'] as List<LiveStoreHub>?) ?? [];

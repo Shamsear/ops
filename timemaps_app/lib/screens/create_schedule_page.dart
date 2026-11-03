@@ -38,13 +38,13 @@ class _CreateSchedulePageState extends State<CreateSchedulePage> {
 
   // Multi-date selection (Set of YYYY-MM-DD strings)
   final Set<String> _selectedDates = {};
-  DateTime _currentCalendarMonth = DateTime(2026, 10, 1);
+  DateTime _currentCalendarMonth = DateTime(DateTime.now().year, DateTime.now().month, 1);
   String _selectedShiftPreset = 'Evening Shift (14:00 - 22:00)';
 
   @override
   void initState() {
     super.initState();
-    _selectedDates.addAll(['2026-10-15', '2026-10-16', '2026-10-17', '2026-10-18']);
+    _selectedDates.add(DateFormat('yyyy-MM-dd').format(DateTime.now()));
     _loadFormData();
   }
 
