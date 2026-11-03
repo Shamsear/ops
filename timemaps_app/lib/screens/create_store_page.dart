@@ -16,7 +16,7 @@ class CreateStorePage extends StatefulWidget {
 class _CreateStorePageState extends State<CreateStorePage> {
   final _storeNameController = TextEditingController();
   final _customerCodeController = TextEditingController();
-  final _retailerController = TextEditingController(text: 'Lulu Hypermarket');
+  String _selectedRetailer = 'Lulu Hypermarket';
   final _branchCodeController = TextEditingController();
   final _cityController = TextEditingController(text: 'Dubai');
   final _smnContactController = TextEditingController();
@@ -37,7 +37,7 @@ class _CreateStorePageState extends State<CreateStorePage> {
     'Fujairah',
   ];
 
-  final List<String> _popularRetailers = [
+  List<String> _popularRetailers = [
     'Lulu Hypermarket',
     'Carrefour',
     'Union Coop',
@@ -57,7 +57,7 @@ class _CreateStorePageState extends State<CreateStorePage> {
       final s = widget.storeToEdit!;
       _storeNameController.text = s.storeName;
       _customerCodeController.text = s.customerCode ?? '';
-      _retailerController.text = s.chain ?? s.retailer;
+      _selectedRetailer = s.chain ?? s.retailer;
       _branchCodeController.text = s.branchCode ?? '';
       _cityController.text = s.city ?? '';
       _smnContactController.text = s.smnContact ?? '';
@@ -68,13 +68,25 @@ class _CreateStorePageState extends State<CreateStorePage> {
         _selectedEmirate = s.emirate;
       }
     }
+    _loadChains();
+  }
+
+  Future<void> _loadChains() async {
+    final list = await ApiService.getDistinctChains();
+    if (mounted) {
+      setState(() {
+        _popularRetailers = list;
+        if (!_popularRetailers.contains(_selectedRetailer)) {
+          _popularRetailers.insert(0, _selectedRetailer);
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     _storeNameController.dispose();
     _customerCodeController.dispose();
-    _retailerController.dispose();
     _branchCodeController.dispose();
     _cityController.dispose();
     _smnContactController.dispose();
@@ -104,14 +116,15 @@ class _CreateStorePageState extends State<CreateStorePage> {
     setState(() => _isSaving = true);
 
     StoreModel? store;
+    final retailerVal = _selectedRetailer.trim().isEmpty ? 'Retailer' : _selectedRetailer.trim();
     if (widget.storeToEdit != null) {
       store = await ApiService.updateStore(
         storeId: widget.storeToEdit!.id,
         storeName: name,
-        retailer: _retailerController.text.trim().isEmpty ? 'Retailer' : _retailerController.text.trim(),
+        retailer: retailerVal,
         emirate: _selectedEmirate,
         customerCode: _customerCodeController.text.trim().isEmpty ? null : _customerCodeController.text.trim(),
-        chain: _retailerController.text.trim().isEmpty ? null : _retailerController.text.trim(),
+        chain: retailerVal,
         city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
         smnContact: _smnContactController.text.trim().isEmpty ? null : _smnContactController.text.trim(),
         merchandiserLead: _merchandiserLeadController.text.trim().isEmpty ? null : _merchandiserLeadController.text.trim(),
@@ -123,10 +136,10 @@ class _CreateStorePageState extends State<CreateStorePage> {
     } else {
       store = await ApiService.createStore(
         storeName: name,
-        retailer: _retailerController.text.trim().isEmpty ? 'Retailer' : _retailerController.text.trim(),
+        retailer: retailerVal,
         emirate: _selectedEmirate,
         customerCode: _customerCodeController.text.trim().isEmpty ? null : _customerCodeController.text.trim(),
-        chain: _retailerController.text.trim().isEmpty ? null : _retailerController.text.trim(),
+        chain: retailerVal,
         city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
         smnContact: _smnContactController.text.trim().isEmpty ? null : _smnContactController.text.trim(),
         merchandiserLead: _merchandiserLeadController.text.trim().isEmpty ? null : _merchandiserLeadController.text.trim(),
@@ -233,23 +246,28 @@ class _CreateStorePageState extends State<CreateStorePage> {
                   hint: 'e.g. Lulu Hypermarket - Al Barsha',
                 ),
                 const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  controller: _retailerController,
+                SearchableSelectField<String>(
                   label: 'Retailer / Chain *',
-                  hint: 'e.g. Lulu Hypermarket, Carrefour, Union Coop',
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: _popularRetailers.map((chain) {
-                    final isSel = _retailerController.text == chain;
-                    return FilterPill(
-                      label: chain,
-                      isSelected: isSel,
-                      onTap: () => setState(() => _retailerController.text = chain),
-                    );
-                  }).toList(),
+                  value: _selectedRetailer,
+                  hintText: 'Select or type chain name',
+                  allowCustomValue: true,
+                  prefixIcon: const Icon(Icons.storefront_rounded, size: 20, color: AppColors.primary),
+                  options: _popularRetailers
+                      .map((chain) => SearchableOption<String>(value: chain, label: chain))
+                      .toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedRetailer = val);
+                    }
+                  },
+                  onCustomValueSubmitted: (val) {
+                    setState(() {
+                      _selectedRetailer = val;
+                      if (!_popularRetailers.contains(val)) {
+                        _popularRetailers.insert(0, val);
+                      }
+                    });
+                  },
                 ),
               ],
             ),
@@ -268,21 +286,18 @@ class _CreateStorePageState extends State<CreateStorePage> {
                   title: 'Emirate & System Codes',
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Text(
-                  'EMIRATE *',
-                  style: AppText.micro.copyWith(color: AppColors.textMuted),
-                ),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: _emirates.map((em) {
-                    return FilterPill(
-                      label: em,
-                      isSelected: _selectedEmirate == em,
-                      onTap: () => setState(() => _selectedEmirate = em),
-                    );
-                  }).toList(),
+                SearchableSelectField<String>(
+                  label: 'Emirate *',
+                  value: _selectedEmirate,
+                  prefixIcon: const Icon(Icons.location_on_outlined, size: 20, color: AppColors.accent),
+                  options: _emirates
+                      .map((em) => SearchableOption<String>(value: em, label: em))
+                      .toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedEmirate = val);
+                    }
+                  },
                 ),
                 const SizedBox(height: AppSpacing.md),
                 LayoutBuilder(

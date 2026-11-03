@@ -13,21 +13,45 @@ class CreateProjectPage extends StatefulWidget {
 
 class _CreateProjectPageState extends State<CreateProjectPage> {
   final _nameController = TextEditingController();
-  final _clientController = TextEditingController();
+  String _selectedClient = '';
+  List<String> _clients = [
+    'Sadia',
+    'L\'Oreal',
+    'Nestle',
+    'Mondelez',
+    'Unilever',
+    'P&G',
+    'IFFCO',
+  ];
   DateTime _startDate = DateTime(2026, 10, 14);
   DateTime _endDate = DateTime(2026, 11, 30);
   bool _isSaving = false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadClients();
+  }
+
+  Future<void> _loadClients() async {
+    final list = await ApiService.getDistinctClients();
+    if (mounted && list.isNotEmpty) {
+      setState(() {
+        final set = {..._clients, ...list};
+        _clients = set.toList()..sort();
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
-    _clientController.dispose();
     super.dispose();
   }
 
   Future<void> _handleSave() async {
     final name = _nameController.text.trim();
-    final client = _clientController.text.trim();
+    final client = _selectedClient.trim();
     if (name.isEmpty || client.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -35,7 +59,7 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.inner)),
           content: Text(
-            'Please enter Campaign Name and Client Name',
+            'Please enter Campaign Name and select Client Brand',
             style: AppText.bodySmall.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ),
@@ -139,10 +163,28 @@ class _CreateProjectPageState extends State<CreateProjectPage> {
                   hint: 'e.g. Sadia In-Store Sampling Q4',
                 ),
                 const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  controller: _clientController,
+                SearchableSelectField<String>(
                   label: 'Client / Brand *',
-                  hint: 'e.g. Sadia, L\'Oreal, Nestle',
+                  value: _selectedClient.isEmpty ? null : _selectedClient,
+                  hintText: 'Select or type brand / client name',
+                  allowCustomValue: true,
+                  prefixIcon: const Icon(Icons.business_rounded, size: 20, color: AppColors.accent),
+                  options: _clients
+                      .map((c) => SearchableOption<String>(value: c, label: c))
+                      .toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedClient = val);
+                    }
+                  },
+                  onCustomValueSubmitted: (val) {
+                    setState(() {
+                      _selectedClient = val;
+                      if (!_clients.contains(val)) {
+                        _clients.insert(0, val);
+                      }
+                    });
+                  },
                 ),
                 const SizedBox(height: AppSpacing.md),
                 LayoutBuilder(

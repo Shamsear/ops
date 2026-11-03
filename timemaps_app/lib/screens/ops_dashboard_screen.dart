@@ -35,6 +35,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   List<LiveStoreHub> _allLiveStores = [];
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  Map<String, int> _weeklyCampaignCounts = {};
 
   final List<String> _emirates = [
     'All',
@@ -71,6 +72,14 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       date: dateStr,
       emirate: 'All', // Always load national data so emirate filtering is instant
     );
+
+    final startStr = DateFormat('yyyy-MM-dd').format(_selectedDate.subtract(const Duration(days: 7)));
+    final endStr = DateFormat('yyyy-MM-dd').format(_selectedDate.add(const Duration(days: 7)));
+    ApiService.getCampaignCountsForRange(startStr, endStr).then((counts) {
+      if (mounted) {
+        setState(() => _weeklyCampaignCounts = counts);
+      }
+    });
 
     if (mounted) {
       setState(() {
@@ -171,6 +180,14 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       return matchStore || matchRetailer || matchSupervisor || matchPromoter;
     }).toList();
 
+    final activeCampaignIds = <int>{};
+    for (final s in filteredStores) {
+      for (final p in s.projects) {
+        activeCampaignIds.add(p.projectId);
+      }
+    }
+    final activeCampaignsCount = activeCampaignIds.length;
+
     return AppScreenScaffold(
       title: 'Command Dashboard',
       subtitle: '$dateDisplay • UAE Operations',
@@ -257,12 +274,15 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                                     maxLines: 1,
                                   ),
                                 ),
-                                const FittedBox(
+                                FittedBox(
                                   fit: BoxFit.scaleDown,
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    'Tap to change date',
-                                    style: AppText.caption,
+                                    '$activeCampaignsCount Active Campaign${activeCampaignsCount == 1 ? '' : 's'} • Tap to change',
+                                    style: AppText.caption.copyWith(
+                                      color: activeCampaignsCount > 0 ? AppColors.accent : AppColors.textMuted,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                     maxLines: 1,
                                   ),
                                 ),
@@ -292,6 +312,10 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
               ],
             ),
           ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // 1b. MyWisdom Horizontal Calendar Date Strip with Campaign Counts
+          _buildCalendarDateStrip(),
           const SizedBox(height: AppSpacing.itemGap),
 
           // 2. KPI Section (2x2 Grid)
@@ -472,6 +496,100 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
               itemBuilder: (ctx, idx) => _buildLiveStoreCard(filteredStores[idx]),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarDateStrip() {
+    final days = List.generate(7, (i) => _selectedDate.add(Duration(days: i - 3)));
+
+    return SizedBox(
+      height: 66,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: days.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final day = days[index];
+          final isSelected = day.year == _selectedDate.year &&
+              day.month == _selectedDate.month &&
+              day.day == _selectedDate.day;
+          final dStr = DateFormat('yyyy-MM-dd').format(day);
+          final count = _weeklyCampaignCounts[dStr] ?? 0;
+          final isToday = DateTime.now().year == day.year &&
+              DateTime.now().month == day.month &&
+              DateTime.now().day == day.day;
+
+          return InkWell(
+            onTap: () {
+              if (!isSelected) {
+                setState(() => _selectedDate = day);
+                _loadDashboardData();
+              }
+            },
+            borderRadius: BorderRadius.circular(AppRadius.inner),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 58,
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary
+                    : (isToday ? AppColors.primarySoft : AppColors.surface),
+                borderRadius: BorderRadius.circular(AppRadius.inner),
+                border: Border.all(
+                  color: isSelected
+                      ? AppColors.primary
+                      : (isToday ? AppColors.accent : AppColors.borderSubtle),
+                  width: isSelected || isToday ? 1.5 : 1.0,
+                ),
+                boxShadow: isSelected ? AppShadows.card : null,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    DateFormat('E').format(day).toUpperCase(),
+                    style: AppText.micro.copyWith(
+                      color: isSelected ? Colors.white70 : AppColors.textMuted,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    '${day.day}',
+                    style: AppText.bodyBold.copyWith(
+                      color: isSelected ? Colors.white : AppColors.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Colors.white.withOpacity(0.2)
+                          : (count > 0 ? AppColors.accentSoft : AppColors.surfaceMuted),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                    ),
+                    child: Text(
+                      count > 0 ? '$count Cmp' : '—',
+                      style: AppText.caption.copyWith(
+                        color: isSelected
+                            ? Colors.white
+                            : (count > 0 ? AppColors.accent : AppColors.textMuted),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

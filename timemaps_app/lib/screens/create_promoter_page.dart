@@ -14,26 +14,43 @@ class _CreatePromoterPageState extends State<CreatePromoterPage> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
-  final _nationalityController = TextEditingController(text: 'Filipino');
-
-  String _gender = 'FEMALE';
-  bool _isSaving = false;
-
-  final List<String> _popularNationalities = [
+  String _selectedNationality = 'Filipino';
+  List<String> _nationalities = [
     'Filipino',
     'Indian',
     'Pakistani',
     'Nepalese',
     'Arabic',
     'African',
+    'Egyptian',
   ];
+
+  String _gender = 'FEMALE';
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNationalities();
+  }
+
+  Future<void> _loadNationalities() async {
+    final list = await ApiService.getDistinctNationalities();
+    if (mounted) {
+      setState(() {
+        _nationalities = list;
+        if (!_nationalities.contains(_selectedNationality)) {
+          _nationalities.insert(0, _selectedNationality);
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
-    _nationalityController.dispose();
     super.dispose();
   }
 
@@ -62,7 +79,7 @@ class _CreatePromoterPageState extends State<CreatePromoterPage> {
       phone: phone,
       email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
       gender: _gender,
-      nationality: _nationalityController.text.trim().isEmpty ? null : _nationalityController.text.trim(),
+      nationality: _selectedNationality.trim().isEmpty ? null : _selectedNationality.trim(),
     );
 
     if (!mounted) return;
@@ -204,23 +221,28 @@ class _CreatePromoterPageState extends State<CreatePromoterPage> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
-                AppTextField(
-                  controller: _nationalityController,
+                SearchableSelectField<String>(
                   label: 'Nationality',
-                  hint: 'Filipino, Indian, etc.',
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: _popularNationalities.map((nat) {
-                    final isSel = _nationalityController.text == nat;
-                    return FilterPill(
-                      label: nat,
-                      isSelected: isSel,
-                      onTap: () => setState(() => _nationalityController.text = nat),
-                    );
-                  }).toList(),
+                  value: _selectedNationality,
+                  hintText: 'Select or type any nationality',
+                  allowCustomValue: true,
+                  prefixIcon: const Icon(Icons.public_rounded, size: 20, color: AppColors.accent),
+                  options: _nationalities
+                      .map((nat) => SearchableOption<String>(value: nat, label: nat))
+                      .toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedNationality = val);
+                    }
+                  },
+                  onCustomValueSubmitted: (val) {
+                    setState(() {
+                      _selectedNationality = val;
+                      if (!_nationalities.contains(val)) {
+                        _nationalities.insert(0, val);
+                      }
+                    });
+                  },
                 ),
               ],
             ),

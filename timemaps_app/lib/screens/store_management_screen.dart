@@ -150,41 +150,37 @@ class _StoreManagementScreenState extends State<StoreManagementScreen> with Auto
                 ),
                 const SizedBox(height: AppSpacing.sm),
 
-                // Horizontal Chain Filters
-                SizedBox(
-                  height: 32,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _availableChains.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 6),
-                    itemBuilder: (ctx, i) {
-                      final chain = _availableChains[i];
-                      return FilterPill(
-                        label: chain,
-                        isSelected: _selectedChain == chain,
-                        onTap: () => setState(() => _selectedChain = chain),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-
-                // Horizontal Emirate Filters
-                SizedBox(
-                  height: 32,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _emirates.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 6),
-                    itemBuilder: (ctx, i) {
-                      final em = _emirates[i];
-                      return FilterPill(
-                        label: em,
-                        isSelected: _selectedEmirate == em,
-                        onTap: () => setState(() => _selectedEmirate = em),
-                      );
-                    },
-                  ),
+                // Compact Dynamic Filter Dropdowns
+                Row(
+                  children: [
+                    Expanded(
+                      child: SearchableSelectField<String>.compact(
+                        label: 'Chain',
+                        value: _selectedChain,
+                        prefixIcon: const Icon(Icons.storefront_outlined, size: 16, color: AppColors.accent),
+                        options: _availableChains
+                            .map((c) => SearchableOption<String>(value: c, label: c))
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _selectedChain = val);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: SearchableSelectField<String>.compact(
+                        label: 'Emirate',
+                        value: _selectedEmirate,
+                        prefixIcon: const Icon(Icons.location_on_outlined, size: 16, color: AppColors.accent),
+                        options: _emirates
+                            .map((em) => SearchableOption<String>(value: em, label: em))
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _selectedEmirate = val);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

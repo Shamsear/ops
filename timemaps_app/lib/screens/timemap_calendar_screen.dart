@@ -32,7 +32,8 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
   String _selectedChain = 'All';
 
   final List<String> _emirates = ['All', 'Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Al Ain', 'Ras Al Khaimah', 'Fujairah'];
-  final List<String> _chains = ['All', 'Lulu', 'Union Coop', 'Carrefour', 'MAIR GROUP', 'MARK AND SAVE'];
+  List<String> _chains = ['All'];
+  Map<String, int> _matrixCampaignCounts = {};
 
   @override
   void initState() {
@@ -69,14 +70,22 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
 
   Future<void> _loadMatrixData() async {
     try {
-      final data = await ApiService.getMatrix(
+      final chainsFuture = ApiService.getDistinctChains();
+      final matrixFuture = ApiService.getMatrix(
         emirate: _selectedEmirate == 'All' ? null : _selectedEmirate,
         chain: _selectedChain == 'All' ? null : _selectedChain,
       );
 
+      final results = await Future.wait([chainsFuture, matrixFuture]);
+      final distinctChains = results[0] as List<String>;
+      final data = results[1] as Map<String, dynamic>;
+
       final rawStores = (data['stores'] as List<dynamic>?) ?? [];
       final rawShifts = (data['shifts'] as List<dynamic>?) ?? [];
+      final counts = (data['campaign_counts'] as Map<dynamic, dynamic>?) ?? {};
 
+      _chains = ['All', ...distinctChains];
+      _matrixCampaignCounts = counts.map((k, v) => MapEntry(k.toString(), v as int));
       _matrixStores = rawStores.map((s) => StoreModel.fromJson(s as Map<String, dynamic>)).toList();
       _matrixShifts = rawShifts;
 
@@ -212,6 +221,13 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
       );
     }
 
+    final activeCampaigns = <String>{};
+    for (final s in _schedules) {
+      for (final p in (s as LiveStoreHub).projects) {
+        activeCampaigns.add(p.projectName);
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -221,7 +237,7 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
           microLabel: 'Active Shift Queue',
           title: 'Store Deployment Timeline',
           trailing: StatusBadge(
-            label: '${_schedules.length} Stores',
+            label: '${activeCampaigns.length} Campaigns • ${_schedules.length} Stores',
             variant: StatusVariant.info,
           ),
         ),
@@ -352,46 +368,36 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Filter Controls
+        // Filter Controls: Dynamic Database Dropdowns
         AppCard.compact(
-          child: Column(
+          child: Row(
             children: [
-              SizedBox(
-                height: 32,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _chains.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 6),
-                  itemBuilder: (ctx, i) {
-                    final chain = _chains[i];
-                    return FilterPill(
-                      label: chain,
-                      isSelected: _selectedChain == chain,
-                      onTap: () {
-                        setState(() => _selectedChain = chain);
-                        _loadMatrixData();
-                      },
-                    );
+              Expanded(
+                child: SearchableSelectField<String>.compact(
+                  label: 'Chain',
+                  value: _selectedChain,
+                  prefixIcon: const Icon(Icons.storefront_outlined, size: 16, color: AppColors.accent),
+                  options: _chains.map((c) => SearchableOption<String>(value: c, label: c)).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedChain = val);
+                      _loadMatrixData();
+                    }
                   },
                 ),
               ),
-              const SizedBox(height: AppSpacing.sm),
-              SizedBox(
-                height: 32,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _emirates.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 6),
-                  itemBuilder: (ctx, i) {
-                    final em = _emirates[i];
-                    return FilterPill(
-                      label: em,
-                      isSelected: _selectedEmirate == em,
-                      onTap: () {
-                        setState(() => _selectedEmirate = em);
-                        _loadMatrixData();
-                      },
-                    );
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: SearchableSelectField<String>.compact(
+                  label: 'Emirate',
+                  value: _selectedEmirate,
+                  prefixIcon: const Icon(Icons.location_on_outlined, size: 16, color: AppColors.accent),
+                  options: _emirates.map((e) => SearchableOption<String>(value: e, label: e)).toList(),
+                  onChanged: (val) {
+                    if (val != null) {
+                      setState(() => _selectedEmirate = val);
+                      _loadMatrixData();
+                    }
                   },
                 ),
               ),
@@ -414,12 +420,36 @@ class _TimeMapCalendarScreenState extends State<TimeMapCalendarScreen>
                   label: Text('STORE VENUE', style: AppText.micro),
                 ),
                 ..._matrixDates.map(
-                  (d) => DataColumn(
-                    label: Text(
-                      d.substring(5),
-                      style: AppText.micro,
-                    ),
-                  ),
+                  (d) {
+                    final cmpCount = _matrixCampaignCounts[d] ?? 0;
+                    return DataColumn(
+                      label: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            d.length >= 5 ? d.substring(5) : d,
+                            style: AppText.micro.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: 2),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: cmpCount > 0 ? AppColors.accentSoft : AppColors.surfaceMuted,
+                              borderRadius: BorderRadius.circular(AppRadius.pill),
+                            ),
+                            child: Text(
+                              cmpCount > 0 ? '$cmpCount Cmp' : '—',
+                              style: AppText.caption.copyWith(
+                                color: cmpCount > 0 ? AppColors.accent : AppColors.textMuted,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
               rows: _matrixStores.map((store) {

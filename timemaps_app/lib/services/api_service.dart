@@ -933,13 +933,122 @@ class ApiService {
       final shiftsRes = await http.get(Uri.parse(shiftsUrl), headers: headers);
       final List<dynamic> shifts = shiftsRes.statusCode == 200 ? jsonDecode(shiftsRes.body) : [];
 
+      final Map<String, Set<int>> dateCampaigns = {};
+      for (final s in shifts) {
+        final dRaw = s['shift_date'];
+        if (dRaw == null) continue;
+        final dStr = DateTime.parse(dRaw.toString()).toIso8601String().split('T')[0];
+        final pId = s['project_id'] as int? ?? 0;
+        if (pId > 0) {
+          dateCampaigns.putIfAbsent(dStr, () => <int>{}).add(pId);
+        }
+      }
+      final Map<String, int> campaignCounts = {
+        for (final entry in dateCampaigns.entries) entry.key: entry.value.length,
+      };
+
       return {
         'stores': stores,
         'shifts': shifts,
+        'campaign_counts': campaignCounts,
       };
     } catch (e) {
       print('Get matrix error: $e');
-      return {'stores': [], 'shifts': []};
+      return {'stores': [], 'shifts': [], 'campaign_counts': <String, int>{}};
+    }
+  }
+
+  // ==============================================
+  // 11. DYNAMIC AGGREGATIONS & OPTION PROVIDERS
+  // ==============================================
+  static Future<List<String>> getDistinctChains() async {
+    try {
+      final stores = await getStores();
+      final chains = <String>{};
+      for (final s in stores) {
+        if (s.chain != null && s.chain!.trim().isNotEmpty) {
+          chains.add(s.chain!.trim());
+        }
+        if (s.retailer.trim().isNotEmpty) {
+          chains.add(s.retailer.trim());
+        }
+      }
+      final list = chains.toList()..sort();
+      return list;
+    } catch (e) {
+      return ['Lulu Hypermarket', 'Carrefour', 'Union Coop', 'Spinneys', 'Nesto'];
+    }
+  }
+
+  static Future<List<String>> getDistinctNationalities() async {
+    final baseline = <String>[
+      'Filipino',
+      'Indian',
+      'Pakistani',
+      'Nepalese',
+      'Egyptian',
+      'Arabic',
+      'Jordanian',
+      'Syrian',
+      'Lebanese',
+      'African',
+      'Nigerian',
+      'Kenyan',
+      'Ghanaian',
+      'Sri Lankan',
+      'Bangladeshi',
+      'Emirati',
+      'British',
+    ];
+    try {
+      final promoters = await getPromoters();
+      final set = baseline.toSet();
+      for (final p in promoters) {
+        if (p.nationality != null && p.nationality!.trim().isNotEmpty) {
+          set.add(p.nationality!.trim());
+        }
+      }
+      final list = set.toList()..sort();
+      return list;
+    } catch (e) {
+      return baseline;
+    }
+  }
+
+  static Future<List<String>> getDistinctClients() async {
+    try {
+      final projects = await getProjects();
+      final set = <String>{};
+      for (final p in projects) {
+        if (p.clientName.trim().isNotEmpty) {
+          set.add(p.clientName.trim());
+        }
+      }
+      final list = set.toList()..sort();
+      return list;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<Map<String, int>> getCampaignCountsForRange(String startDate, String endDate) async {
+    try {
+      final url = '$baseUrl/timemap_schedules?shift_date=gte.$startDate&shift_date=lte.$endDate&select=shift_date,project_id';
+      final res = await http.get(Uri.parse(url), headers: headers);
+      if (res.statusCode != 200) return {};
+      final List<dynamic> list = jsonDecode(res.body);
+      final Map<String, Set<int>> map = {};
+      for (final item in list) {
+        final d = item['shift_date']?.toString();
+        final p = item['project_id'] as int?;
+        if (d != null && p != null && p > 0) {
+          final dStr = d.split('T')[0];
+          map.putIfAbsent(dStr, () => <int>{}).add(p);
+        }
+      }
+      return map.map((k, v) => MapEntry(k, v.length));
+    } catch (e) {
+      return {};
     }
   }
 

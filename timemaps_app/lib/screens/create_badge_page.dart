@@ -279,30 +279,26 @@ class _CreateBadgePageState extends State<CreateBadgePage> {
                           title: 'Staff Identity & Activation',
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Autocomplete<String>(
-                          initialValue: TextEditingValue(text: _promoterNameController.text),
-                          optionsBuilder: (textEditingValue) {
-                            if (textEditingValue.text.isEmpty) {
-                              return const Iterable<String>.empty();
+                        SearchableSelectField<String>(
+                          label: 'Promoter Full Name *',
+                          value: _promoterNameController.text.isEmpty ? null : _promoterNameController.text,
+                          hintText: 'Select or type promoter name',
+                          allowCustomValue: true,
+                          prefixIcon: const Icon(Icons.person_outline_rounded, size: 20, color: AppColors.primary),
+                          options: _promoters
+                              .map((p) => SearchableOption<String>(
+                                    value: p.name,
+                                    label: p.name,
+                                    subtitle: '${p.phone} • ${p.nationality ?? "Staff"}',
+                                  ))
+                              .toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => _promoterNameController.text = val);
                             }
-                            return _promoters
-                                .map((p) => p.name)
-                                .where((name) =>
-                                    name.toLowerCase().contains(textEditingValue.text.toLowerCase()));
                           },
-                          onSelected: (selection) {
-                            _promoterNameController.text = selection;
-                          },
-                          fieldViewBuilder: (ctx, controller, focusNode, onFieldSubmitted) {
-                            controller.addListener(() {
-                              _promoterNameController.text = controller.text;
-                            });
-                            return AppTextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              label: 'Promoter Full Name *',
-                              hint: 'Type promoter name (e.g. Sony Mathew)',
-                            );
+                          onCustomValueSubmitted: (val) {
+                            setState(() => _promoterNameController.text = val);
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
@@ -357,21 +353,18 @@ class _CreateBadgePageState extends State<CreateBadgePage> {
                           },
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'EMIRATE *',
-                          style: AppText.micro.copyWith(color: AppColors.textMuted),
-                        ),
-                        const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: _emirates.map((em) {
-                            return FilterPill(
-                              label: em,
-                              isSelected: _selectedEmirate == em,
-                              onTap: () => setState(() => _selectedEmirate = em),
-                            );
-                          }).toList(),
+                        SearchableSelectField<String>(
+                          label: 'Emirate *',
+                          value: _selectedEmirate,
+                          prefixIcon: const Icon(Icons.location_on_outlined, size: 20, color: AppColors.accent),
+                          options: _emirates
+                              .map((em) => SearchableOption<String>(value: em, label: em))
+                              .toList(),
+                          onChanged: (em) {
+                            if (em != null) {
+                              setState(() => _selectedEmirate = em);
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -390,21 +383,18 @@ class _CreateBadgePageState extends State<CreateBadgePage> {
                           title: 'Clearance Status & Pass No.',
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'INITIAL CLEARANCE STATUS *',
-                          style: AppText.micro.copyWith(color: AppColors.textMuted),
-                        ),
-                        const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: _statusOptions.map((st) {
-                            return FilterPill(
-                              label: st,
-                              isSelected: _selectedStatus == st,
-                              onTap: () => setState(() => _selectedStatus = st),
-                            );
-                          }).toList(),
+                        SearchableSelectField<String>(
+                          label: 'Initial Clearance Status *',
+                          value: _selectedStatus,
+                          prefixIcon: const Icon(Icons.check_circle_outline_rounded, size: 20, color: AppColors.success),
+                          options: _statusOptions
+                              .map((st) => SearchableOption<String>(value: st, label: st))
+                              .toList(),
+                          onChanged: (st) {
+                            if (st != null) {
+                              setState(() => _selectedStatus = st);
+                            }
+                          },
                         ),
                         const SizedBox(height: AppSpacing.md),
                         LayoutBuilder(
