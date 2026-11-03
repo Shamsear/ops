@@ -36,6 +36,9 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   Map<String, int> _weeklyCampaignCounts = {};
+  late final ScrollController _dateStripController;
+  late DateTime _anchorDate;
+  late List<DateTime> _stripDays;
 
   final List<String> _emirates = [
     'All',
@@ -53,14 +56,57 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
     super.initState();
     _currentNavIndex = widget.initialTab;
     _pageController = PageController(initialPage: _currentNavIndex);
+    _dateStripController = ScrollController();
+    _anchorDate = _selectedDate;
+    _stripDays = List.generate(61, (i) => _anchorDate.add(Duration(days: i - 30)));
     _loadDashboardData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToSelectedDate(animate: false);
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _searchController.dispose();
+    _dateStripController.dispose();
     super.dispose();
+  }
+
+  void _ensureSelectedDateInStrip() {
+    final contains = _stripDays.any((d) =>
+        d.year == _selectedDate.year &&
+        d.month == _selectedDate.month &&
+        d.day == _selectedDate.day);
+    if (!contains) {
+      _anchorDate = _selectedDate;
+      _stripDays = List.generate(61, (i) => _anchorDate.add(Duration(days: i - 30)));
+    }
+  }
+
+  void _scrollToSelectedDate({bool animate = true}) {
+    if (!_dateStripController.hasClients) return;
+    final index = _stripDays.indexWhere((d) =>
+        d.year == _selectedDate.year &&
+        d.month == _selectedDate.month &&
+        d.day == _selectedDate.day);
+    if (index == -1) return;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemOffset = index * 66.0;
+    final targetOffset = itemOffset - (screenWidth / 2) + 29.0;
+    final maxScroll = _dateStripController.position.maxScrollExtent;
+    final clamped = targetOffset.clamp(0.0, maxScroll);
+
+    if (animate) {
+      _dateStripController.animateTo(
+        clamped,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+      );
+    } else {
+      _dateStripController.jumpTo(clamped);
+    }
   }
 
   Future<void> _loadDashboardData({bool isUserPull = false}) async {
@@ -73,8 +119,8 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
       emirate: 'All', // Always load national data so emirate filtering is instant
     );
 
-    final startStr = DateFormat('yyyy-MM-dd').format(_selectedDate.subtract(const Duration(days: 7)));
-    final endStr = DateFormat('yyyy-MM-dd').format(_selectedDate.add(const Duration(days: 7)));
+    final startStr = DateFormat('yyyy-MM-dd').format(_stripDays.first);
+    final endStr = DateFormat('yyyy-MM-dd').format(_stripDays.last);
     ApiService.getCampaignCountsForRange(startStr, endStr).then((counts) {
       if (mounted) {
         setState(() => _weeklyCampaignCounts = counts);
@@ -230,8 +276,10 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                   onPressed: () {
                     setState(() {
                       _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                      _ensureSelectedDateInStrip();
                     });
                     _loadDashboardData();
+                    _scrollToSelectedDate(animate: true);
                   },
                 ),
                 Expanded(
@@ -244,8 +292,12 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                         lastDate: DateTime(2030),
                       );
                       if (picked != null) {
-                        setState(() => _selectedDate = picked);
+                        setState(() {
+                          _selectedDate = picked;
+                          _ensureSelectedDateInStrip();
+                        });
                         _loadDashboardData();
+                        _scrollToSelectedDate(animate: true);
                       }
                     },
                     borderRadius: BorderRadius.circular(AppRadius.inner),
@@ -305,8 +357,10 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
                   onPressed: () {
                     setState(() {
                       _selectedDate = _selectedDate.add(const Duration(days: 1));
+                      _ensureSelectedDateInStrip();
                     });
                     _loadDashboardData();
+                    _scrollToSelectedDate(animate: true);
                   },
                 ),
               ],
@@ -501,17 +555,16 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
   }
 
   Widget _buildCalendarDateStrip() {
-    final days = List.generate(7, (i) => _selectedDate.add(Duration(days: i - 3)));
-
     return SizedBox(
       height: 66,
       child: ListView.separated(
+        controller: _dateStripController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        itemCount: days.length,
+        itemCount: _stripDays.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final day = days[index];
+          final day = _stripDays[index];
           final isSelected = day.year == _selectedDate.year &&
               day.month == _selectedDate.month &&
               day.day == _selectedDate.day;
@@ -526,6 +579,7 @@ class _OpsDashboardScreenState extends State<OpsDashboardScreen> {
               if (!isSelected) {
                 setState(() => _selectedDate = day);
                 _loadDashboardData();
+                _scrollToSelectedDate(animate: true);
               }
             },
             borderRadius: BorderRadius.circular(AppRadius.inner),
